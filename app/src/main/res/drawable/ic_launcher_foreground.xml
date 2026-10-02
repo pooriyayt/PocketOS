@@ -1,0 +1,17 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="108dp" android:height="108dp" android:viewportWidth="108" android:viewportHeight="108">
+    <!-- Glass card -->
+    <path android:pathData="M44,32h20a12,12 0 0 1 12,12v20a12,12 0 0 1 -12,12h-20a12,12 0 0 1 -12,-12v-20a12,12 0 0 1 12,-12z">
+        <aapt:attr name="android:fillColor">
+            <gradient android:type="linear" android:startX="32" android:startY="32" android:endX="76" android:endY="76"
+                android:startColor="#FF34D399" android:endColor="#FF059669" />
+        </aapt:attr>
+    </path>
+    <!-- Top sheen -->
+    <path android:fillColor="#33FFFFFF" android:pathData="M44,33h20a11,11 0 0 1 11,11v2h-42v-2a11,11 0 0 1 11,-11z" />
+    <!-- Pocket -->
+    <path android:fillColor="#F2FFFFFF" android:pathData="M42,47h24v8a12,12 0 0 1 -24,0z" />
+    <!-- Spark -->
+    <path android:fillColor="#FFFFFFFF" android:pathData="M66,37m-3,0a3,3 0 1 0 6,0a3,3 0 1 0 -6,0" />
+</vector>

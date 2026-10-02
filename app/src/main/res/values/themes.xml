@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.PocketOS" parent="Theme.AppCompat.DayNight.NoActionBar">
+        <item name="android:windowBackground">@color/pocket_background</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="colorPrimary">@color/pocket_accent</item>
+        <item name="colorAccent">@color/pocket_accent</item>
+    </style>
+
+    <style name="Theme.PocketOS.Splash" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/pocket_background</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_splash</item>
+        <item name="postSplashScreenTheme">@style/Theme.PocketOS</item>
+    </style>
+</resources>

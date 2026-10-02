@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="pocket_background">#090E0B</color>
+    <color name="pocket_accent">#10B981</color>
+</resources>

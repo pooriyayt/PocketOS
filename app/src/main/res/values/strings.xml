@@ -1,0 +1,890 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name" translatable="false">PocketOS</string>
+
+    <!-- Navigation -->
+    <string name="nav_home">Home</string>
+    <string name="nav_reminders">Reminders</string>
+    <string name="nav_subscriptions">Subscriptions</string>
+    <string name="nav_insights">Insights</string>
+    <string name="nav_settings">Settings</string>
+    <string name="back">Back</string>
+    <string name="search">Search</string>
+    <string name="quick_add">Quick add</string>
+    <string name="calendar">Calendar</string>
+    <string name="account_and_settings">Account and settings</string>
+
+    <!-- Generic actions -->
+    <string name="add">Add</string>
+    <string name="save">Save</string>
+    <string name="cancel">Cancel</string>
+    <string name="done">Done</string>
+    <string name="edit">Edit</string>
+    <string name="delete">Delete</string>
+    <string name="duplicate">Duplicate</string>
+    <string name="undo">Undo</string>
+    <string name="retry">Try again</string>
+    <string name="dismiss">Dismiss</string>
+    <string name="next">Next</string>
+    <string name="skip">Skip</string>
+    <string name="more">More</string>
+    <string name="more_actions">More actions</string>
+    <string name="more_options">More options</string>
+    <string name="change">Change</string>
+    <string name="create">Create</string>
+    <string name="allow">Allow</string>
+    <string name="see_all">See all</string>
+    <string name="not_now">Not now</string>
+    <string name="continue_label">Continue</string>
+    <string name="increase">Increase</string>
+    <string name="decrease">Decrease</string>
+    <string name="move_up">Move up</string>
+    <string name="move_down">Move down</string>
+    <string name="sort">Sort</string>
+    <string name="sort_by">Sort by</string>
+    <string name="sort_renewal">Next renewal</string>
+    <string name="sort_name">Name</string>
+    <string name="sort_amount">Monthly cost</string>
+    <string name="archive">Archive</string>
+    <string name="pause">Pause</string>
+    <string name="resume">Resume</string>
+    <string name="mark_cancelled">Mark as cancelled</string>
+    <string name="complete">Complete</string>
+    <string name="mark_not_done">Mark as not done</string>
+    <string name="snooze">Snooze</string>
+    <string name="reschedule">Reschedule</string>
+    <string name="change_date">Change date</string>
+    <string name="change_category">Change category</string>
+    <string name="duplicated">Duplicated</string>
+    <string name="changes_saved">Changes saved</string>
+
+    <!-- Time & dates -->
+    <string name="today">Today</string>
+    <string name="tomorrow">Tomorrow</string>
+    <string name="yesterday">Yesterday</string>
+    <string name="next_week">Next week</string>
+    <string name="no_date">No date</string>
+    <string name="pick_date">Pick a date</string>
+    <string name="pick_time">Pick a time</string>
+    <string name="date">Date</string>
+    <string name="time">Time</string>
+    <string name="all_day">All day</string>
+    <string name="when_label">When</string>
+    <string name="previous_month">Previous month</string>
+    <string name="next_month">Next month</string>
+    <plurals name="in_days">
+        <item quantity="one">in %d day</item>
+        <item quantity="other">in %d days</item>
+    </plurals>
+    <plurals name="days_ago">
+        <item quantity="one">%d day ago</item>
+        <item quantity="other">%d days ago</item>
+    </plurals>
+    <string-array name="jalali_months">
+        <item>Farvardin</item>
+        <item>Ordibehesht</item>
+        <item>Khordad</item>
+        <item>Tir</item>
+        <item>Mordad</item>
+        <item>Shahrivar</item>
+        <item>Mehr</item>
+        <item>Aban</item>
+        <item>Azar</item>
+        <item>Dey</item>
+        <item>Bahman</item>
+        <item>Esfand</item>
+    </string-array>
+
+    <!-- Greeting & home -->
+    <string name="greeting_morning">Good morning</string>
+    <string name="greeting_afternoon">Good afternoon</string>
+    <string name="greeting_evening">Good evening</string>
+    <string name="greeting_night">Good night</string>
+    <plurals name="summary_things">
+        <item quantity="one">You have %d thing that needs you.</item>
+        <item quantity="other">You have %d things coming up.</item>
+    </plurals>
+    <string name="summary_clear">Nothing needs your attention right now.</string>
+    <string name="summary_empty">Your digital life, in one calm place.</string>
+    <string name="section_attention">Needs attention</string>
+    <string name="section_today">Today at a glance</string>
+    <string name="section_coming_up">Coming up</string>
+    <string name="section_renewals">Upcoming renewals</string>
+    <string name="section_suggestions">For you</string>
+    <string name="section_quick_actions">Quick actions</string>
+    <string name="view_schedule">Schedule</string>
+    <string name="customize_home">Customize home</string>
+    <string name="stat_due_today">Due today</string>
+    <string name="stat_overdue">Overdue</string>
+    <string name="stat_done">Done today</string>
+    <string name="stat_payments_7d">Payments in 7 days</string>
+    <string name="qa_reminder">Reminder</string>
+    <string name="qa_subscription">Subscription</string>
+    <string name="qa_payment">Payment</string>
+    <string name="qa_task">Task</string>
+    <string name="qa_schedule">Schedule</string>
+    <string name="first_run_title">Let\'s set up your first item</string>
+    <string name="first_run_message">Type it the way you\'d say it. These are just examples - tap one to try it.</string>
+    <string name="add_first_item">Add something</string>
+    <string name="empty_attention_title">You\'re all caught up</string>
+    <string name="empty_attention_message">Nothing needs your attention today.</string>
+
+    <!-- Suggestions (always based on your own data) -->
+    <plurals name="suggestion_renewals_month">
+        <item quantity="one">%d subscription renews this month.</item>
+        <item quantity="other">%d subscriptions renew this month.</item>
+    </plurals>
+    <plurals name="suggestion_annual_soon">
+        <item quantity="one">%1$d annual renewal is coming up, starting %2$s.</item>
+        <item quantity="other">%1$d annual renewals are coming up, starting %2$s.</item>
+    </plurals>
+    <plurals name="suggestion_new_subs">
+        <item quantity="one">You added %1$d subscription this month (about %2$s a month).</item>
+        <item quantity="other">You added %1$d subscriptions this month (about %2$s a month).</item>
+    </plurals>
+    <plurals name="suggestion_overdue">
+        <item quantity="one">%d item is overdue. Want to review it?</item>
+        <item quantity="other">%d items are overdue. Want to review them?</item>
+    </plurals>
+    <string name="suggestion_trial_ending">Your %1$s free trial ends %2$s.</string>
+    <string name="suggestion_stale">You haven\'t touched “%1$s” in %2$s days.</string>
+
+    <!-- Examples (temporary hints only; never saved automatically) -->
+    <string name="example_netflix">Netflix 15 dollars every month</string>
+    <string name="example_call_mom">Call Mom tomorrow at 7 PM</string>
+    <string name="example_domain">Renew my domain every year on November 20</string>
+    <string name="example_internet">Internet 450000 toman every 30 days</string>
+    <string name="example_hosting">Pay hosting on October 15</string>
+
+    <!-- Quick add -->
+    <string name="quick_add_title">Tell PocketOS what you need</string>
+    <string name="quick_add_subtitle">Reminders, tasks or subscriptions - in your own words.</string>
+    <string name="quick_add_placeholder">e.g. Spotify 10.99 euros monthly</string>
+    <string name="try_saying">Try saying</string>
+    <string name="or_fill_form">Prefer a form?</string>
+    <string name="understood_as">I understood this as</string>
+    <string name="open_full_form">Open the full form</string>
+    <string name="assumed_tap_to_change">Assumed - tap to change</string>
+    <string name="currency_assumed">Currency assumed - tap to change</string>
+    <string name="suggested">Suggested</string>
+    <string name="add_a_title">Add a title</string>
+    <string name="title">Title</string>
+    <string name="name">Name</string>
+    <string name="service">Service</string>
+    <string name="frequency">Frequency</string>
+    <string name="kind_reminder">Reminder</string>
+    <string name="kind_task">Task</string>
+    <string name="kind_subscription">Subscription</string>
+    <string name="reminder_added">Reminder added</string>
+    <string name="task_added">Task added</string>
+    <string name="subscription_added">Subscription added</string>
+
+    <!-- Reminders -->
+    <string name="filter_today">Today</string>
+    <string name="filter_upcoming">Upcoming</string>
+    <string name="filter_all">All</string>
+    <string name="filter_done">Done</string>
+    <string name="filter_active">Active</string>
+    <string name="filter_inactive">Inactive</string>
+    <string name="all_categories">All</string>
+    <string name="new_reminder">New reminder</string>
+    <string name="new_task">New task</string>
+    <string name="edit_reminder">Edit reminder</string>
+    <string name="reminder_details">Reminder</string>
+    <string name="reminder_title_hint">What should we remind you about?</string>
+    <string name="task_title_hint">What needs to be done?</string>
+    <string name="notes_hint">Notes (optional)</string>
+    <string name="notes">Notes</string>
+    <string name="error_title_required">Give it a short title.</string>
+    <string name="repeat">Repeat</string>
+    <string name="repeats">Repeats</string>
+    <string name="repeat_never">Never</string>
+    <string name="repeat_daily">Every day</string>
+    <string name="repeat_weekdays">Weekdays</string>
+    <string name="repeat_weekly">Every week</string>
+    <string name="repeat_weekly_on">Every week on %1$s</string>
+    <string name="repeat_monthly">Every month</string>
+    <string name="repeat_yearly">Every year</string>
+    <string name="repeat_custom">Custom</string>
+    <plurals name="repeat_every_days">
+        <item quantity="one">Every %d day</item>
+        <item quantity="other">Every %d days</item>
+    </plurals>
+    <plurals name="repeat_every_weeks">
+        <item quantity="one">Every %d week</item>
+        <item quantity="other">Every %d weeks</item>
+    </plurals>
+    <plurals name="repeat_every_weeks_on">
+        <item quantity="one">Every %1$d week on %2$s</item>
+        <item quantity="other">Every %1$d weeks on %2$s</item>
+    </plurals>
+    <plurals name="repeat_every_months">
+        <item quantity="one">Every %d month</item>
+        <item quantity="other">Every %d months</item>
+    </plurals>
+    <plurals name="repeat_every_years">
+        <item quantity="one">Every %d year</item>
+        <item quantity="other">Every %d years</item>
+    </plurals>
+    <string name="on_days">On</string>
+    <string name="every">Every</string>
+    <string name="unit_days">Days</string>
+    <string name="unit_weeks">Weeks</string>
+    <string name="unit_months">Months</string>
+    <string name="unit_years">Years</string>
+    <string name="notify_me">Notify me</string>
+    <string name="lead_at_time">At the time</string>
+    <plurals name="lead_minutes">
+        <item quantity="one">%d minute before</item>
+        <item quantity="other">%d minutes before</item>
+    </plurals>
+    <plurals name="lead_hours">
+        <item quantity="one">%d hour before</item>
+        <item quantity="other">%d hours before</item>
+    </plurals>
+    <plurals name="lead_days">
+        <item quantity="one">%d day before</item>
+        <item quantity="other">%d days before</item>
+    </plurals>
+    <string name="category">Category</string>
+    <string name="choose_category">Choose a category</string>
+    <string name="new_category">New category</string>
+    <string name="new_category_name">Category name</string>
+    <string name="priority">Priority</string>
+    <string name="priority_low">Low</string>
+    <string name="priority_normal">Normal</string>
+    <string name="priority_high">High</string>
+    <string name="notification_sound">Notification sound</string>
+    <string name="sound_default">Default</string>
+    <string name="sound_custom">Custom sound</string>
+    <string name="sound_device_only">Sounds are stored on this device only and are not synced.</string>
+    <string name="overdue">Overdue</string>
+    <string name="snoozed_until">Snoozed until %1$s</string>
+    <string name="state_completed">Completed</string>
+    <string name="state_not_completed">Not completed</string>
+    <string name="completed">Completed</string>
+    <string name="completed_next">Done. Next: %1$s</string>
+    <plurals name="snoozed_for_minutes">
+        <item quantity="one">Snoozed for %d minute</item>
+        <item quantity="other">Snoozed for %d minutes</item>
+    </plurals>
+    <plurals name="snooze_minutes">
+        <item quantity="one">%d minute</item>
+        <item quantity="other">%d minutes</item>
+    </plurals>
+    <plurals name="snooze_hours">
+        <item quantity="one">%d hour</item>
+        <item quantity="other">%d hours</item>
+    </plurals>
+    <string name="snooze_tomorrow">Until tomorrow</string>
+    <string name="rescheduled_to">Moved to %1$s</string>
+    <string name="deleted_item">Deleted “%1$s”</string>
+    <string name="delete_reminder_title">Delete this reminder?</string>
+    <string name="delete_reminder_message">“%1$s” will be removed from all your devices.</string>
+    <string name="history">History</string>
+    <string name="event_created">Created</string>
+    <string name="event_completed">Completed</string>
+    <string name="event_snoozed">Snoozed</string>
+    <string name="event_rescheduled">Rescheduled</string>
+    <string name="event_uncompleted">Marked not done</string>
+    <string name="not_found_title">This item is no longer here</string>
+    <string name="not_found_reminder">It may have been deleted on another device.</string>
+    <string name="not_found_subscription">It may have been deleted on another device.</string>
+    <string name="empty_reminders_title">Nothing to remember yet</string>
+    <string name="empty_reminders_message">Add a reminder and PocketOS will nudge you at the right moment.</string>
+    <string name="empty_upcoming_title">A clear road ahead</string>
+    <string name="empty_upcoming_message">There\'s nothing scheduled after today.</string>
+    <string name="empty_done_title">No finished items yet</string>
+    <string name="empty_done_message">Completed reminders and tasks will appear here.</string>
+    <string name="notifications_off_title">Notifications are off</string>
+    <string name="notifications_off_message">Allow notifications so your reminders can reach you.</string>
+    <string name="exact_alarm_title">Allow precise reminder timing</string>
+    <string name="exact_alarm_message">Without it, Android may deliver reminders a few minutes late to save battery.</string>
+
+    <!-- Subscriptions -->
+    <string name="new_subscription">New subscription</string>
+    <string name="edit_subscription">Edit subscription</string>
+    <string name="add_subscription">Add subscription</string>
+    <string name="step_what_title">What are you paying for?</string>
+    <string name="step_what_subtitle">Search for a service or type your own.</string>
+    <string name="step_amount_title">How much?</string>
+    <string name="step_amount_subtitle">Enter the amount you\'re charged each time.</string>
+    <string name="step_renewal_title">When does it renew?</string>
+    <string name="step_renewal_subtitle">We\'ll remind you before it renews.</string>
+    <string name="service_search_hint">Netflix, Spotify, hosting…</string>
+    <string name="recent_and_frequent">Recent and frequent</string>
+    <string name="browse_categories">Browse by category</string>
+    <string name="use_custom_service">Use “%1$s”</string>
+    <string name="amount">Amount</string>
+    <string name="amount_hint">0.00</string>
+    <string name="amount_unknown">Not set</string>
+    <string name="amount_optional_note">Optional - leave empty if it varies.</string>
+    <string name="error_amount_invalid">Enter a valid amount.</string>
+    <string name="error_name_required">Give it a name.</string>
+    <string name="error_url_invalid">Enter a web address starting with https://</string>
+    <string name="currency">Currency</string>
+    <string name="currency_no_conversion">Amounts always stay in the currency you choose. PocketOS never converts between currencies.</string>
+    <string name="billing_cycle">Billing cycle</string>
+    <string name="billing_daily">Daily</string>
+    <string name="billing_weekly">Weekly</string>
+    <string name="billing_monthly">Monthly</string>
+    <string name="billing_yearly">Yearly</string>
+    <plurals name="billing_every_days">
+        <item quantity="one">Every %d day</item>
+        <item quantity="other">Every %d days</item>
+    </plurals>
+    <plurals name="billing_every_weeks">
+        <item quantity="one">Every %d week</item>
+        <item quantity="other">Every %d weeks</item>
+    </plurals>
+    <plurals name="billing_every_months">
+        <item quantity="one">Every %d month</item>
+        <item quantity="other">Every %d months</item>
+    </plurals>
+    <plurals name="billing_every_years">
+        <item quantity="one">Every %d year</item>
+        <item quantity="other">Every %d years</item>
+    </plurals>
+    <string name="per_day_short">/day</string>
+    <string name="per_week_short">/wk</string>
+    <string name="per_month_short">/mo</string>
+    <string name="per_year_short">/yr</string>
+    <string name="per_month_short_label">per month</string>
+    <string name="next_renewal">Next renewal</string>
+    <string name="next_renewals">Next renewals</string>
+    <string name="renews">Renews</string>
+    <string name="renewal">Renewal</string>
+    <string name="renews_on">Renews %1$s</string>
+    <string name="renews_relative">Renews %1$s</string>
+    <string name="trial_ends_relative">Trial ends %1$s</string>
+    <string name="remind_me">Remind me</string>
+    <string name="on_the_day">On the day</string>
+    <plurals name="days_before">
+        <item quantity="one">%d day before</item>
+        <item quantity="other">%d days before</item>
+    </plurals>
+    <string name="reminders_off">No reminders</string>
+    <string name="reminders_off_note">You won\'t get a notification before this renews.</string>
+    <string name="start_date">Start date</string>
+    <string name="started_on">Started %1$s</string>
+    <string name="free_trial">Free trial</string>
+    <string name="trial_ends_on">Trial ends %1$s</string>
+    <string name="remove_trial">Remove trial</string>
+    <string name="cancellation_url">Cancellation page (optional)</string>
+    <string name="open_cancellation_page">Open cancellation page</string>
+    <string name="status">Status</string>
+    <string name="status_active">Active</string>
+    <string name="status_paused">Paused</string>
+    <string name="status_cancelled">Cancelled</string>
+    <string name="status_expired">Expired</string>
+    <string name="subscription_paused">%1$s paused</string>
+    <string name="subscription_cancelled">%1$s marked as cancelled</string>
+    <string name="subscription_resumed">%1$s is active again</string>
+    <string name="subscription_expired">%1$s marked as expired</string>
+    <string name="delete_subscription_title">Delete this subscription?</string>
+    <string name="delete_subscription_message">“%1$s” and its reminders will be removed from all your devices.</string>
+    <string name="estimated_monthly">Estimated monthly</string>
+    <string name="estimate_note">Estimated from billing frequency, not actual payments.</string>
+    <string name="per_year_value">%1$s / year</string>
+    <string name="per_month_estimate">Per month (est.)</string>
+    <string name="per_year_estimate">Per year (est.)</string>
+    <plurals name="active_subscriptions">
+        <item quantity="one">%d active</item>
+        <item quantity="other">%d active</item>
+    </plurals>
+    <string name="empty_subscriptions_title">No subscriptions yet</string>
+    <string name="empty_subscriptions_message">Keep your recurring payments in one place and never miss a renewal.</string>
+    <string name="empty_filter_title">Nothing here</string>
+    <string name="empty_filter_message">Try a different filter.</string>
+
+    <!-- Categories -->
+    <string name="cat_personal">Personal</string>
+    <string name="cat_work">Work</string>
+    <string name="cat_health">Health &amp; Fitness</string>
+    <string name="cat_finance">Finance</string>
+    <string name="cat_home">Home</string>
+    <string name="cat_shopping">Shopping</string>
+    <string name="cat_learning">Learning</string>
+    <string name="cat_other">Other</string>
+    <string name="cat_entertainment">Entertainment</string>
+    <string name="cat_music">Music &amp; Audio</string>
+    <string name="cat_ai">AI Tools</string>
+    <string name="cat_productivity">Productivity</string>
+    <string name="cat_developer">Developer Tools</string>
+    <string name="cat_hosting">Hosting &amp; Infrastructure</string>
+    <string name="cat_domains">Domains</string>
+    <string name="cat_cloud_storage">Cloud Storage</string>
+    <string name="cat_design">Design</string>
+    <string name="cat_communication">Communication</string>
+    <string name="cat_security">Security &amp; VPN</string>
+    <string name="cat_gaming">Gaming</string>
+    <string name="cat_news">News &amp; Reading</string>
+    <string name="cat_education">Education</string>
+    <string name="cat_utilities">Utilities</string>
+    <string name="cat_transport">Transport</string>
+
+    <!-- Insights -->
+    <string name="insights_subtitle">Calculated from your own data, on your device.</string>
+    <string name="recurring_costs">Recurring costs</string>
+    <string name="estimates_disclaimer">Estimates based on billing frequency. Different currencies are never added together.</string>
+    <string name="by_category">By category</string>
+    <string name="donut_description">Monthly estimate in %1$s by category: %2$s</string>
+    <string name="upcoming_payments_30">Upcoming payments · 30 days</string>
+    <string name="renewal_calendar">Renewal calendar</string>
+    <string name="completion_trend">Completion trend</string>
+    <string name="completed_this_week">completed this week</string>
+    <string name="trend_description">Completed items per week for the last 8 weeks. This week %1$d, last week %2$d.</string>
+    <string name="trend_none">Complete a few reminders to see your trend.</string>
+    <string name="trend_up">Last week: %1$d</string>
+    <string name="trend_down">Last week: %1$d</string>
+    <string name="recently_completed">Recently completed</string>
+    <string name="completed_on">Completed %1$s</string>
+    <string name="empty_insights_title">Insights grow with your data</string>
+    <string name="empty_insights_message">Add a subscription or complete a few reminders to see real trends here.</string>
+    <plurals name="count_short">
+        <item quantity="one">%d</item>
+        <item quantity="other">%d</item>
+    </plurals>
+
+    <!-- Calendar -->
+    <string name="legend_reminders">Reminders</string>
+    <string name="legend_tasks">Tasks</string>
+    <string name="legend_renewals">Renewals</string>
+    <string name="empty_day_title">Nothing scheduled</string>
+    <string name="empty_day_message">Enjoy the free time.</string>
+    <plurals name="items_count">
+        <item quantity="one">%d item</item>
+        <item quantity="other">%d items</item>
+    </plurals>
+
+    <!-- Search -->
+    <string name="search_hint">Search reminders, subscriptions, services…</string>
+    <string name="search_empty_title">Find anything</string>
+    <string name="search_empty_message">Try “spot”, “music” or “domain”.</string>
+    <string name="search_no_results_title">No matches</string>
+    <string name="search_no_results_message">Nothing matched “%1$s”.</string>
+    <string name="group_reminders">Reminders</string>
+    <string name="group_tasks">Tasks</string>
+    <string name="group_subscriptions">Subscriptions</string>
+    <string name="group_services">Services</string>
+    <string name="group_categories">Categories</string>
+
+    <!-- Onboarding -->
+    <string name="onboarding_1_title">Your digital life, organized.</string>
+    <string name="onboarding_1_body">Reminders, tasks and subscriptions in one calm, private place.</string>
+    <string name="onboarding_2_title">Never miss a renewal.</string>
+    <string name="onboarding_2_body">PocketOS recognises your services and reminds you before money leaves your account.</string>
+    <string name="onboarding_3_title">Keep everything in one place.</string>
+    <string name="onboarding_3_body">Works offline. Sync across devices only if you want to.</string>
+    <string name="onboarding_ready_title">Ready when you are</string>
+    <string name="onboarding_ready_body">Start right away on this device. You can create an account later.</string>
+    <string name="what_should_we_call_you">What should we call you?</string>
+    <string name="your_name_optional">Your name (optional)</string>
+    <string name="continue_without_account">Continue without account</string>
+    <string name="create_account">Create account</string>
+    <string name="get_started">Get started</string>
+    <string name="onboarding_privacy_line">Your data stays on this device unless you turn on sync.</string>
+
+    <!-- Lock -->
+    <string name="pocketos_locked">PocketOS is locked</string>
+    <string name="enter_pin">Enter your PIN</string>
+    <string name="unlock">Unlock</string>
+    <string name="unlock_pocketos">Unlock PocketOS</string>
+    <string name="biometric_subtitle">Confirm it\'s you</string>
+    <string name="use_pin">Use PIN</string>
+    <string name="use_biometrics">Use biometrics</string>
+    <string name="forgot_pin">Forgot PIN?</string>
+    <string name="pin_wrong">That PIN isn\'t right.</string>
+    <string name="pin_locked_out">Too many attempts. Please wait a moment.</string>
+    <plurals name="try_again_in_seconds">
+        <item quantity="one">Too many attempts. Try again in %d second.</item>
+        <item quantity="other">Too many attempts. Try again in %d seconds.</item>
+    </plurals>
+    <string name="delete_digit">Delete digit</string>
+    <string name="biometric_changed">Your biometrics changed. Unlock with your PIN, then turn biometric unlock on again.</string>
+    <string name="recover_with_password">Signed in as %1$s. Enter your account password to reset the app lock.</string>
+    <string name="verify_and_reset_pin">Verify and reset PIN</string>
+    <string name="error_wrong_password_or_offline">Couldn\'t verify. Check the password and your connection.</string>
+    <string name="erase_explanation">As a last resort you can erase PocketOS data on this device. Synced data stays in your account.</string>
+    <string name="erase_device_data">Erase data on this device</string>
+    <string name="erase_confirm_title">Erase everything on this device?</string>
+    <string name="erase_confirm_message">Reminders and subscriptions stored only on this device will be permanently deleted. This can\'t be undone.</string>
+    <string name="erase">Erase</string>
+
+    <!-- Account -->
+    <string name="sign_in">Sign in</string>
+    <string name="sign_in_subtitle">Sign in to sync PocketOS across your devices.</string>
+    <string name="register_subtitle">An account lets you back up and sync. PocketOS works fine without one.</string>
+    <string name="verify_email">Verify your e-mail</string>
+    <string name="verify_subtitle">We sent a 6-digit code to %1$s. It may take a minute to arrive.</string>
+    <string name="forgot_subtitle">Enter your e-mail and we\'ll send you a reset code.</string>
+    <string name="reset_subtitle">Enter the code we sent to %1$s and choose a new password.</string>
+    <string name="reset_password">Reset password</string>
+    <string name="email">E-mail</string>
+    <string name="password">Password</string>
+    <string name="new_password">New password</string>
+    <string name="current_password">Current password</string>
+    <string name="six_digit_code">6-digit code</string>
+    <string name="show_password">Show password</string>
+    <string name="hide_password">Hide password</string>
+    <string name="forgot_password">Forgot password?</string>
+    <string name="have_account_sign_in">Already have an account? Sign in</string>
+    <string name="verify">Verify</string>
+    <string name="resend_code">Resend code</string>
+    <plurals name="resend_in">
+        <item quantity="one">Resend in %ds</item>
+        <item quantity="other">Resend in %ds</item>
+    </plurals>
+    <string name="code_sent">If an account is waiting, a new code is on its way.</string>
+    <string name="send_code">Send code</string>
+    <string name="back_to_sign_in">Back to sign in</string>
+    <string name="password_reset_done">Password changed. Sign in with your new password.</string>
+    <string name="password_rules">Use at least 10 characters. A short phrase works well.</string>
+    <string name="password_too_short">Too short</string>
+    <string name="password_ok">Okay</string>
+    <string name="password_strong">Strong</string>
+    <string name="account_benefits">Your password is never stored on this device, and never sent by e-mail.</string>
+    <string name="signed_in_welcome">You\'re signed in. Syncing your data…</string>
+    <string name="move_local_title">Bring your data along?</string>
+    <plurals name="move_local_message">
+        <item quantity="one">You have %d item saved on this device. Add it to your account so it syncs?</item>
+        <item quantity="other">You have %d items saved on this device. Add them to your account so they sync?</item>
+    </plurals>
+    <string name="move_to_account">Add to account</string>
+    <string name="keep_separate">Keep on device</string>
+    <string name="server_not_configured_title">Sync isn\'t set up in this build</string>
+    <string name="server_not_configured_message">This version of PocketOS isn\'t connected to a server yet. Everything still works on this device.</string>
+    <string name="session_expired_title">You\'ve been signed out</string>
+    <string name="session_expired_message">Your data is safe on this device. Sign in again to resume syncing.</string>
+    <string name="sign_in_again">Sign in again to resume syncing</string>
+    <string name="profile">Profile</string>
+    <string name="display_name">Display name</string>
+    <string name="email_verified">Verified</string>
+    <string name="email_not_verified">Not verified</string>
+    <string name="change_password">Change password</string>
+    <string name="change_password_note">Other devices will be signed out.</string>
+    <string name="password_changed">Password changed</string>
+    <string name="devices">Devices</string>
+    <string name="devices_footer">Sign out a lost or old device to stop it syncing.</string>
+    <string name="signed_in_devices">Signed-in devices</string>
+    <string name="this_device">This device</string>
+    <string name="unknown_device">Unknown device</string>
+    <string name="sign_out_device">Sign out this device?</string>
+    <string name="sign_out">Sign out</string>
+    <string name="sign_out_title">Sign out of PocketOS?</string>
+    <string name="sign_out_message">Your synced data stays in your account and is removed from this device.</string>
+    <plurals name="sign_out_pending">
+        <item quantity="one">%d change hasn\'t synced yet. We\'ll try to sync it first; if that fails it will be lost.</item>
+        <item quantity="other">%d changes haven\'t synced yet. We\'ll try to sync them first; if that fails they will be lost.</item>
+    </plurals>
+    <string name="sign_out_everywhere">Sign out everywhere</string>
+    <string name="sign_out_everywhere_message">Every device, including this one, will be signed out.</string>
+    <string name="delete_account">Delete account</string>
+    <string name="delete_account_message">This permanently deletes your account and all synced data. Enter your password and type DELETE to confirm.</string>
+    <string name="delete_account_footer">Deleting your account removes all data from our server. Export it first if you want a copy.</string>
+    <string name="delete_permanently">Delete permanently</string>
+    <string name="type_delete">Type DELETE</string>
+    <string name="type_delete_hint">Type DELETE in capital letters to confirm.</string>
+    <string name="account_deleted">Your account was deleted.</string>
+
+    <!-- Errors (human, never technical) -->
+    <string name="error_generic_title">Something went wrong</string>
+    <string name="error_generic_message">Your data is still safe. Please try again.</string>
+    <string name="error_offline_title">You\'re offline</string>
+    <string name="error_offline_message">Your changes are saved on this device and will sync when you\'re back online.</string>
+    <string name="error_offline_short">No connection. Check your internet and try again.</string>
+    <string name="error_server_message">Our server is having trouble. Your data is safe - please try again later.</string>
+    <string name="error_rate_limited">Too many attempts. Please wait a few minutes.</string>
+    <string name="error_mail_unavailable">We can\'t send e-mails right now. Please try again later.</string>
+    <string name="error_invalid_credentials">Incorrect e-mail or password. If you just signed up, verify your e-mail first.</string>
+    <string name="error_invalid_code">That code is invalid or expired. Request a new one.</string>
+    <string name="error_email_taken">An account with this e-mail already exists. Try signing in.</string>
+    <string name="error_email_invalid">Enter a valid e-mail address.</string>
+    <string name="error_wrong_password">The password is incorrect.</string>
+    <string name="error_check_fields">Please check the highlighted details.</string>
+
+    <!-- Settings -->
+    <string name="settings_account">Account</string>
+    <string name="sign_in_to_sync">Sign in to sync</string>
+    <string name="sign_in_to_sync_subtitle">Optional. Back up and use PocketOS on several devices.</string>
+    <string name="settings_general">General</string>
+    <string name="settings_security">Security &amp; app lock</string>
+    <string name="app_lock_on">App lock is on</string>
+    <string name="app_lock_off">App lock is off</string>
+    <string name="settings_appearance">Appearance</string>
+    <string name="settings_appearance_subtitle">Theme, accent, glass and motion</string>
+    <string name="settings_language">Language</string>
+    <string name="language_system">System default</string>
+    <string name="language_english">English</string>
+    <string name="language_persian">فارسی</string>
+    <string name="settings_notifications">Notifications</string>
+    <string name="settings_notifications_subtitle">Timing, snooze and privacy</string>
+    <string name="settings_widgets_privacy">Widgets &amp; privacy</string>
+    <string name="settings_widgets_privacy_subtitle">What widgets and notifications may show</string>
+    <string name="settings_data">Data</string>
+    <string name="settings_sync">Sync</string>
+    <string name="sync_on_subtitle">Syncing with your account</string>
+    <string name="sync_off_subtitle">Not syncing - data stays on this device</string>
+    <string name="settings_export_delete">Export &amp; delete</string>
+    <string name="settings_export_delete_subtitle">Download your data or remove it</string>
+    <string name="settings_ads_privacy">Advertising &amp; privacy</string>
+    <string name="settings_ads_privacy_subtitle">Consent and privacy notice</string>
+    <string name="settings_about_group">About</string>
+    <string name="about_pocketos">About PocketOS</string>
+    <string name="version_value">Version %1$s</string>
+
+    <string name="app_lock">App lock</string>
+    <string name="app_lock_footer">The lock protects access on this device. It doesn\'t replace your account password. Reminders still notify while the app is locked.</string>
+    <string name="require_pin">Require PIN</string>
+    <string name="require_pin_subtitle">Ask for a PIN when opening PocketOS</string>
+    <string name="unlock_with_biometrics">Unlock with biometrics</string>
+    <string name="biometrics_available">Fingerprint, face or your screen lock</string>
+    <string name="biometrics_none_enrolled">Set up a fingerprint or face in Android settings first</string>
+    <string name="biometrics_unavailable">Not available on this device</string>
+    <string name="enable_biometrics_title">Confirm to turn on biometric unlock</string>
+    <string name="change_pin">Change PIN</string>
+    <string name="lock_now">Lock now</string>
+    <string name="relock_after">Lock again after leaving the app</string>
+    <string name="relock_immediately">Immediately</string>
+    <string name="relock_30s">30 seconds</string>
+    <string name="relock_1m">1 minute</string>
+    <string name="relock_5m">5 minutes</string>
+    <string name="relock_15m">15 minutes</string>
+    <string name="privacy_screen">Privacy screen</string>
+    <string name="hide_in_recents">Hide in recent apps</string>
+    <string name="hide_in_recents_subtitle">Blocks screenshots and blanks the app preview</string>
+    <string name="biometric_scope_note">Biometric unlock only protects access to PocketOS on this device. It is not used to sign in to your account, and your fingerprint or face data never leaves Android.</string>
+    <string name="set_pin">Choose a PIN</string>
+    <string name="pin_rules">Use 4 to 12 digits.</string>
+    <string name="pin_mismatch">The PINs don\'t match.</string>
+    <string name="new_pin">New PIN</string>
+    <string name="confirm_pin">Confirm PIN</string>
+    <string name="enter_current_pin">Enter your current PIN</string>
+    <string name="app_lock_enabled_message">App lock is on</string>
+
+    <string name="theme">Theme</string>
+    <string name="theme_system">System</string>
+    <string name="theme_light">Light</string>
+    <string name="theme_dark">Dark</string>
+    <string name="accent_color">Accent colour</string>
+    <string name="accent_violet">Violet</string>
+    <string name="accent_indigo">Indigo</string>
+    <string name="accent_blue">Blue</string>
+    <string name="accent_teal">Teal</string>
+    <string name="accent_rose">Rose</string>
+    <string name="accent_amber">Amber</string>
+    <string name="dynamic_color">Use wallpaper colours</string>
+    <string name="dynamic_color_subtitle">Tints accents from your wallpaper; PocketOS keeps its look</string>
+    <string name="glass_effect">Glass effect</string>
+    <string name="glass_subtle">Subtle</string>
+    <string name="glass_balanced">Balanced</string>
+    <string name="glass_vivid">Vivid</string>
+    <string name="glass_hint">Floating bars use real background blur on this device.</string>
+    <string name="glass_hint_no_blur">This Android version can\'t blur backgrounds, so glass surfaces use a tinted fallback.</string>
+    <string name="motion">Motion</string>
+    <string name="motion_system">System</string>
+    <string name="motion_reduced">Reduced</string>
+    <string name="motion_full">Full</string>
+    <string name="haptics">Haptic feedback</string>
+    <string name="haptics_on">On</string>
+    <string name="haptics_reduced">Essential</string>
+    <string name="haptics_off">Off</string>
+    <string name="haptics_hint">Also follows Android\'s touch feedback setting.</string>
+    <string name="calendar_system">Calendar</string>
+    <string name="calendar_auto">Automatic</string>
+    <string name="calendar_gregorian">Gregorian</string>
+    <string name="calendar_solar_hijri">Solar Hijri</string>
+
+    <string name="permissions">Permissions</string>
+    <string name="notifications">Notifications</string>
+    <string name="allowed">Allowed</string>
+    <string name="not_allowed">Not allowed - tap to fix</string>
+    <string name="precise_timing">Precise timing</string>
+    <string name="precise_timing_on">Reminders arrive on time</string>
+    <string name="precise_timing_off">Off - reminders may arrive a few minutes late</string>
+    <string name="exact_alarm_footer">Android limits background activity to save battery. With precise timing allowed, reminders use exact alarms; otherwise Android may delay them. Some manufacturers add further restrictions.</string>
+    <string name="defaults">Defaults</string>
+    <string name="default_reminder_time">Default reminder time</string>
+    <string name="renewal_reminder_time">Renewal reminder time</string>
+    <string name="snooze_duration">Snooze duration</string>
+    <string name="privacy">Privacy</string>
+    <string name="show_sensitive_in_notifications">Show sensitive information in notifications</string>
+    <string name="show_sensitive_subtitle">Include amounts in renewal notifications</string>
+    <string name="notification_privacy_footer">On the lock screen, notifications only show a generic message until you unlock.</string>
+    <string name="system_notification_settings">Android notification settings</string>
+
+    <string name="widgets">Widgets</string>
+    <string name="widgets_footer">Widgets are visible to anyone who sees your home screen. Android limits how often widgets can refresh.</string>
+    <string name="widget_hide_amounts">Hide amounts on widgets</string>
+    <string name="widget_hide_titles">Hide titles on widgets</string>
+    <string name="personalized_ads">Personalized ads</string>
+    <string name="personalized_ads_subtitle">Off by default. PocketOS never shares your reminders or subscriptions with advertisers.</string>
+    <string name="ads_footer">Ads, if shown, appear only in secondary areas - never on the lock screen, in sign-in, or while you create or complete items.</string>
+    <string name="ads_footer_disabled">This build shows no ads and contains no advertising SDK.</string>
+    <string name="privacy_notice">Privacy notice</string>
+
+    <string name="sync_status">Sync</string>
+    <string name="last_synced">Last synced %1$s</string>
+    <string name="never_synced">Not synced yet</string>
+    <plurals name="pending_changes">
+        <item quantity="one">%d change waiting to sync</item>
+        <item quantity="other">%d changes waiting to sync</item>
+    </plurals>
+    <string name="sync_problem">Sync is paused</string>
+    <string name="sync_now">Sync now</string>
+    <string name="options">Options</string>
+    <string name="background_sync">Background sync</string>
+    <string name="background_sync_subtitle">Sync automatically when online</string>
+    <string name="wifi_only">Sync on Wi-Fi only</string>
+    <string name="sync_local_explanation">Without an account, everything stays on this device. Signing in is optional.</string>
+    <string name="sync_policy_explanation">If the same item is changed on two devices, the most recent edit wins and older edits never overwrite newer ones. Deletions sync too.</string>
+    <string name="sync_synced">Synced</string>
+    <string name="sync_syncing">Syncing…</string>
+    <string name="sync_waiting">Waiting for connection</string>
+    <string name="sync_paused">Sync paused</string>
+    <string name="sync_signed_out">Signed out</string>
+
+    <string name="export">Export</string>
+    <string name="export_footer">Exports are JSON files you save wherever you choose. PocketOS needs no storage permission.</string>
+    <string name="export_device_data">Export data on this device</string>
+    <string name="export_device_data_subtitle">Works offline</string>
+    <string name="export_account_data">Export account data</string>
+    <string name="export_account_data_subtitle">Everything stored on the server</string>
+    <string name="export_done">Export saved</string>
+    <string name="erase_local_footer">Erasing removes reminders and subscriptions from this device permanently.</string>
+
+    <string name="about_body">PocketOS keeps reminders, tasks and subscriptions in one private place. It works offline, syncs only if you choose, and never sells your data.</string>
+    <string name="legal">Legal</string>
+    <string name="brand_icons">Brand icons</string>
+    <string name="brand_icons_notice">From Simple Icons %1$s (CC0). Brand names and logos belong to their owners and are used only to identify services.</string>
+    <string name="open_source_notice">Built with Android Jetpack, Kotlin, OkHttp, Retrofit, SQLCipher and Haze - all open-source software under their respective licenses.</string>
+
+    <!-- Privacy notice -->
+    <string name="pn_intro">PocketOS collects only what it needs to work. Here is exactly what happens with your information.</string>
+    <string name="pn_local_title">Stored on your device</string>
+    <string name="pn_local_body">Reminders, tasks, subscriptions, categories, your settings and a short local history of completed reminders. The database is encrypted with a key protected by Android Keystore. Notification sounds and app-lock settings never leave the device.</string>
+    <string name="pn_server_title">Uploaded to the server (only with an account)</string>
+    <string name="pn_server_body">Your e-mail, a password hash (never the password), your display name, and the reminders, subscriptions, custom categories and synced preferences you create. Sign-in sessions record the device name and app version. Security logs store a one-way hash of your IP address, never the address itself.</string>
+    <string name="pn_sync_title">How sync works</string>
+    <string name="pn_sync_body">Changes are saved on the device first and uploaded over HTTPS when you are online. Each device downloads only what changed. Without an account, nothing is uploaded.</string>
+    <string name="pn_export_title">Export and deletion</string>
+    <string name="pn_export_body">Export your device or account data at any time from Settings → Export &amp; delete. Deleting your account permanently removes it and all synced data from the server. Signing out removes account data from this device.</string>
+    <string name="pn_notifications_title">Notifications and widgets</string>
+    <string name="pn_notifications_body">Notifications show reminder titles once your phone is unlocked; the lock screen only shows a generic message. Amounts appear only if you allow it. Widgets show titles but hide amounts by default; you can hide both.</string>
+    <string name="pn_disable_title">Turning sync off</string>
+    <string name="pn_disable_body">Sign out, or turn off background sync, in Settings → Sync. PocketOS keeps working fully offline.</string>
+    <string name="pn_security_title">Encryption</string>
+    <string name="pn_security_body">Data is encrypted in transit (HTTPS) and at rest on your device. Data on the server is protected by the server\'s security; PocketOS does not use end-to-end encryption.</string>
+    <string name="pn_ads_title">Advertising</string>
+    <string name="pn_ads_body">This version contains no advertising SDK. If ads are added in future, personalized ads stay off unless you agree, and your reminders and subscriptions are never shared.</string>
+
+    <!-- Notifications -->
+    <string name="channel_reminders">Reminders</string>
+    <string name="channel_reminders_desc">Reminders and tasks at the time you set</string>
+    <string name="channel_reminders_custom_sound">Reminders (custom sound)</string>
+    <string name="channel_renewals">Renewals</string>
+    <string name="channel_renewals_desc">Upcoming subscription renewals and trial endings</string>
+    <string name="notif_reminder_public_title">PocketOS reminder</string>
+    <string name="notif_renewal_public_title">Upcoming renewal</string>
+    <string name="notif_unlock_to_view">Unlock to see details</string>
+    <string name="notif_reminder_due">It\'s time</string>
+    <string name="notif_renews_today_title">%1$s renews today</string>
+    <string name="notif_renews_tomorrow_title">%1$s renews tomorrow</string>
+    <plurals name="notif_renews_in_days_title">
+        <item quantity="one">%1$s renews in %2$d day</item>
+        <item quantity="other">%1$s renews in %2$d days</item>
+    </plurals>
+    <string name="notif_trial_ending_title">Your %1$s trial ends soon</string>
+    <string name="notif_renewal_amount">Expected charge: %1$s</string>
+    <string name="notif_renewal_generic">Tap to review or cancel in time.</string>
+    <string name="action_complete">Complete</string>
+    <string name="action_snooze_minutes">Snooze %1$d min</string>
+    <string name="action_view">View</string>
+    <string name="action_remind_later">Remind me later</string>
+
+    <!-- Widgets -->
+    <string name="widget_today_name">Today</string>
+    <string name="widget_today_desc">Today\'s overview and next reminder</string>
+    <string name="widget_upcoming_name">Upcoming reminders</string>
+    <string name="widget_upcoming_desc">Your next reminders</string>
+    <string name="widget_renewal_name">Next renewal</string>
+    <string name="widget_renewal_desc">Countdown to your next subscription renewal</string>
+    <string name="widget_quick_name">Quick actions</string>
+    <string name="widget_quick_desc">Add reminders and subscriptions in one tap</string>
+    <string name="widget_all_clear">All clear today</string>
+    <plurals name="widget_due_today">
+        <item quantity="one">%d due today</item>
+        <item quantity="other">%d due today</item>
+    </plurals>
+    <plurals name="widget_overdue">
+        <item quantity="one">%d overdue</item>
+        <item quantity="other">%d overdue</item>
+    </plurals>
+    <string name="widget_next">Next</string>
+    <string name="widget_upcoming">Upcoming</string>
+    <string name="widget_no_upcoming">Nothing coming up</string>
+    <string name="widget_next_renewal">Next renewal</string>
+    <string name="widget_no_renewals">No upcoming renewals</string>
+    <string name="widget_open_app">Open PocketOS to refresh</string>
+    <string name="widget_hidden_title">Private item</string>
+
+    <!-- Local-First Backup & Updates -->
+    <string name="settings_backup_title">Backup &amp; Data</string>
+    <string name="backup_encrypted_action">Create encrypted backup (.pocketos)</string>
+    <string name="backup_encrypted_desc">Encrypted with AES-256-GCM using your password</string>
+    <string name="backup_plain_action">Export plain JSON</string>
+    <string name="backup_plain_desc">Unencrypted readable data export</string>
+    <string name="restore_action">Restore from backup</string>
+    <string name="restore_desc">Import a .pocketos or .json file</string>
+    <string name="password_prompt_title">Enter backup password</string>
+    <string name="password_prompt_message">Set a strong password to protect your backup file.</string>
+    <string name="password_restore_message">Enter the password used when creating this backup.</string>
+    <string name="password_hint">Password</string>
+    <string name="backup_success">Backup saved successfully</string>
+    <string name="restore_success">Restored %1$d reminders and %2$d subscriptions</string>
+    <string name="restore_failed">Could not restore backup. Incorrect password or invalid format.</string>
+    <string name="check_for_updates">Check for updates</string>
+    <string name="check_for_updates_desc">Check GitHub Releases for new PocketOS versions</string>
+    <string name="privacy_first_tagline">100% on-device, encrypted database, no accounts</string>
+    <string name="github_repository">GitHub Repository</string>
+
+    <!-- In-App Updates -->
+    <string name="update_available_title">Update Available</string>
+    <string name="update_changelog_title">What\'s New</string>
+    <string name="update_later">Later</string>
+    <string name="update_now">Download &amp; Update</string>
+    <string name="downloading_update">Downloading Update</string>
+    <string name="update_ready_title">Update Ready</string>
+    <string name="update_ready_subtitle">The new version has been downloaded and verified.</string>
+    <string name="install_update">Install</string>
+    <string name="update_check_failed">Could not check for updates</string>
+    <string name="up_to_date_title">You\'re Up to Date</string>
+    <string name="up_to_date_message">PocketOS is running the latest version.</string>
+    <string name="ok">OK</string>
+
+    <!-- Onboarding Strings -->
+    <string name="privacy_badge">Privacy-First</string>
+    <string name="onboarding_lang_title">Choose Language</string>
+    <string name="onboarding_lang_subtitle">PocketOS supports English and فارسی natively.</string>
+    <string name="follow_system_lang">Follow system language</string>
+    <string name="onboarding_theme_title">Appearance &amp; Theme</string>
+    <string name="onboarding_theme_subtitle">Choose your preferred display style.</string>
+    <string name="theme_dark_subtitle">Deep dark emerald with glass accents</string>
+    <string name="theme_light_subtitle">Clean light mint with crisp emerald</string>
+    <string name="theme_system_subtitle">Matches your device system setting</string>
+    <string name="onboarding_focus_title">What brings you to PocketOS?</string>
+    <string name="onboarding_focus_subtitle">We\'ll tailor your daily dashboard to what matters most.</string>
+    <string name="focus_reminders">Reminders</string>
+    <string name="focus_reminders_sub">Timely alarms &amp; notifications</string>
+    <string name="focus_tasks">Tasks</string>
+    <string name="focus_tasks_sub">Checklists &amp; daily to-dos</string>
+    <string name="focus_subs">Subscriptions</string>
+    <string name="focus_subs_sub">Renewal alerts &amp; free trials</string>
+    <string name="focus_expenses">Expenses</string>
+    <string name="focus_expenses_sub">Recurring spending forecasts</string>
+    <string name="focus_organization">Personal Organization</string>
+    <string name="focus_organization_sub">Calendar &amp; daily timeline</string>
+    <string name="focus_all">All-in-One</string>
+    <string name="focus_all_sub">Full dashboard with all features</string>
+    <string name="onboarding_privacy_promise">Your data stays on your device. PocketOS stores everything locally in an encrypted database with zero cloud accounts or tracking.</string>
+</resources>

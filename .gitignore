@@ -1,0 +1,46 @@
+# Built application files
+*.apk
+*.aar
+*.aab
+
+# Gradle files
+.gradle/
+build/
+**/build/
+.kotlin/
+
+# Local configuration
+local.properties
+.env
+.env.*
+*.local
+
+# Keystores & Signing
+*.keystore
+*.jks
+*.p12
+*.pem
+*.key
+signing.properties
+
+# IDE & Editor files
+.idea/
+*.iml
+.vscode/
+*.swp
+*.swo
+*~
+
+# Android Studio / OS
+captures/
+.externalNativeBuild/
+.cxx/
+Thumbs.db
+ehthumbs.db
+[Dd]esktop.ini
+$RECYCLE.BIN/
+.DS_Store
+
+# Test reports and outputs
+**/build/reports/
+**/build/test-results/

@@ -1,0 +1,147 @@
+package app.pocketos.ui.design
+
+import android.os.Build
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsFocusedAsState
+import androidx.compose.foundation.interaction.collectIsPressedAsState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.staticCompositionLocalOf
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.graphics.drawOutline
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
+import app.pocketos.data.prefs.GlassIntensity
+import app.pocketos.ui.theme.LocalPocketColors
+import dev.chrisbanes.haze.HazeInput
+import dev.chrisbanes.haze.HazeState
+import dev.chrisbanes.haze.blur.HazeBlurStyle
+import dev.chrisbanes.haze.blur.HazeColorEffect
+import dev.chrisbanes.haze.blur.hazeBlur
+
+/**
+ * Glass material levels.
+ *  - L1: subtle translucent surface for grouping (no blur, no shadow).
+ *  - L2: elevated interactive card (translucent over the ambient background).
+ *  - L3: floating chrome / modal surfaces (real backdrop blur on Android 12+).
+ */
+enum class GlassLevel(val tintDark: Float, val tintLight: Float, val blurRadius: Dp, val shadow: Dp) {
+    L1(0.38f, 0.52f, 0.dp, 0.dp),
+    L2(0.58f, 0.72f, 0.dp, 8.dp),
+    L3(0.62f, 0.70f, 26.dp, 20.dp),
+}
+
+@Immutable
+class GlassSettings(val intensity: GlassIntensity, val reducedMotion: Boolean) {
+    /** Backdrop blur requires RenderEffect (Android 12+). */
+    val blurSupported: Boolean = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
+
+    fun tintAlpha(level: GlassLevel, dark: Boolean): Float {
+        val base = if (dark) level.tintDark else level.tintLight
+        val adjust = when (intensity) {
+            GlassIntensity.SUBTLE -> 0.16f // more opaque, calmer
+            GlassIntensity.BALANCED -> 0f
+            GlassIntensity.VIVID -> -0.10f
+        }
+        return (base + adjust).coerceIn(0.2f, 0.96f)
+    }
+
+    fun blurScale(): Float = when (intensity) {
+        GlassIntensity.SUBTLE -> 0.7f
+        GlassIntensity.BALANCED -> 1f
+        GlassIntensity.VIVID -> 1.3f
+    }
+}
+
+val LocalGlassSettings = staticCompositionLocalOf { GlassSettings(GlassIntensity.BALANCED, false) }
+
+/** Source of backdrop content for blurred chrome (navigation bar, toolbars, FAB). */
+val LocalHazeState = staticCompositionLocalOf<HazeState?> { null }
+
+/**
+ * Applies a glass material: tint (or real backdrop blur), top sheen, hairline
+ * gradient border and, in the light theme, a soft tinted shadow.
+ */
+@Composable
+fun Modifier.glass(
+    level: GlassLevel,
+    shape: Shape,
+    blur: Boolean = level == GlassLevel.L3,
+    tint: Color? = null,
+    borderWidth: Dp = 1.dp,
+): Modifier {
+    val colors = LocalPocketColors.current
+    val settings = LocalGlassSettings.current
+    val haze = LocalHazeState.current
+    val baseTint = tint ?: colors.glassTint
+    val alpha = settings.tintAlpha(level, colors.isDark)
+    val useBlur = blur && haze != null && settings.blurSupported && level.blurRadius > 0.dp
+
+    var m = this
+    if (!colors.isDark && level.shadow > 0.dp) {
+        m = m.shadow(level.shadow, shape, clip = false, ambientColor = colors.glassShadow.copy(alpha = 0.10f), spotColor = colors.glassShadow.copy(alpha = 0.16f))
+    }
+    m = m.clip(shape)
+    m = if (useBlur) {
+        val style = HazeBlurStyle {
+            blurRadius(level.blurRadius * settings.blurScale())
+            backgroundColor(colors.background)
+            colorEffects(listOf(HazeColorEffect.tint(baseTint.copy(alpha = alpha * 0.82f))))
+            noiseFactor(if (colors.isDark) 0.04f else 0.02f)
+        }
+        m.hazeBlur(HazeInput.Sources(haze!!), style)
+    } else {
+        // Without real blur, compensate with a more opaque tint so text stays legible.
+        val fallback = if (blur) (alpha + 0.22f).coerceAtMost(0.97f) else alpha
+        m.background(baseTint.copy(alpha = fallback))
+    }
+    val sheen = Brush.verticalGradient(
+        0f to colors.glassHighlight.copy(alpha = if (colors.isDark) 0.08f else 0.35f),
+        0.45f to Color.Transparent,
+    )
+    val border = Brush.linearGradient(
+        listOf(colors.glassBorder.copy(alpha = colors.glassBorder.alpha * 1.6f), colors.glassBorder.copy(alpha = colors.glassBorder.alpha * 0.35f)),
+    )
+    return m.background(sheen).border(BorderStroke(borderWidth, border), shape)
+}
+
+/**
+ * Physical press response shared by every tappable glass element: a subtle
+ * scale-down, a brightness lift shaped to the element, and a visible focus
+ * ring for keyboard / switch-access users.
+ */
+@Composable
+fun Modifier.pressFeedback(interactionSource: MutableInteractionSource, shape: Shape, enabled: Boolean = true): Modifier {
+    val motion = LocalMotion.current
+    val colors = LocalPocketColors.current
+    val pressed by interactionSource.collectIsPressedAsState()
+    val focused by interactionSource.collectIsFocusedAsState()
+    val scale by animateFloatAsState(if (pressed && enabled) motion.pressedScale else 1f, motion.press(), label = "pressScale")
+    val lift by animateFloatAsState(if (pressed && enabled) 1f else 0f, motion.press(), label = "pressLift")
+    val focusRing = colors.accentSoft
+    val highlight = if (colors.isDark) Color.White else colors.accent
+    return this
+        .graphicsLayer {
+            scaleX = scale
+            scaleY = scale
+        }
+        .drawWithContent {
+            drawContent()
+            val outline = shape.createOutline(size, layoutDirection, this)
+            if (lift > 0f) drawOutline(outline, highlight.copy(alpha = 0.07f * lift))
+            if (focused) drawOutline(outline, focusRing, style = Stroke(width = 2.dp.toPx()))
+        }
+}

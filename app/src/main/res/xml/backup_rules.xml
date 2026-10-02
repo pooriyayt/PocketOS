@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Android 11 and lower. Backups are disabled (allowBackup=false); this file
+     additionally excludes everything in case backup is ever re-enabled: the
+     database and sealed secrets are bound to this device's Keystore and would be
+     unreadable elsewhere. Users move data with sync or the JSON export. -->
+<full-backup-content>
+    <exclude domain="database" path="." />
+    <exclude domain="sharedpref" path="." />
+    <exclude domain="file" path="." />
+    <exclude domain="root" path="." />
+</full-backup-content>
