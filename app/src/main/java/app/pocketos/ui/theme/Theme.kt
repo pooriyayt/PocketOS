@@ -14,7 +14,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
+import app.pocketos.R
+import androidx.compose.runtime.SideEffect
+import androidx.compose.ui.platform.LocalView
+import androidx.core.view.WindowCompat
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
@@ -29,23 +34,37 @@ import app.pocketos.ui.design.MotionScheme
 import app.pocketos.ui.design.rememberHapticManager
 import app.pocketos.ui.design.systemPrefersReducedMotion
 
-private val Base = FontFamily.Default
+/** Vazirmatn: one family with first-class Persian and Latin glyphs, so both languages look designed. */
+val Vazirmatn = FontFamily(
+    Font(R.font.vazirmatn_regular, FontWeight.Normal),
+    Font(R.font.vazirmatn_medium, FontWeight.Medium),
+    Font(R.font.vazirmatn_semibold, FontWeight.SemiBold),
+    Font(R.font.vazirmatn_bold, FontWeight.Bold),
+    Font(R.font.vazirmatn_extrabold, FontWeight.ExtraBold),
+)
 
-/** Type scale: generous display sizes, tight tracking, readable body text. */
+private val Base = Vazirmatn
+
+/**
+ * Type scale. Line heights are generous because Persian glyphs need room
+ * above and below; tracking stays at zero so cursive Persian joins cleanly.
+ */
 val PocketTypography = Typography(
-    displaySmall = TextStyle(fontFamily = Base, fontWeight = FontWeight.SemiBold, fontSize = 34.sp, lineHeight = 40.sp, letterSpacing = (-0.02).em),
-    headlineLarge = TextStyle(fontFamily = Base, fontWeight = FontWeight.SemiBold, fontSize = 30.sp, lineHeight = 36.sp, letterSpacing = (-0.02).em),
-    headlineMedium = TextStyle(fontFamily = Base, fontWeight = FontWeight.SemiBold, fontSize = 26.sp, lineHeight = 32.sp, letterSpacing = (-0.015).em),
-    headlineSmall = TextStyle(fontFamily = Base, fontWeight = FontWeight.SemiBold, fontSize = 22.sp, lineHeight = 28.sp, letterSpacing = (-0.01).em),
-    titleLarge = TextStyle(fontFamily = Base, fontWeight = FontWeight.SemiBold, fontSize = 20.sp, lineHeight = 26.sp, letterSpacing = (-0.01).em),
-    titleMedium = TextStyle(fontFamily = Base, fontWeight = FontWeight.SemiBold, fontSize = 16.sp, lineHeight = 22.sp),
-    titleSmall = TextStyle(fontFamily = Base, fontWeight = FontWeight.Medium, fontSize = 14.sp, lineHeight = 20.sp),
-    bodyLarge = TextStyle(fontFamily = Base, fontWeight = FontWeight.Normal, fontSize = 16.sp, lineHeight = 24.sp),
-    bodyMedium = TextStyle(fontFamily = Base, fontWeight = FontWeight.Normal, fontSize = 14.sp, lineHeight = 20.sp),
-    bodySmall = TextStyle(fontFamily = Base, fontWeight = FontWeight.Normal, fontSize = 12.sp, lineHeight = 16.sp),
-    labelLarge = TextStyle(fontFamily = Base, fontWeight = FontWeight.Medium, fontSize = 14.sp, lineHeight = 20.sp, letterSpacing = 0.01.em),
-    labelMedium = TextStyle(fontFamily = Base, fontWeight = FontWeight.Medium, fontSize = 12.sp, lineHeight = 16.sp, letterSpacing = 0.02.em),
-    labelSmall = TextStyle(fontFamily = Base, fontWeight = FontWeight.Medium, fontSize = 11.sp, lineHeight = 14.sp, letterSpacing = 0.03.em),
+    displayLarge = TextStyle(fontFamily = Base, fontWeight = FontWeight.ExtraBold, fontSize = 48.sp, lineHeight = 60.sp),
+    displayMedium = TextStyle(fontFamily = Base, fontWeight = FontWeight.ExtraBold, fontSize = 40.sp, lineHeight = 52.sp),
+    displaySmall = TextStyle(fontFamily = Base, fontWeight = FontWeight.ExtraBold, fontSize = 34.sp, lineHeight = 46.sp),
+    headlineLarge = TextStyle(fontFamily = Base, fontWeight = FontWeight.ExtraBold, fontSize = 30.sp, lineHeight = 42.sp),
+    headlineMedium = TextStyle(fontFamily = Base, fontWeight = FontWeight.ExtraBold, fontSize = 27.sp, lineHeight = 38.sp),
+    headlineSmall = TextStyle(fontFamily = Base, fontWeight = FontWeight.Bold, fontSize = 22.sp, lineHeight = 32.sp),
+    titleLarge = TextStyle(fontFamily = Base, fontWeight = FontWeight.Bold, fontSize = 19.sp, lineHeight = 28.sp),
+    titleMedium = TextStyle(fontFamily = Base, fontWeight = FontWeight.SemiBold, fontSize = 16.sp, lineHeight = 24.sp),
+    titleSmall = TextStyle(fontFamily = Base, fontWeight = FontWeight.SemiBold, fontSize = 14.sp, lineHeight = 22.sp),
+    bodyLarge = TextStyle(fontFamily = Base, fontWeight = FontWeight.Normal, fontSize = 15.sp, lineHeight = 25.sp),
+    bodyMedium = TextStyle(fontFamily = Base, fontWeight = FontWeight.Normal, fontSize = 14.sp, lineHeight = 22.sp),
+    bodySmall = TextStyle(fontFamily = Base, fontWeight = FontWeight.Normal, fontSize = 12.sp, lineHeight = 19.sp),
+    labelLarge = TextStyle(fontFamily = Base, fontWeight = FontWeight.Medium, fontSize = 14.sp, lineHeight = 20.sp),
+    labelMedium = TextStyle(fontFamily = Base, fontWeight = FontWeight.Medium, fontSize = 12.sp, lineHeight = 18.sp),
+    labelSmall = TextStyle(fontFamily = Base, fontWeight = FontWeight.Medium, fontSize = 11.sp, lineHeight = 16.sp),
 )
 
 @Composable
@@ -70,6 +89,7 @@ fun PocketTheme(settings: AppSettings, content: @Composable () -> Unit) {
             accentSoft = dynamicScheme.primary.copy(alpha = 0.8f),
             accentHighlight = dynamicScheme.primaryContainer,
             accentDeep = dynamicScheme.primary,
+            accentGradientEnd = dynamicScheme.tertiary,
             onAccent = dynamicScheme.onPrimary,
             ambientA = dynamicScheme.primary.copy(alpha = if (dark) 0.30f else 0.18f),
         )
@@ -103,6 +123,18 @@ fun PocketTheme(settings: AppSettings, content: @Composable () -> Unit) {
     val motion = remember(reduced) { MotionScheme(reduced) }
     val haptics = rememberHapticManager(settings.haptics)
     val glass = remember(settings.glass, reduced) { GlassSettings(settings.glass, reducedMotion = reduced) }
+
+    // Status / navigation bar icons follow the app theme, not the system one.
+    val view = LocalView.current
+    if (!view.isInEditMode) {
+        SideEffect {
+            val window = (view.context as? android.app.Activity)?.window ?: return@SideEffect
+            WindowCompat.getInsetsController(window, view).apply {
+                isAppearanceLightStatusBars = !dark
+                isAppearanceLightNavigationBars = !dark
+            }
+        }
+    }
 
     CompositionLocalProvider(
         LocalPocketColors provides pocket,

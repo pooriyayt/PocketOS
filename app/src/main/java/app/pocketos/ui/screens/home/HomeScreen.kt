@@ -1,5 +1,14 @@
 package app.pocketos.ui.screens.home
 
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.foundation.layout.widthIn
+import app.pocketos.ui.design.GlassProgressRing
+import app.pocketos.ui.components.ToneIcon
+import app.pocketos.ui.components.GradientCard
+import androidx.compose.material.icons.rounded.Today
+import androidx.compose.material.icons.rounded.Schedule
+import androidx.compose.ui.graphics.Color
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.Arrangement
@@ -217,7 +226,7 @@ fun HomeScreen(nav: NavController) {
 
             item(key = "customize") {
                 Row(Modifier.fillMaxWidth().padding(top = Spacing.xl), horizontalArrangement = Arrangement.Center) {
-                    PocketButton(stringResource(R.string.customize_home), { customizing = true }, style = ButtonStyle.Text, icon = Icons.Rounded.Tune)
+                    PocketButton(stringResource(R.string.customize_home), { customizing = true }, style = ButtonStyle.Tonal, icon = Icons.Rounded.Tune)
                 }
             }
             item { BottomClearance() }
@@ -248,7 +257,12 @@ private fun HomeHeader(state: HomeUiState, onSearch: () -> Unit, onProfile: () -
     )
     Row(Modifier.fillMaxWidth().padding(top = Spacing.lg), verticalAlignment = Alignment.CenterVertically) {
         Column(Modifier.weight(1f)) {
-            Text(f.date(state.today, withYear = false, withWeekday = true), style = MaterialTheme.typography.labelLarge, color = c.textSecondary)
+            Text(
+                f.date(state.today, withYear = false, withWeekday = true).uppercase(f.locale),
+                style = MaterialTheme.typography.labelMedium,
+                fontWeight = FontWeight.SemiBold,
+                color = if (c.isDark) c.accentSoft else c.accent,
+            )
             Spacer(Modifier.height(Spacing.xs))
             Text(
                 if (name != null) "$greeting, $name" else greeting,
@@ -276,7 +290,8 @@ private fun ProfileButton(initials: String, label: String, onClick: () -> Unit) 
             .size(48.dp)
             .padding(2.dp)
             .pressFeedback(interaction, CircleShape)
-            .glass(GlassLevel.L2, CircleShape, tint = c.accent)
+            .clip(CircleShape)
+            .background(c.brandGradient)
             .selectable(false, role = androidx.compose.ui.semantics.Role.Button, interactionSource = interaction, indication = null) {
                 haptics.perform(HapticType.LightTap)
                 onClick()
@@ -285,16 +300,17 @@ private fun ProfileButton(initials: String, label: String, onClick: () -> Unit) 
         contentAlignment = Alignment.Center,
     ) {
         if (initials.isEmpty()) {
-            Icon(Icons.Rounded.Person, null, tint = c.accentHighlight, modifier = Modifier.size(22.dp))
+            Icon(Icons.Rounded.Person, null, tint = c.onAccent, modifier = Modifier.size(22.dp))
         } else {
-            Text(initials, style = MaterialTheme.typography.labelLarge, color = c.textPrimary)
+            Text(initials, style = MaterialTheme.typography.labelLarge, fontWeight = FontWeight.Bold, color = c.onAccent)
         }
     }
 }
 
+/** Gradient hero: the one-line status of the day plus today's progress. */
 @Composable
 private fun Summary(state: HomeUiState) {
-    val c = LocalPocketColors.current
+    val f = LocalFormatter.current
     val model = state.model ?: return
     val count = model.attention.size
     val text = when {
@@ -302,9 +318,53 @@ private fun Summary(state: HomeUiState) {
         count == 0 -> stringResource(R.string.summary_clear)
         else -> pluralStringResource(R.plurals.summary_things, count, count)
     }
+    val total = model.completedToday + model.dueToday + model.overdue
+    val progress = if (total == 0) 0f else model.completedToday.toFloat() / total
     val motion = LocalMotion.current
-    AnimatedContent(text, transitionSpec = { motion.tabEnter() togetherWith motion.tabExit() }, label = "summary") { t ->
-        Text(t, style = MaterialTheme.typography.bodyLarge, color = c.textSecondary, modifier = Modifier.padding(top = Spacing.sm))
+    GradientCard(Modifier.fillMaxWidth().padding(top = Spacing.xl)) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Column(Modifier.weight(1f)) {
+                AnimatedContent(text, transitionSpec = { motion.tabEnter() togetherWith motion.tabExit() }, label = "summary") { t ->
+                    Text(t, style = MaterialTheme.typography.titleLarge, color = Color.White, maxLines = 3, overflow = TextOverflow.Ellipsis)
+                }
+                Spacer(Modifier.height(Spacing.sm))
+                Text(
+                    if (total > 0) stringResource(R.string.hero_progress, f.localizeDigits(model.completedToday.toString()), f.localizeDigits(total.toString()))
+                    else stringResource(R.string.hero_nothing_planned),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = Color.White.copy(alpha = 0.82f),
+                )
+            }
+            Spacer(Modifier.width(Spacing.lg))
+            Box(contentAlignment = Alignment.Center) {
+                GlassProgressRing(progress, size = 64.dp, strokeWidth = 7.dp, color = Color.White)
+                Text(
+                    f.localizeDigits("${(progress * 100).toInt()}%"),
+                    style = MaterialTheme.typography.labelLarge,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White,
+                )
+            }
+        }
+        if (model.paymentsNext7Days > 0 || model.overdue > 0) {
+            Spacer(Modifier.height(Spacing.lg))
+            Row(horizontalArrangement = Arrangement.spacedBy(Spacing.sm)) {
+                if (model.overdue > 0) HeroPill(Icons.Rounded.Schedule, "${f.localizeDigits(model.overdue.toString())} ${stringResource(R.string.stat_overdue)}")
+                if (model.paymentsNext7Days > 0) HeroPill(Icons.Rounded.Payments, "${f.localizeDigits(model.paymentsNext7Days.toString())} · ${stringResource(R.string.stat_payments_7d)}")
+            }
+        }
+    }
+}
+
+@Composable
+private fun HeroPill(icon: ImageVector, text: String) {
+    Row(
+        Modifier.clip(CircleShape).background(Color.White.copy(alpha = 0.18f)).padding(horizontal = Spacing.md, vertical = 6.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Icon(icon, null, tint = Color.White, modifier = Modifier.size(14.dp))
+        Spacer(Modifier.width(6.dp))
+        Text(text, style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.SemiBold, color = Color.White, maxLines = 1, overflow = TextOverflow.Ellipsis)
     }
 }
 
@@ -341,7 +401,7 @@ private fun AgendaRow(
                         else stringResource(R.string.renews_relative, f.relative(item.date, state.today))
                         Text(label, style = MaterialTheme.typography.bodySmall, color = if (ChronoUnit.DAYS.between(state.today, item.date) <= 1) c.warning else c.textSecondary)
                     }
-                    sub.amount?.let { Text(f.money(it.amountMinor, it.currency, compact = true), style = MaterialTheme.typography.titleSmall, color = c.textPrimary) }
+                    sub.amount?.let { Text(f.money(it.amountMinor, it.currency, compact = true), style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold, color = c.textPrimary) }
                 }
             }
         }
@@ -351,27 +411,64 @@ private fun AgendaRow(
 @Composable
 private fun Overview(state: HomeUiState) {
     val model = state.model ?: return
-    val c = LocalPocketColors.current
+    val t = LocalPocketColors.current.tones
+    val tiles = listOf(
+        Triple(model.dueToday, R.string.stat_due_today, Icons.Rounded.Today to t.blue),
+        Triple(model.overdue, R.string.stat_overdue, Icons.Rounded.Schedule to t.orange),
+        Triple(model.completedToday, R.string.stat_done, Icons.Rounded.TaskAlt to t.green),
+        Triple(model.paymentsNext7Days, R.string.stat_payments_7d, Icons.Rounded.Payments to t.violet),
+    )
     Column {
         SectionHeader(stringResource(R.string.section_today))
-        Row(horizontalArrangement = Arrangement.spacedBy(Spacing.sm)) {
-            StatTile(model.dueToday, stringResource(R.string.stat_due_today), c.accent, Modifier.weight(1f))
-            StatTile(model.overdue, stringResource(R.string.stat_overdue), c.warning, Modifier.weight(1f))
-            StatTile(model.completedToday, stringResource(R.string.stat_done), c.success, Modifier.weight(1f))
-            StatTile(model.paymentsNext7Days, stringResource(R.string.stat_payments_7d), c.info, Modifier.weight(1f))
+        androidx.compose.foundation.layout.BoxWithConstraints(Modifier.fillMaxWidth()) {
+            // Two columns on phones, one row of four once there is room.
+            val columns = if (maxWidth >= 560.dp) 4 else 2
+            Column(verticalArrangement = Arrangement.spacedBy(Spacing.sm)) {
+                tiles.chunked(columns).forEach { row ->
+                    Row(horizontalArrangement = Arrangement.spacedBy(Spacing.sm)) {
+                        row.forEach { (value, label, visual) ->
+                            StatTile(value, stringResource(label), visual.first, visual.second, Modifier.weight(1f))
+                        }
+                    }
+                }
+            }
         }
     }
 }
 
 @Composable
-private fun StatTile(value: Int, label: String, color: androidx.compose.ui.graphics.Color, modifier: Modifier) {
+private fun StatTile(value: Int, label: String, icon: ImageVector, tone: Color, modifier: Modifier) {
     val c = LocalPocketColors.current
     val f = LocalFormatter.current
-    GlassCard(modifier.clearAndSetSemantics { contentDescription = "$label: $value" }, level = GlassLevel.L1, contentPadding = PaddingValues(horizontal = Spacing.sm, vertical = Spacing.md)) {
-        Text(f.localizeDigits(value.toString()), style = MaterialTheme.typography.titleLarge, color = if (value > 0) color else c.textTertiary)
-        Text(label, style = MaterialTheme.typography.labelSmall, color = c.textSecondary, maxLines = 2)
+    val shown by app.pocketos.ui.design.animatedInt(value)
+    GlassCard(
+        modifier.clearAndSetSemantics { contentDescription = "$label: $value" },
+        contentPadding = PaddingValues(Spacing.lg),
+        decoration = {
+            // Soft glow of the tile's own colour from its top corner.
+            drawRect(
+                Brush.radialGradient(
+                    listOf(tone.copy(alpha = if (c.isDark) 0.22f else 0.12f), Color.Transparent),
+                    center = androidx.compose.ui.geometry.Offset(if (layoutDirection == androidx.compose.ui.unit.LayoutDirection.Ltr) 0f else size.width, 0f),
+                    radius = size.width * 0.9f,
+                )
+            )
+        },
+    ) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            ToneIcon(icon, tone, size = 38.dp, filled = value > 0)
+            Spacer(Modifier.weight(1f))
+            Text(
+                f.localizeDigits(shown.toString()),
+                style = MaterialTheme.typography.headlineMedium,
+                color = if (value > 0) c.textPrimary else c.textTertiary,
+            )
+        }
+        Spacer(Modifier.height(Spacing.md))
+        Text(label, style = MaterialTheme.typography.labelLarge, color = c.textSecondary, maxLines = 1, overflow = TextOverflow.Ellipsis)
     }
 }
+
 
 @Composable
 private fun SuggestionCard(s: Suggestion, onDismiss: () -> Unit, nav: NavController, modifier: Modifier) {
@@ -393,7 +490,7 @@ private fun SuggestionCard(s: Suggestion, onDismiss: () -> Unit, nav: NavControl
     }
     GlassCard(modifier.fillMaxWidth(), level = GlassLevel.L1, onClick = target, contentPadding = PaddingValues(start = Spacing.lg, top = Spacing.sm, bottom = Spacing.sm, end = Spacing.xs)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Icon(Icons.Rounded.AutoAwesome, null, tint = c.accentHighlight, modifier = Modifier.size(20.dp))
+            ToneIcon(Icons.Rounded.AutoAwesome, c.tones.violet, size = 34.dp)
             Spacer(Modifier.width(Spacing.md))
             Text(text, style = MaterialTheme.typography.bodyMedium, color = c.textPrimary, modifier = Modifier.weight(1f))
             GlassIconButton(Icons.Rounded.Close, stringResource(R.string.dismiss), onDismiss, level = GlassLevel.L1, size = 32.dp)
@@ -427,27 +524,41 @@ private fun FirstRunCard(onPick: (String) -> Unit, onDismiss: () -> Unit) {
     }
 }
 
-private data class QuickAction(val icon: ImageVector, val label: Int, val go: (NavController) -> Unit)
+private data class QuickAction(val icon: ImageVector, val label: Int, val tone: Color, val go: (NavController) -> Unit)
 
 @Composable
 private fun QuickActions(nav: NavController) {
     val c = LocalPocketColors.current
+    val t = c.tones
     val actions = listOf(
-        QuickAction(Icons.Rounded.NotificationsActive, R.string.qa_reminder) { it.navigate(Routes.ReminderEditor()) },
-        QuickAction(Icons.Rounded.AccountBalanceWallet, R.string.qa_subscription) { it.navigate(Routes.SubscriptionEditor()) },
-        QuickAction(Icons.Rounded.Payments, R.string.qa_payment) { it.navigate(Routes.SubscriptionEditor(serviceId = "")) },
-        QuickAction(Icons.Rounded.TaskAlt, R.string.qa_task) { it.navigate(Routes.ReminderEditor(kind = "task")) },
-        QuickAction(Icons.Rounded.CalendarMonth, R.string.qa_schedule) { it.navigate(Routes.Calendar) },
+        QuickAction(Icons.Rounded.NotificationsActive, R.string.qa_reminder, t.amber) { it.navigate(Routes.ReminderEditor()) },
+        QuickAction(Icons.Rounded.AccountBalanceWallet, R.string.qa_subscription, t.violet) { it.navigate(Routes.SubscriptionEditor()) },
+        QuickAction(Icons.Rounded.Payments, R.string.qa_payment, t.green) { it.navigate(Routes.SubscriptionEditor(serviceId = "")) },
+        QuickAction(Icons.Rounded.TaskAlt, R.string.qa_task, t.blue) { it.navigate(Routes.ReminderEditor(kind = "task")) },
+        QuickAction(Icons.Rounded.CalendarMonth, R.string.qa_schedule, t.pink) { it.navigate(Routes.Calendar) },
     )
     Column {
         SectionHeader(stringResource(R.string.section_quick_actions))
-        Row(horizontalArrangement = Arrangement.spacedBy(Spacing.sm)) {
-            actions.forEach { a ->
-                GlassCard(Modifier.weight(1f), level = GlassLevel.L1, onClick = { a.go(nav) }, contentPadding = PaddingValues(vertical = Spacing.md, horizontal = Spacing.xs)) {
-                    Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
-                        Icon(a.icon, null, tint = c.accentSoft, modifier = Modifier.size(24.dp))
-                        Spacer(Modifier.height(Spacing.xs))
-                        Text(stringResource(a.label), style = MaterialTheme.typography.labelSmall, color = c.textSecondary, maxLines = 2, overflow = TextOverflow.Ellipsis)
+        // A swipeable rail: every label gets the width it needs and the
+        // partially visible last tile hints that there is more.
+        LazyRow(horizontalArrangement = Arrangement.spacedBy(Spacing.md), contentPadding = PaddingValues(end = Spacing.gutter)) {
+            items(actions, key = { it.label }) { a ->
+                GlassCard(
+                    Modifier.width(112.dp),
+                    onClick = { a.go(nav) },
+                    contentPadding = PaddingValues(start = Spacing.sm, end = Spacing.sm, top = Spacing.lg, bottom = Spacing.md),
+                ) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.align(Alignment.CenterHorizontally)) {
+                        ToneIcon(a.icon, a.tone, size = 52.dp, filled = true)
+                        Spacer(Modifier.height(Spacing.md))
+                        Text(
+                            stringResource(a.label),
+                            style = MaterialTheme.typography.labelMedium,
+                            fontWeight = FontWeight.SemiBold,
+                            color = c.textPrimary,
+                            maxLines = 1,
+                            softWrap = false,
+                        )
                     }
                 }
             }
@@ -511,37 +622,37 @@ private fun GuidedTourCard(
     val (icon, title, desc, actionLabel, action) = when (focus) {
         OnboardingFocus.SUBSCRIPTIONS -> Quintuple(
             Icons.Rounded.AccountBalanceWallet,
-            "Track Your Subscriptions",
-            "Monitor recurring bills, trial end dates, and renewal notifications. PocketOS alerts you before charges occur.",
-            "Add Subscription",
+            stringResource(R.string.tour_subs_title),
+            stringResource(R.string.tour_subs_body),
+            stringResource(R.string.tour_subs_action),
             { nav.navigate(Routes.SubscriptionEditor()) },
         )
         OnboardingFocus.REMINDERS -> Quintuple(
             Icons.Rounded.NotificationsActive,
-            "Reliable Offline Reminders",
-            "Schedule timely notifications with custom sounds and alarms. Completely local and private.",
-            "Set Reminder",
+            stringResource(R.string.tour_rem_title),
+            stringResource(R.string.tour_rem_body),
+            stringResource(R.string.tour_rem_action),
             { nav.navigate(Routes.ReminderEditor()) },
         )
         OnboardingFocus.TASKS -> Quintuple(
             Icons.Rounded.TaskAlt,
-            "Stay on Top of Tasks",
-            "Keep organized checklists and daily todos. Complete tasks directly from Home or notifications.",
-            "Add Task",
+            stringResource(R.string.tour_task_title),
+            stringResource(R.string.tour_task_body),
+            stringResource(R.string.tour_task_action),
             { nav.navigate(Routes.ReminderEditor(kind = "task")) },
         )
         OnboardingFocus.EXPENSES -> Quintuple(
             Icons.Rounded.Payments,
-            "Manage Recurring Expenses",
-            "Get clear monthly spending summaries and upcoming payment forecasts without linking a bank account.",
-            "Add Expense",
+            stringResource(R.string.tour_exp_title),
+            stringResource(R.string.tour_exp_body),
+            stringResource(R.string.tour_exp_action),
             { nav.navigate(Routes.SubscriptionEditor()) },
         )
         OnboardingFocus.ORGANIZATION, OnboardingFocus.ALL -> Quintuple(
             Icons.Rounded.AutoAwesome,
-            "Welcome to PocketOS",
-            "Your private daily command center. Reminders, tasks, and subscriptions stay safe on your device.",
-            "Quick Add",
+            stringResource(R.string.tour_all_title),
+            stringResource(R.string.tour_all_body),
+            stringResource(R.string.quick_add),
             { ui.openQuickAdd() },
         )
     }
@@ -552,15 +663,7 @@ private fun GuidedTourCard(
         tint = c.accent,
     ) {
         Row(verticalAlignment = Alignment.Top) {
-            Box(
-                modifier = Modifier
-                    .size(44.dp)
-                    .clip(CircleShape)
-                    .background(c.accent.copy(alpha = 0.16f)),
-                contentAlignment = Alignment.Center,
-            ) {
-                Icon(icon, null, tint = c.accentHighlight, modifier = Modifier.size(24.dp))
-            }
+            ToneIcon(icon, c.accent, size = 44.dp, filled = true)
             Spacer(Modifier.width(Spacing.md))
             Column(Modifier.weight(1f)) {
                 Text(title, style = MaterialTheme.typography.titleMedium, color = c.textPrimary, fontWeight = FontWeight.SemiBold)

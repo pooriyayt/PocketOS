@@ -328,10 +328,18 @@ private fun AmountEditDialog(initial: Money?, currency: String, onDismiss: () ->
         if (text.isBlank()) { onSave(null); onDismiss() }
         else MoneyFormatter.parse(text, code)?.let { onSave(Money(it, code)); onDismiss() } ?: run { error = true }
     }, dismissText = stringResource(R.string.cancel)) {
-        GlassTextField(text, { text = it; error = false }, keyboardType = KeyboardType.Decimal, error = if (error) errorText else null)
+        val f = app.pocketos.ui.format.LocalFormatter.current
+        GlassTextField(
+            text,
+            { text = app.pocketos.ui.components.AmountInput.sanitize(it, code); error = false },
+            keyboardType = KeyboardType.Decimal,
+            error = if (error) errorText else null,
+            textStyle = MaterialTheme.typography.headlineSmall,
+            visualTransformation = remember(f.locale) { app.pocketos.ui.components.AmountInput.Grouping(f.locale.language == "fa") },
+        )
         Spacer(Modifier.height(Spacing.md))
         FlowRow(horizontalArrangement = Arrangement.spacedBy(Spacing.xs), verticalArrangement = Arrangement.spacedBy(Spacing.xs)) {
-            app.pocketos.core.money.Currencies.common.take(8).forEach { cur -> GlassChip(cur, cur == code, { code = cur }) }
+            app.pocketos.core.money.Currencies.common.take(8).forEach { cur -> app.pocketos.ui.components.CurrencyChip(cur, cur == code, { code = cur }) }
         }
     }
 }

@@ -114,16 +114,21 @@ private fun AccentPicker(selected: AccentColor, onPick: (AccentColor) -> Unit) {
     val haptics = LocalHaptics.current
     val c = LocalPocketColors.current
     val names = mapOf(
+        AccentColor.AURORA to R.string.accent_aurora, AccentColor.EMERALD to R.string.accent_emerald,
         AccentColor.VIOLET to R.string.accent_violet, AccentColor.INDIGO to R.string.accent_indigo, AccentColor.BLUE to R.string.accent_blue,
         AccentColor.TEAL to R.string.accent_teal, AccentColor.ROSE to R.string.accent_rose, AccentColor.AMBER to R.string.accent_amber,
     )
-    Row(horizontalArrangement = Arrangement.spacedBy(Spacing.md)) {
+    androidx.compose.foundation.layout.FlowRow(
+        horizontalArrangement = Arrangement.spacedBy(Spacing.md),
+        verticalArrangement = Arrangement.spacedBy(Spacing.md),
+    ) {
         AccentColor.entries.forEach { accent ->
-            val color: Color = accentPalette(accent).primary
+            val palette = accentPalette(accent)
             val isSelected = accent == selected
             val label = stringResource(names.getValue(accent))
             Box(
-                Modifier.size(44.dp).clip(CircleShape).background(color)
+                Modifier.size(48.dp).clip(CircleShape)
+                    .background(androidx.compose.ui.graphics.Brush.linearGradient(listOf(palette.primary, palette.gradientEnd)))
                     .then(if (isSelected) Modifier.border(3.dp, c.textPrimary, CircleShape) else Modifier)
                     .selectable(isSelected, role = Role.RadioButton, interactionSource = remember { MutableInteractionSource() }, indication = null) {
                         haptics.perform(HapticType.Selection)

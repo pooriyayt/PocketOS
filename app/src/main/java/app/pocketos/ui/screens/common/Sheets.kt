@@ -90,9 +90,9 @@ fun MenuRow(icon: ImageVector, label: String, onClick: () -> Unit, tint: Color? 
             .padding(vertical = Spacing.sm),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Icon(icon, null, tint = tint ?: c.textSecondary, modifier = Modifier.size(Sizes.icon))
-        Spacer(Modifier.width(Spacing.lg))
-        Text(label, style = MaterialTheme.typography.bodyLarge, color = tint ?: c.textPrimary)
+        app.pocketos.ui.components.ToneIcon(icon, tint ?: app.pocketos.ui.components.autoTone(icon, c.tones), size = 36.dp)
+        Spacer(Modifier.width(Spacing.md))
+        Text(label, style = MaterialTheme.typography.bodyLarge, fontWeight = androidx.compose.ui.text.font.FontWeight.Medium, color = tint ?: c.textPrimary)
     }
 }
 

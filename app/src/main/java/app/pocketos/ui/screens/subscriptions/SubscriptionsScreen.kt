@@ -1,5 +1,17 @@
 package app.pocketos.ui.screens.subscriptions
 
+import app.pocketos.ui.theme.Shapes
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.draw.clip
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.graphics.Color
+import app.pocketos.core.money.Currencies
+import app.pocketos.ui.components.GradientCard
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -105,21 +117,56 @@ fun SubscriptionsScreen(nav: NavController) {
                 if (all.isNotEmpty()) {
                     item(key = "summary") {
                         val snapshot = remember(all) { InsightsCalculator.compute(all, emptyList(), emptyList(), today, container.clock.zone()) }
-                        GlassCard(Modifier.fillMaxWidth().padding(bottom = Spacing.md), level = GlassLevel.L2, tint = c.accent) {
-                            Text(stringResource(R.string.estimated_monthly), style = MaterialTheme.typography.labelLarge, color = c.textSecondary)
+                        GradientCard(Modifier.fillMaxWidth().padding(bottom = Spacing.lg)) {
+                            Text(
+                                stringResource(R.string.monthly_spend).uppercase(f.locale),
+                                style = MaterialTheme.typography.labelMedium,
+                                fontWeight = FontWeight.SemiBold,
+                                color = Color.White.copy(alpha = 0.8f),
+                            )
+                            Spacer(Modifier.height(Spacing.sm))
                             if (snapshot.totals.isEmpty()) {
-                                Text("—", style = MaterialTheme.typography.headlineMedium, color = c.textPrimary)
+                                Text("—", style = MaterialTheme.typography.displaySmall, color = Color.White)
                             }
-                            snapshot.totals.forEach { t ->
-                                Row {
-                                    Text(f.money(t.monthlyMinor, t.currency), style = MaterialTheme.typography.headlineSmall, color = c.textPrimary, modifier = Modifier.weight(1f))
-                                    Text(stringResource(R.string.per_year_value, f.money(t.annualMinor, t.currency, compact = true)), style = MaterialTheme.typography.bodySmall, color = c.textSecondary, modifier = Modifier.padding(top = 8.dp))
+                            snapshot.totals.forEachIndexed { index, t ->
+                                if (index > 0) Spacer(Modifier.height(Spacing.sm))
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Text(Currencies.flag(t.currency), fontSize = if (index == 0) 22.sp else 16.sp)
+                                    Spacer(Modifier.width(Spacing.sm))
+                                    Text(
+                                        f.money(t.monthlyMinor, t.currency),
+                                        style = if (index == 0) MaterialTheme.typography.headlineLarge else MaterialTheme.typography.titleLarge,
+                                        color = Color.White,
+                                        maxLines = 1,
+                                        overflow = TextOverflow.Ellipsis,
+                                        modifier = Modifier.weight(1f),
+                                    )
                                 }
+                                Text(
+                                    stringResource(R.string.per_year_value, f.money(t.annualMinor, t.currency, compact = true)),
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = Color.White.copy(alpha = 0.75f),
+                                )
+                            }
+                            Spacer(Modifier.height(Spacing.md))
+                            Row(
+                                Modifier.clip(Shapes.pill).background(Color.White.copy(alpha = 0.18f)).padding(horizontal = Spacing.md, vertical = 6.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                            ) {
+                                Box(Modifier.size(6.dp).clip(Shapes.pill).background(Color.White))
+                                Spacer(Modifier.width(6.dp))
+                                Text(
+                                    androidx.compose.ui.res.pluralStringResource(R.plurals.active_subscriptions, snapshot.activeSubscriptions, snapshot.activeSubscriptions),
+                                    style = MaterialTheme.typography.labelMedium,
+                                    fontWeight = FontWeight.SemiBold,
+                                    color = Color.White,
+                                )
                             }
                             Text(
-                                androidx.compose.ui.res.pluralStringResource(R.plurals.active_subscriptions, snapshot.activeSubscriptions, snapshot.activeSubscriptions) +
-                                    " · " + stringResource(R.string.estimate_note),
-                                style = MaterialTheme.typography.bodySmall, color = c.textTertiary,
+                                stringResource(R.string.estimate_note),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = Color.White.copy(alpha = 0.65f),
+                                modifier = Modifier.padding(top = Spacing.sm),
                             )
                         }
                     }

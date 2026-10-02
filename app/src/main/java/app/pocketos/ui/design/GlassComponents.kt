@@ -59,6 +59,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
@@ -81,6 +83,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import app.pocketos.ui.theme.LocalPocketColors
@@ -103,6 +106,7 @@ fun GlassCard(
     onClick: (() -> Unit)? = null,
     onLongClick: (() -> Unit)? = null,
     onClickLabel: String? = null,
+    decoration: (androidx.compose.ui.graphics.drawscope.DrawScope.() -> Unit)? = null,
     content: @Composable ColumnScope.() -> Unit,
 ) {
     val haptics = LocalHaptics.current
@@ -112,6 +116,8 @@ fun GlassCard(
         modifier = modifier
             .then(if (clickable) Modifier.pressFeedback(interaction, shape) else Modifier)
             .glass(level, shape, tint = tint)
+            // Drawn inside the card's clip, above its surface and below its content.
+            .then(if (decoration != null) Modifier.drawBehind(decoration) else Modifier)
             .then(
                 if (clickable) Modifier.combinedClickable(
                     interactionSource = interaction,
@@ -154,9 +160,9 @@ fun PocketButton(
     val interaction = remember { MutableInteractionSource() }
     val shape = Shapes.pill
     val (bg, fg) = when (style) {
-        ButtonStyle.Primary -> Brush.horizontalGradient(listOf(colors.accent, colors.accentDeep)) to colors.onAccent
+        ButtonStyle.Primary -> colors.brandGradient to colors.onAccent
         ButtonStyle.Danger -> Brush.horizontalGradient(listOf(colors.danger, colors.danger)) to Color.White
-        ButtonStyle.Tonal -> Brush.horizontalGradient(listOf(colors.accent.copy(alpha = 0.16f), colors.accent.copy(alpha = 0.16f))) to colors.accent
+        ButtonStyle.Tonal -> Brush.horizontalGradient(listOf(colors.accent.copy(alpha = if (colors.isDark) 0.20f else 0.12f), colors.accent.copy(alpha = if (colors.isDark) 0.20f else 0.12f))) to (if (colors.isDark) colors.accentHighlight else colors.accent)
         ButtonStyle.Glass, ButtonStyle.Text -> Brush.horizontalGradient(listOf(Color.Transparent, Color.Transparent)) to colors.textPrimary
     }
     val alpha by animateFloatAsState(if (enabled) 1f else 0.45f, LocalMotion.current.standard(), label = "btnAlpha")
@@ -181,7 +187,7 @@ fun PocketButton(
             Icon(icon, contentDescription = null, tint = fg.copy(alpha = alpha), modifier = Modifier.size(Sizes.iconSm))
             Spacer(Modifier.width(Spacing.sm))
         }
-        Text(text, style = MaterialTheme.typography.labelLarge, color = fg.copy(alpha = alpha), maxLines = 1, overflow = TextOverflow.Ellipsis)
+        Text(text, style = MaterialTheme.typography.labelLarge, fontWeight = FontWeight.SemiBold, color = fg.copy(alpha = alpha), maxLines = 1, overflow = TextOverflow.Ellipsis)
     }
 }
 
@@ -236,9 +242,11 @@ fun GlassFloatingActionButton(
     Box(
         modifier = modifier
             .size(Sizes.fab)
-            .pressFeedback(interaction, CircleShape)
-            .glass(GlassLevel.L3, CircleShape, tint = colors.accent)
-            .background(Brush.linearGradient(listOf(colors.accent.copy(alpha = 0.85f), colors.accentDeep.copy(alpha = 0.95f))), CircleShape)
+            .pressFeedback(interaction, Shapes.fab)
+            .shadow(18.dp, Shapes.fab, clip = false, ambientColor = colors.accent.copy(alpha = 0.55f), spotColor = colors.accent.copy(alpha = 0.75f))
+            .clip(Shapes.fab)
+            .background(colors.brandGradient)
+            .border(1.dp, Brush.verticalGradient(listOf(Color.White.copy(alpha = 0.35f), Color.White.copy(alpha = 0.05f))), Shapes.fab)
             .combinedClickable(
                 interactionSource = interaction,
                 indication = null,
@@ -261,134 +269,91 @@ fun GlassFloatingActionButton(
 data class NavItem(val label: String, val icon: ImageVector, val selectedIcon: ImageVector)
 
 /**
- * Floating glass navigation bar with a Liquid / Drop / Morphing selection indicator.
- * Provides micro-spring bounce on icon selection, liquid droplet morphing, and haptic feedback.
+ * Floating navigation dock. The selected tab grows into a gradient pill that
+ * shows its label; the others collapse to icons. Widths spring between
+ * states so switching tabs feels fluid. Capped in width for tablets.
  */
 @Composable
 fun GlassNavigationBar(items: List<NavItem>, selectedIndex: Int, onSelect: (Int) -> Unit, modifier: Modifier = Modifier) {
     val colors = LocalPocketColors.current
     val haptics = LocalHaptics.current
     val motion = LocalMotion.current
-    val shape = RoundedCornerShape(Radii.xl)
+    val shape = RoundedCornerShape(30.dp)
 
-    BoxWithConstraints(
-        modifier = modifier
-            .navigationBarsPadding()
-            .padding(horizontal = Spacing.lg, vertical = Spacing.sm)
-            .fillMaxWidth()
-            .height(Sizes.navBarHeight)
-            .glass(GlassLevel.L3, shape),
-    ) {
-        val count = items.size.coerceAtLeast(1)
-        val itemWidth = maxWidth / count
-        val targetOffset = itemWidth * selectedIndex.coerceAtLeast(0)
-
-        // Liquid spring: fast, organic, slightly bouncy for morphing droplet effect
-        val liquidSpring = androidx.compose.animation.core.spring<Dp>(
-            dampingRatio = if (motion.reduced) 1f else 0.62f,
-            stiffness = if (motion.reduced) 1000f else 380f,
-        )
-        val animatedOffset by animateDpAsState(targetOffset, liquidSpring, label = "liquidIndicator")
-
-        if (selectedIndex >= 0) {
-            // Morphing liquid droplet pill
-            Box(
-                Modifier
-                    .offset(x = animatedOffset)
-                    .width(itemWidth)
-                    .fillMaxHeight()
-                    .padding(horizontal = 6.dp, vertical = 6.dp)
-                    .clip(RoundedCornerShape(Radii.lg))
-                    .background(
-                        Brush.horizontalGradient(
-                            listOf(
-                                colors.accent.copy(alpha = if (colors.isDark) 0.25f else 0.16f),
-                                colors.accentSoft.copy(alpha = if (colors.isDark) 0.16f else 0.08f),
-                            )
-                        )
-                    )
-                    .border(
-                        1.dp,
-                        Brush.horizontalGradient(
-                            listOf(
-                                colors.accent.copy(alpha = if (colors.isDark) 0.45f else 0.35f),
-                                colors.accentHighlight.copy(alpha = if (colors.isDark) 0.20f else 0.15f),
-                            )
-                        ),
-                        RoundedCornerShape(Radii.lg)
-                    )
-            )
-
-            // Liquid droplet top highlight bar
-            Box(
-                Modifier
-                    .offset(x = animatedOffset + (itemWidth - 24.dp) / 2, y = 4.dp)
-                    .size(width = 24.dp, height = 3.dp)
-                    .clip(Shapes.pill)
-                    .background(
-                        Brush.horizontalGradient(
-                            listOf(colors.accentHighlight, colors.accent)
-                        )
-                    )
-            )
-        }
-
-        Row(Modifier.fillMaxWidth().fillMaxHeight().selectableGroup()) {
+    Box(modifier.fillMaxWidth().navigationBarsPadding().padding(horizontal = Spacing.lg, vertical = Spacing.sm), contentAlignment = Alignment.Center) {
+        Row(
+            modifier = Modifier
+                .widthIn(max = Sizes.navBarMaxWidth)
+                .fillMaxWidth()
+                .height(Sizes.navBarHeight)
+                .shadow(if (colors.isDark) 0.dp else 20.dp, shape, clip = false, ambientColor = colors.glassShadow.copy(alpha = 0.12f), spotColor = colors.glassShadow.copy(alpha = 0.18f))
+                .glass(GlassLevel.L3, shape)
+                .padding(6.dp)
+                .selectableGroup(),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
             items.forEachIndexed { index, item ->
                 val selected = index == selectedIndex
-                val tint by animateColorAsState(
-                    if (selected) colors.accent else colors.textSecondary,
-                    motion.standard(),
-                    label = "navTint"
+                val weight by animateFloatAsState(
+                    if (selected) 3.1f else 1f,
+                    if (motion.reduced) androidx.compose.animation.core.tween(0) else androidx.compose.animation.core.spring(dampingRatio = 0.8f, stiffness = 380f),
+                    label = "navWeight",
                 )
-                val iconScale by animateFloatAsState(
-                    if (selected && !motion.reduced) 1.12f else 1.0f,
-                    androidx.compose.animation.core.spring(dampingRatio = 0.5f, stiffness = 420f),
-                    label = "iconScale"
-                )
-                val iconOffsetY by animateDpAsState(
-                    if (selected && !motion.reduced) (-2).dp else 0.dp,
-                    androidx.compose.animation.core.spring(dampingRatio = 0.6f, stiffness = 400f),
-                    label = "iconOffsetY"
-                )
-
-                Column(
+                val fill by animateFloatAsState(if (selected) 1f else 0f, motion.standard(), label = "navFill")
+                val tint by animateColorAsState(if (selected) colors.onAccent else colors.textTertiary, motion.standard(), label = "navTint")
+                Row(
                     modifier = Modifier
-                        .weight(1f)
+                        .weight(weight)
                         .fillMaxHeight()
+                        .clip(RoundedCornerShape(24.dp))
+                        .graphicsLayer { }
+                        .drawBehind {
+                            if (fill > 0f) {
+                                drawRoundRect(
+                                    brush = colors.brandGradient,
+                                    alpha = fill,
+                                    cornerRadius = androidx.compose.ui.geometry.CornerRadius(24.dp.toPx()),
+                                )
+                            }
+                        }
                         .selectable(
                             selected = selected,
                             role = Role.Tab,
                             interactionSource = remember { MutableInteractionSource() },
-                            indication = null
+                            indication = null,
                         ) {
                             if (!selected) haptics.perform(HapticType.Selection)
                             onSelect(index)
-                        },
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center,
+                        }
+                        .semantics { contentDescription = item.label }
+                        .padding(horizontal = 8.dp),
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Icon(
                         if (selected) item.selectedIcon else item.icon,
                         contentDescription = null,
                         tint = tint,
-                        modifier = Modifier
-                            .offset(y = iconOffsetY)
-                            .graphicsLayer {
-                                scaleX = iconScale
-                                scaleY = iconScale
-                            }
-                            .size(Sizes.icon)
+                        modifier = Modifier.size(Sizes.icon),
                     )
-                    Spacer(Modifier.height(3.dp))
-                    Text(
-                        item.label,
-                        style = MaterialTheme.typography.labelSmall,
-                        fontWeight = if (selected) androidx.compose.ui.text.font.FontWeight.SemiBold else androidx.compose.ui.text.font.FontWeight.Normal,
-                        color = tint,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
+                    AnimatedVisibility(
+                        visible = selected,
+                        enter = androidx.compose.animation.fadeIn(androidx.compose.animation.core.tween(220, delayMillis = 60)) +
+                            androidx.compose.animation.expandHorizontally(androidx.compose.animation.core.tween(260)),
+                        exit = androidx.compose.animation.fadeOut(androidx.compose.animation.core.tween(120)) +
+                            androidx.compose.animation.shrinkHorizontally(androidx.compose.animation.core.tween(200)),
+                    ) {
+                        Text(
+                            item.label,
+                            style = MaterialTheme.typography.labelMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = colors.onAccent,
+                            maxLines = 1,
+                            softWrap = false,
+                            overflow = TextOverflow.Ellipsis,
+                            modifier = Modifier.padding(start = 8.dp),
+                        )
+                    }
                 }
             }
         }
@@ -457,12 +422,12 @@ fun <T> GlassSegmentedControl(
         val offset by animateDpAsState(segment * index, motion.standard(), label = "segment")
         Box(
             Modifier.offset(x = offset).width(segment).fillMaxHeight().padding(4.dp)
-                .clip(shape).background(if (colors.isDark) colors.surfaceElevated else colors.surface)
+                .clip(shape).background(colors.brandGradient)
         )
         Row(Modifier.fillMaxWidth().fillMaxHeight().selectableGroup()) {
             options.forEach { option ->
                 val isSelected = option == selected
-                val tint by animateColorAsState(if (isSelected) colors.textPrimary else colors.textSecondary, motion.standard(), label = "segTint")
+                val tint by animateColorAsState(if (isSelected) colors.onAccent else colors.textSecondary, motion.standard(), label = "segTint")
                 Box(
                     Modifier.weight(1f).fillMaxHeight()
                         .selectable(isSelected, role = Role.RadioButton, interactionSource = remember { MutableInteractionSource() }, indication = null) {
@@ -471,7 +436,16 @@ fun <T> GlassSegmentedControl(
                         },
                     contentAlignment = Alignment.Center,
                 ) {
-                    Text(label(option), style = MaterialTheme.typography.labelLarge, color = tint, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                    Text(
+                        label(option),
+                        style = MaterialTheme.typography.labelLarge,
+                        fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Medium,
+                        color = tint,
+                        maxLines = 1,
+                        softWrap = false,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.padding(horizontal = 4.dp),
+                    )
                 }
             }
         }
@@ -492,7 +466,8 @@ fun GlassChip(
     val motion = LocalMotion.current
     val interaction = remember { MutableInteractionSource() }
     val tone = accent ?: colors.accent
-    val bg by animateColorAsState(if (selected) tone.copy(alpha = if (colors.isDark) 0.24f else 0.14f) else Color.Transparent, motion.standard(), label = "chipBg")
+    val bg by animateColorAsState(if (selected) tone.copy(alpha = if (colors.isDark) 0.22f else 0.12f) else Color.Transparent, motion.standard(), label = "chipBg")
+    val outline by animateColorAsState(if (selected) tone.copy(alpha = 0.55f) else Color.Transparent, motion.standard(), label = "chipOutline")
     val fg by animateColorAsState(if (selected) (if (colors.isDark) colors.accentHighlight else tone) else colors.textSecondary, motion.standard(), label = "chipFg")
     Row(
         modifier = modifier
@@ -500,6 +475,7 @@ fun GlassChip(
             .pressFeedback(interaction, Shapes.pill)
             .glass(GlassLevel.L1, Shapes.pill)
             .background(bg, Shapes.pill)
+            .border(1.dp, outline, Shapes.pill)
             .selectable(selected, role = Role.Checkbox, interactionSource = interaction, indication = null) {
                 haptics.perform(HapticType.Selection)
                 onClick()
@@ -511,7 +487,7 @@ fun GlassChip(
             it()
             Spacer(Modifier.width(6.dp))
         }
-        Text(text, style = MaterialTheme.typography.labelLarge, color = fg, maxLines = 1)
+        Text(text, style = MaterialTheme.typography.labelLarge, fontWeight = if (selected) FontWeight.SemiBold else null, color = fg, maxLines = 1)
     }
 }
 
@@ -534,6 +510,7 @@ fun GlassTextField(
     textStyle: TextStyle = MaterialTheme.typography.bodyLarge,
     leading: (@Composable () -> Unit)? = null,
     trailing: (@Composable () -> Unit)? = null,
+    visualTransformation: VisualTransformation? = null,
 ) {
     val colors = LocalPocketColors.current
     val borderColor by animateColorAsState(if (error != null) colors.danger else Color.Transparent, LocalMotion.current.standard(), label = "fieldBorder")
@@ -550,7 +527,7 @@ fun GlassTextField(
             cursorBrush = Brush.verticalGradient(listOf(colors.accent, colors.accent)),
             keyboardOptions = KeyboardOptions(keyboardType = keyboardType, imeAction = imeAction),
             keyboardActions = KeyboardActions(onAny = { onImeAction() }),
-            visualTransformation = if (password) PasswordVisualTransformation() else VisualTransformation.None,
+            visualTransformation = visualTransformation ?: if (password) PasswordVisualTransformation() else VisualTransformation.None,
             modifier = Modifier.fillMaxWidth().semantics { if (label != null) contentDescription = label },
             decorationBox = { inner ->
                 Row(
@@ -652,7 +629,7 @@ fun GlassBottomSheet(
         onDismissRequest = onDismiss,
         sheetState = sheetState,
         shape = Shapes.sheet,
-        containerColor = if (colors.isDark) colors.surface.copy(alpha = 0.97f) else colors.surface.copy(alpha = 0.98f),
+        containerColor = if (colors.isDark) colors.backgroundAlt else colors.surface,
         scrimColor = colors.scrim,
         dragHandle = {
             Box(Modifier.padding(top = Spacing.md, bottom = Spacing.sm).size(width = 40.dp, height = 4.dp).clip(Shapes.pill).background(colors.textTertiary.copy(alpha = 0.5f)))
@@ -690,8 +667,8 @@ fun GlassDialog(
                 .widthIn(max = 420.dp)
                 .fillMaxWidth()
                 .clip(Shapes.cardLarge)
-                .background(colors.surfaceElevated)
-                .glass(GlassLevel.L2, Shapes.cardLarge)
+                .background(if (colors.isDark) colors.surfaceElevated else colors.surface)
+                .border(1.dp, colors.glassBorder, Shapes.cardLarge)
                 .padding(Spacing.xxl),
         ) {
             Text(title, style = MaterialTheme.typography.titleLarge, color = colors.textPrimary, modifier = Modifier.semantics { heading() })

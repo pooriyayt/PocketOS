@@ -667,6 +667,8 @@
     <string name="theme_light">Light</string>
     <string name="theme_dark">Dark</string>
     <string name="accent_color">Accent colour</string>
+    <string name="accent_aurora">Aurora</string>
+    <string name="accent_emerald">Emerald</string>
     <string name="accent_violet">Violet</string>
     <string name="accent_indigo">Indigo</string>
     <string name="accent_blue">Blue</string>
@@ -869,8 +871,8 @@
     <string name="follow_system_lang">Follow system language</string>
     <string name="onboarding_theme_title">Appearance &amp; Theme</string>
     <string name="onboarding_theme_subtitle">Choose your preferred display style.</string>
-    <string name="theme_dark_subtitle">Deep dark emerald with glass accents</string>
-    <string name="theme_light_subtitle">Clean light mint with crisp emerald</string>
+    <string name="theme_dark_subtitle">Deep ink with an aurora glow</string>
+    <string name="theme_light_subtitle">Bright porcelain with crisp contrast</string>
     <string name="theme_system_subtitle">Matches your device system setting</string>
     <string name="onboarding_focus_title">What brings you to PocketOS?</string>
     <string name="onboarding_focus_subtitle">We\'ll tailor your daily dashboard to what matters most.</string>
@@ -887,4 +889,43 @@
     <string name="focus_all">All-in-One</string>
     <string name="focus_all_sub">Full dashboard with all features</string>
     <string name="onboarding_privacy_promise">Your data stays on your device. PocketOS stores everything locally in an encrypted database with zero cloud accounts or tracking.</string>
+    <!-- Redesign (Aurora) -->
+    <string name="hero_progress">%1$s of %2$s done today</string>
+    <string name="hero_nothing_planned">Nothing planned yet. Add something to stay ahead.</string>
+    <string name="status_trial">Trial</string>
+    <string name="status_renews_soon">Due soon</string>
+    <string name="status_overdue_payment">Payment overdue</string>
+    <string name="renews_today">Renews today</string>
+    <string name="renewal_was_due">Was due %1$s</string>
+    <string name="monthly_spend">Monthly spend</string>
+    <string name="next_payment">Next payment</string>
+    <string name="none_upcoming">Nothing upcoming</string>
+    <!-- Redesign v2 -->
+    <string name="tour_subs_title">Track your subscriptions</string>
+    <string name="tour_subs_body">Monitor recurring bills, trial end dates and renewals. PocketOS alerts you before charges occur.</string>
+    <string name="tour_subs_action">Add subscription</string>
+    <string name="tour_rem_title">Reliable offline reminders</string>
+    <string name="tour_rem_body">Schedule timely notifications and alarms. Completely local and private.</string>
+    <string name="tour_rem_action">Set reminder</string>
+    <string name="tour_task_title">Stay on top of tasks</string>
+    <string name="tour_task_body">Keep organised checklists and daily to-dos. Complete tasks from Home or notifications.</string>
+    <string name="tour_task_action">Add task</string>
+    <string name="tour_exp_title">Manage recurring expenses</string>
+    <string name="tour_exp_body">Clear monthly spending summaries and payment forecasts without linking a bank account.</string>
+    <string name="tour_exp_action">Add expense</string>
+    <string name="tour_all_title">Welcome to PocketOS</string>
+    <string name="tour_all_body">Your private daily command centre. Reminders, tasks and subscriptions stay safe on your device.</string>
+    <string name="privacy_by_design">Privacy-first by design</string>
+    <string name="backup_footer">Backups contain your active reminders, subscriptions and custom categories.</string>
+    <string name="import_footer">Importing a backup merges records into your local encrypted database.</string>
+    <string name="data_erased">All device data has been erased.</string>
+    <string name="updates_and_source">Updates &amp; source</string>
+    <string name="auto_recognized_service">Auto-recognised service</string>
+    <string name="customize_icon_title">Customise icon &amp; style</string>
+    <string name="symbol_library">Built-in symbol library</string>
+    <string name="search_brand_icons">Search brand icons</string>
+    <string name="onboarding_welcome_title">Your life, beautifully organised</string>
+    <string name="onboarding_welcome_body">Reminders, tasks and subscriptions in one private, offline space.</string>
+    <string name="step_of">Step %1$s of %2$s</string>
+    <string name="theme_preview_label">Preview</string>
 </resources>

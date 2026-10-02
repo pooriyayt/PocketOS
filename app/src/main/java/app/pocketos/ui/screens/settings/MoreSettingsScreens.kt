@@ -169,7 +169,7 @@ fun PrivacyScreen(nav: NavController) {
             level = GlassLevel.L2,
             tint = c.accent,
         ) {
-            Text("Privacy-First by Design", style = MaterialTheme.typography.titleMedium, color = c.textPrimary, fontWeight = FontWeight.SemiBold)
+            Text(stringResource(R.string.privacy_by_design), style = MaterialTheme.typography.titleMedium, color = c.textPrimary, fontWeight = FontWeight.SemiBold)
             Spacer(Modifier.height(Spacing.xs))
             Text(
                 "Your data stays on your device. PocketOS does not send personal details, reminders, or financial amounts to cloud servers. All information is secured with AES-256 encryption in a local database protected by Android Keystore.",
@@ -252,7 +252,7 @@ fun DataScreen(nav: NavController) {
                             }.onSuccess { stats ->
                                 container.notificationScheduler.reconcileAll()
                                 container.widgetUpdater.updateNow()
-                                ui.message("Restored ${stats.remindersCount} reminders & ${stats.subscriptionsCount} subscriptions")
+                                ui.message(context.getString(R.string.restore_success, stats.remindersCount, stats.subscriptionsCount))
                             }.onFailure {
                                 ui.message(context.getString(R.string.restore_failed))
                             }
@@ -271,7 +271,7 @@ fun DataScreen(nav: NavController) {
     SettingsPage(stringResource(R.string.settings_backup_title), nav) {
         SettingsGroup(
             stringResource(R.string.export),
-            footer = "Backups contain your active reminders, subscriptions, and custom categories.",
+            footer = stringResource(R.string.backup_footer),
         ) {
             SettingsRow(
                 icon = Icons.Rounded.Lock,
@@ -300,7 +300,7 @@ fun DataScreen(nav: NavController) {
 
         SettingsGroup(
             "Restore",
-            footer = "Importing a backup will merge records into your local encrypted database.",
+            footer = stringResource(R.string.import_footer),
         ) {
             SettingsRow(
                 icon = Icons.Rounded.Upload,
@@ -385,7 +385,7 @@ fun DataScreen(nav: NavController) {
                         }.onSuccess { stats ->
                             container.notificationScheduler.reconcileAll()
                             container.widgetUpdater.updateNow()
-                            ui.message("Restored ${stats.remindersCount} reminders & ${stats.subscriptionsCount} subscriptions")
+                            ui.message(context.getString(R.string.restore_success, stats.remindersCount, stats.subscriptionsCount))
                         }.onFailure {
                             ui.message(context.getString(R.string.restore_failed))
                         }
@@ -419,7 +419,7 @@ fun DataScreen(nav: NavController) {
                     container.backupManager.clearAllData()
                     container.notificationScheduler.reconcileAll()
                     container.widgetUpdater.updateNow()
-                    ui.message("All device data has been erased.")
+                    ui.message(context.getString(R.string.data_erased))
                 }
             },
             dismissText = stringResource(R.string.cancel),
@@ -454,13 +454,15 @@ fun AboutScreen(nav: NavController) {
             color = c.textSecondary,
         )
 
-        SettingsGroup("Updates & Source") {
-            SettingsRow(
-                icon = Icons.Rounded.SystemUpdate,
-                title = stringResource(R.string.check_for_updates),
-                subtitle = stringResource(R.string.check_for_updates_desc),
-                onClick = { container.updateManager.checkForUpdates(isManual = true) },
-            )
+        SettingsGroup(stringResource(R.string.updates_and_source)) {
+            if (app.pocketos.BuildConfig.SELF_UPDATE) {
+                SettingsRow(
+                    icon = Icons.Rounded.SystemUpdate,
+                    title = stringResource(R.string.check_for_updates),
+                    subtitle = stringResource(R.string.check_for_updates_desc),
+                    onClick = { container.updateManager.checkForUpdates(isManual = true) },
+                )
+            }
             SettingsRow(
                 icon = Icons.Rounded.Code,
                 title = stringResource(R.string.github_repository),

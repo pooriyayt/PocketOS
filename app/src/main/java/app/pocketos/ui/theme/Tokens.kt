@@ -42,6 +42,7 @@ object Shapes {
     val sheet = RoundedCornerShape(topStart = Radii.sheet, topEnd = Radii.sheet)
     val pill = RoundedCornerShape(50)
     val icon = RoundedCornerShape(Radii.sm)
+    val fab = RoundedCornerShape(Radii.lg)
 }
 
 object Sizes {
@@ -52,6 +53,10 @@ object Sizes {
     val iconLg = 28.dp
     val serviceIcon = 44.dp
     val serviceIconLg = 72.dp
-    val navBarHeight = 68.dp
+    val navBarHeight = 66.dp
     val fab = 60.dp
+
+    /** Content column cap so tablets and landscape get a centred, readable layout. */
+    val contentMaxWidth = 720.dp
+    val navBarMaxWidth = 560.dp
 }

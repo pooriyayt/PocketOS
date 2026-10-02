@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.AccountBalanceWallet
 import androidx.compose.material.icons.outlined.CheckCircle
@@ -80,6 +81,7 @@ import app.pocketos.ui.screens.subscriptions.SubscriptionDetailScreen
 import app.pocketos.ui.screens.subscriptions.SubscriptionEditorScreen
 import app.pocketos.ui.screens.subscriptions.SubscriptionsScreen
 import app.pocketos.ui.theme.PocketTheme
+import app.pocketos.ui.theme.Sizes
 import dev.chrisbanes.haze.hazeSource
 import dev.chrisbanes.haze.rememberHazeState
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -149,9 +151,11 @@ private fun MainScaffold(settings: AppSettings, deepLinks: StateFlow<Uri?>, onDe
 
     CompositionLocalProvider(LocalHazeState provides haze) {
         Box(Modifier.fillMaxSize()) {
-            Box(Modifier.fillMaxSize().hazeSource(haze)) {
+            Box(Modifier.fillMaxSize().hazeSource(haze), contentAlignment = Alignment.TopCenter) {
                 NavHost(
                     navController = nav,
+                    // Phones use the full width; tablets / landscape get a centred column.
+                    modifier = Modifier.fillMaxSize().widthIn(max = Sizes.contentMaxWidth),
                     startDestination = Routes.Home,
                     enterTransition = { motion.screenEnter() },
                     exitTransition = { motion.screenExit() },
@@ -202,7 +206,7 @@ private fun MainScaffold(settings: AppSettings, deepLinks: StateFlow<Uri?>, onDe
                 selected in 0..3,
                 enter = motion.popEnter(),
                 exit = motion.popExit(),
-                modifier = Modifier.align(Alignment.BottomEnd).navigationBarsPadding().padding(end = 24.dp, bottom = 92.dp),
+                modifier = Modifier.align(Alignment.BottomEnd).navigationBarsPadding().padding(end = 20.dp, bottom = 96.dp),
             ) {
                 GlassFloatingActionButton(
                     icon = Icons.Rounded.Add,

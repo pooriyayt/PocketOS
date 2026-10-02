@@ -1,5 +1,10 @@
 package app.pocketos.ui.screens.insights
 
+import androidx.compose.material.icons.rounded.TaskAlt
+import androidx.compose.ui.draw.clip
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.ui.graphics.Color
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -118,13 +123,14 @@ fun InsightsScreen(nav: NavController) {
             item {
                 LazyRow(horizontalArrangement = Arrangement.spacedBy(Spacing.md)) {
                     items(s.totals, key = { it.currency }) { t ->
-                        GlassCard(Modifier.width(220.dp), level = GlassLevel.L2, tint = c.accent) {
-                            Text(t.currency, style = MaterialTheme.typography.labelLarge, color = c.textSecondary)
-                            Text(f.money(t.monthlyMinor, t.currency), style = MaterialTheme.typography.headlineSmall, color = c.textPrimary, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                            Text(stringResource(R.string.per_month_estimate), style = MaterialTheme.typography.bodySmall, color = c.textSecondary)
+                        app.pocketos.ui.components.GradientCard(Modifier.width(240.dp)) {
+                            app.pocketos.ui.components.CurrencyLabel(t.currency, color = Color.White.copy(alpha = 0.9f))
                             Spacer(Modifier.height(Spacing.sm))
-                            Text(f.money(t.annualMinor, t.currency), style = MaterialTheme.typography.titleMedium, color = c.textPrimary, maxLines = 1)
-                            Text(stringResource(R.string.per_year_estimate), style = MaterialTheme.typography.bodySmall, color = c.textSecondary)
+                            Text(f.money(t.monthlyMinor, t.currency), style = MaterialTheme.typography.headlineSmall, color = Color.White, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                            Text(stringResource(R.string.per_month_estimate), style = MaterialTheme.typography.bodySmall, color = Color.White.copy(alpha = 0.75f))
+                            Spacer(Modifier.height(Spacing.md))
+                            Text(f.money(t.annualMinor, t.currency), style = MaterialTheme.typography.titleMedium, color = Color.White, maxLines = 1)
+                            Text(stringResource(R.string.per_year_estimate), style = MaterialTheme.typography.bodySmall, color = Color.White.copy(alpha = 0.75f))
                         }
                     }
                 }
@@ -142,10 +148,10 @@ fun InsightsScreen(nav: NavController) {
         if (s.upcoming.isNotEmpty()) {
             item { SectionHeader(stringResource(R.string.upcoming_payments_30)) }
             items(s.upcoming.take(10), key = { it.subscription.id + it.date }) { p ->
-                GlassCard(Modifier.fillMaxWidth().padding(bottom = Spacing.sm), level = GlassLevel.L1, contentPadding = PaddingValues(Spacing.md),
+                GlassCard(Modifier.fillMaxWidth().padding(bottom = Spacing.sm), contentPadding = PaddingValues(Spacing.md),
                     onClick = { nav.navigate(Routes.SubscriptionDetail(p.subscription.id)) }) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        ServiceIcon(catalog.find(p.subscription.serviceId), p.subscription.name, p.subscription.category, size = 36.dp, customColor = p.subscription.color)
+                        ServiceIcon(catalog.find(p.subscription.serviceId), p.subscription.name, p.subscription.category, size = 42.dp, customColor = p.subscription.color)
                         Spacer(Modifier.width(Spacing.md))
                         Column(Modifier.weight(1f)) {
                             Text(p.subscription.name, style = MaterialTheme.typography.bodyLarge, color = c.textPrimary, maxLines = 1)
@@ -164,7 +170,7 @@ fun InsightsScreen(nav: NavController) {
 
         item { SectionHeader(stringResource(R.string.completion_trend)) }
         item {
-            GlassCard(Modifier.fillMaxWidth(), level = GlassLevel.L1) {
+            GlassCard(Modifier.fillMaxWidth()) {
                 val values = s.completionTrend.map { it.completed }
                 val labels = s.completionTrend.map { f.localizeDigits(it.weekStart.dayOfMonth.toString()) }
                 val description = stringResource(R.string.trend_description, s.completedThisWeek, s.completedLastWeek)
@@ -189,12 +195,18 @@ fun InsightsScreen(nav: NavController) {
         if (s.recentlyCompleted.isNotEmpty()) {
             item { SectionHeader(stringResource(R.string.recently_completed)) }
             items(s.recentlyCompleted, key = { "done_" + it.id }) { r ->
-                GlassCard(Modifier.fillMaxWidth().padding(bottom = Spacing.sm), level = GlassLevel.L1, contentPadding = PaddingValues(Spacing.md),
+                GlassCard(Modifier.fillMaxWidth().padding(bottom = Spacing.sm), contentPadding = PaddingValues(Spacing.md),
                     onClick = { nav.navigate(Routes.ReminderDetail(r.id)) }) {
-                    Text(r.title, style = MaterialTheme.typography.bodyLarge, color = c.textPrimary, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                    r.completedAt?.let {
-                        val d = java.time.LocalDate.ofInstant(it, container.clock.zone())
-                        Text(stringResource(R.string.completed_on, f.dayLabel(d, today)), style = MaterialTheme.typography.bodySmall, color = c.textSecondary)
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        app.pocketos.ui.components.ToneIcon(Icons.Rounded.TaskAlt, c.tones.green, size = 36.dp)
+                        Spacer(Modifier.width(Spacing.md))
+                        Column(Modifier.weight(1f)) {
+                            Text(r.title, style = MaterialTheme.typography.bodyLarge, color = c.textPrimary, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                            r.completedAt?.let {
+                                val d = java.time.LocalDate.ofInstant(it, container.clock.zone())
+                                Text(stringResource(R.string.completed_on, f.dayLabel(d, today)), style = MaterialTheme.typography.bodySmall, color = c.textSecondary)
+                            }
+                        }
                     }
                 }
             }
@@ -218,10 +230,10 @@ private fun CategoryDistribution(s: InsightsSnapshot) {
         R.string.donut_description, currency,
         slices.zip(names).joinToString(", ") { (slice, name) -> "$name ${(slice.share * 100).roundToInt()}%" },
     )
-    GlassCard(Modifier.fillMaxWidth(), level = GlassLevel.L1) {
+    GlassCard(Modifier.fillMaxWidth()) {
         if (currencies.size > 1) {
             Row(horizontalArrangement = Arrangement.spacedBy(Spacing.sm)) {
-                currencies.forEach { cur -> GlassChip(cur, cur == currency, { currency = cur }) }
+                currencies.forEach { cur -> app.pocketos.ui.components.CurrencyChip(cur, cur == currency, { currency = cur }) }
             }
             Spacer(Modifier.height(Spacing.md))
         }
@@ -256,18 +268,32 @@ private fun RenewalStrip(s: InsightsSnapshot, today: java.time.LocalDate) {
     val c = LocalPocketColors.current
     val f = LocalFormatter.current
     val days = (0 until 35).map { today.plusDays(it.toLong()) }
-    GlassCard(Modifier.fillMaxWidth(), level = GlassLevel.L1) {
+    GlassCard(Modifier.fillMaxWidth()) {
         LazyRow(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
             items(days) { d ->
                 val count = s.renewalDays[d]?.size ?: 0
                 Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.width(34.dp)) {
                     Text(f.weekdayShort(d.dayOfWeek).take(2), style = MaterialTheme.typography.labelSmall, color = c.textTertiary)
                     Spacer(Modifier.height(4.dp))
-                    Canvas(Modifier.size(30.dp)) {
-                        drawCircle(if (count > 0) c.warning.copy(alpha = 0.25f + 0.2f * count.coerceAtMost(3)) else c.textTertiary.copy(alpha = 0.08f))
+                    Box(
+                        Modifier
+                            .size(32.dp)
+                            .clip(androidx.compose.foundation.shape.CircleShape)
+                            .background(
+                                if (count > 0) c.brandGradient
+                                else androidx.compose.ui.graphics.SolidColor(c.textTertiary.copy(alpha = if (d == today) 0.22f else 0.08f))
+                            ),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        Text(
+                            f.dayOfMonth(d),
+                            style = MaterialTheme.typography.labelMedium,
+                            fontWeight = if (count > 0 || d == today) androidx.compose.ui.text.font.FontWeight.Bold else null,
+                            color = if (count > 0) c.onAccent else c.textSecondary,
+                        )
                     }
-                    Text(f.dayOfMonth(d), style = MaterialTheme.typography.labelSmall, color = if (count > 0) c.textPrimary else c.textSecondary)
-                    if (count > 0) Text(pluralStringResource(R.plurals.count_short, count, count), style = MaterialTheme.typography.labelSmall, color = c.warning)
+                    Spacer(Modifier.height(4.dp))
+                    if (count > 0) Text(pluralStringResource(R.plurals.count_short, count, count), style = MaterialTheme.typography.labelSmall, color = if (c.isDark) c.accentSoft else c.accent)
                 }
             }
         }

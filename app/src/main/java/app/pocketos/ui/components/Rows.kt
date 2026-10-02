@@ -1,5 +1,8 @@
 package app.pocketos.ui.components
 
+import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.Canvas
@@ -124,6 +127,16 @@ fun ReminderRow(
     val categoryColor = categoryColor(CategoryKind.REMINDER, reminder.category)
     GlassCard(
         modifier = modifier.fillMaxWidth(),
+        decoration = {
+            val start = if (layoutDirection == androidx.compose.ui.unit.LayoutDirection.Ltr) 0f else size.width
+            drawRect(
+                androidx.compose.ui.graphics.Brush.radialGradient(
+                    listOf((if (overdue) c.warning else categoryColor).copy(alpha = if (reminder.isCompleted) 0f else if (c.isDark) 0.16f else 0.08f), Color.Transparent),
+                    center = Offset(start, size.height / 2),
+                    radius = size.height * 1.5f,
+                )
+            )
+        },
         level = level,
         contentPadding = androidx.compose.foundation.layout.PaddingValues(start = Spacing.xs, end = Spacing.lg, top = Spacing.sm, bottom = Spacing.sm),
         onClick = onClick,
@@ -169,6 +182,41 @@ fun ReminderRow(
     }
 }
 
+/** Visual status of a subscription: what to call it and which tone to paint it. */
+data class SubscriptionBadge(val label: String, val color: Color, val detail: String)
+
+/**
+ * One source of truth for how a subscription's state is shown, so the list,
+ * detail screen and widgets never disagree. Covers trials, renewals that are
+ * due soon or already past, and paused / cancelled / expired plans.
+ */
+@Composable
+fun subscriptionBadge(subscription: Subscription, today: LocalDate): SubscriptionBadge {
+    val c = LocalPocketColors.current
+    val f = LocalFormatter.current
+    val days = ChronoUnit.DAYS.between(today, subscription.nextRenewal)
+    val trialEnd = subscription.trialEnd
+    return when (subscription.status) {
+        SubscriptionStatus.PAUSED -> SubscriptionBadge(stringResource(R.string.status_paused), c.tones.amber, stringResource(R.string.status_paused))
+        SubscriptionStatus.CANCELLED -> SubscriptionBadge(stringResource(R.string.status_cancelled), c.tones.red, stringResource(R.string.status_cancelled))
+        SubscriptionStatus.EXPIRED -> SubscriptionBadge(stringResource(R.string.status_expired), c.textTertiary, stringResource(R.string.status_expired))
+        SubscriptionStatus.ACTIVE -> when {
+            trialEnd != null && !trialEnd.isBefore(today) ->
+                SubscriptionBadge(stringResource(R.string.status_trial), c.tones.cyan, stringResource(R.string.trial_ends_relative, f.relative(trialEnd, today)))
+            days < 0 ->
+                SubscriptionBadge(stringResource(R.string.status_overdue_payment), c.danger, stringResource(R.string.renewal_was_due, f.date(subscription.nextRenewal)))
+            days == 0L ->
+                SubscriptionBadge(stringResource(R.string.status_renews_soon), c.warning, stringResource(R.string.renews_today))
+            days <= 3 ->
+                SubscriptionBadge(stringResource(R.string.status_renews_soon), c.warning, stringResource(R.string.renews_relative, f.relative(subscription.nextRenewal, today)))
+            days <= 7 ->
+                SubscriptionBadge(stringResource(R.string.status_active), c.success, stringResource(R.string.renews_relative, f.relative(subscription.nextRenewal, today)))
+            else ->
+                SubscriptionBadge(stringResource(R.string.status_active), c.success, stringResource(R.string.renews_on, f.date(subscription.nextRenewal)))
+        }
+    }
+}
+
 @Composable
 fun SubscriptionRow(
     subscription: Subscription,
@@ -181,39 +229,58 @@ fun SubscriptionRow(
 ) {
     val c = LocalPocketColors.current
     val f = LocalFormatter.current
-    val days = ChronoUnit.DAYS.between(today, subscription.nextRenewal)
-    GlassCard(modifier.fillMaxWidth(), onClick = onClick, onLongClick = onLongClick, contentPadding = androidx.compose.foundation.layout.PaddingValues(Spacing.md)) {
+    val badge = subscriptionBadge(subscription, today)
+    val dim = if (subscription.isActive) 1f else 0.55f
+    val brand = parseHex(subscription.color) ?: parseHex(service?.color) ?: categoryColor(CategoryKind.SUBSCRIPTION, subscription.category)
+    GlassCard(
+        modifier.fillMaxWidth(),
+        decoration = {
+            // Brand-coloured light behind the icon ties each row to its service.
+            val start = if (layoutDirection == androidx.compose.ui.unit.LayoutDirection.Ltr) 0f else size.width
+            drawRect(
+                androidx.compose.ui.graphics.Brush.radialGradient(
+                    listOf(brand.copy(alpha = if (c.isDark) 0.20f * dim else 0.10f * dim), Color.Transparent),
+                    center = Offset(start, size.height / 2),
+                    radius = size.height * 1.6f,
+                )
+            )
+        },
+        onClick = onClick,
+        onLongClick = onLongClick,
+        contentPadding = androidx.compose.foundation.layout.PaddingValues(Spacing.md),
+    ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            ServiceIcon(service, subscription.name, subscription.category, customColor = subscription.color)
+            ServiceIcon(service, subscription.name, subscription.category, size = 48.dp, customColor = subscription.color, modifier = Modifier.graphicsLayer { alpha = dim })
             Spacer(Modifier.width(Spacing.md))
             Column(Modifier.weight(1f)) {
-                Text(subscription.name, style = MaterialTheme.typography.titleSmall, color = c.textPrimary, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                Spacer(Modifier.height(2.dp))
-                val statusText = when (subscription.status) {
-                    SubscriptionStatus.ACTIVE -> when {
-                        days < 0 -> f.date(subscription.nextRenewal)
-                        days <= 7 -> stringResource(R.string.renews_relative, f.relative(subscription.nextRenewal, today))
-                        else -> stringResource(R.string.renews_on, f.date(subscription.nextRenewal))
-                    }
-                    SubscriptionStatus.PAUSED -> stringResource(R.string.status_paused)
-                    SubscriptionStatus.CANCELLED -> stringResource(R.string.status_cancelled)
-                    SubscriptionStatus.EXPIRED -> stringResource(R.string.status_expired)
-                }
                 Text(
-                    statusText,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = if (subscription.isActive && days in 0..2) c.warning else c.textSecondary,
+                    subscription.name,
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.SemiBold,
+                    color = if (subscription.isActive) c.textPrimary else c.textSecondary,
                     maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
                 )
+                Spacer(Modifier.height(4.dp))
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    StatusPill(badge.label, badge.color, dot = true)
+                    if (badge.detail != badge.label) {
+                        Spacer(Modifier.width(6.dp))
+                        Text(badge.detail, style = MaterialTheme.typography.bodySmall, color = c.textSecondary, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                    }
+                }
             }
+            Spacer(Modifier.width(Spacing.sm))
             Column(horizontalAlignment = Alignment.End, modifier = Modifier.widthIn(max = 140.dp)) {
                 val amount = subscription.amount
                 Text(
-                    if (amount != null && showAmounts) f.money(amount.amountMinor, amount.currency, compact = true) else "—",
+                    if (amount != null && showAmounts) f.money(amount.amountMinor, amount.currency, compact = true) else "\u2014",
                     style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.Bold,
                     color = if (subscription.isActive) c.textPrimary else c.textTertiary,
                     maxLines = 1,
                 )
+                Spacer(Modifier.height(2.dp))
                 Text(f.billing(subscription.billing), style = MaterialTheme.typography.labelSmall, color = c.textTertiary, maxLines = 1)
             }
         }
@@ -225,20 +292,25 @@ fun SubscriptionRow(
 fun RenewalCard(subscription: Subscription, service: ServiceInfo?, date: LocalDate, today: LocalDate, onClick: () -> Unit, modifier: Modifier = Modifier) {
     val c = LocalPocketColors.current
     val f = LocalFormatter.current
-    GlassCard(modifier.width(156.dp), onClick = onClick, contentPadding = androidx.compose.foundation.layout.PaddingValues(Spacing.md)) {
-        ServiceIcon(service, subscription.name, subscription.category, size = 40.dp, customColor = subscription.color)
+    val soon = ChronoUnit.DAYS.between(today, date) <= 2
+    GlassCard(modifier.width(164.dp), onClick = onClick, contentPadding = androidx.compose.foundation.layout.PaddingValues(Spacing.lg)) {
+        Row(verticalAlignment = Alignment.Top) {
+            ServiceIcon(service, subscription.name, subscription.category, size = 42.dp, customColor = subscription.color)
+            Spacer(Modifier.weight(1f))
+            if (soon) StatusPill(stringResource(R.string.status_renews_soon), c.warning)
+        }
         Spacer(Modifier.height(Spacing.md))
-        Text(subscription.name, style = MaterialTheme.typography.titleSmall, color = c.textPrimary, maxLines = 1, overflow = TextOverflow.Ellipsis)
+        Text(subscription.name, style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.SemiBold, color = c.textPrimary, maxLines = 1, overflow = TextOverflow.Ellipsis)
         Text(
             f.relative(date, today),
             style = MaterialTheme.typography.bodySmall,
-            color = if (ChronoUnit.DAYS.between(today, date) <= 2) c.warning else c.textSecondary,
+            color = if (soon) c.warning else c.textSecondary,
             maxLines = 1,
         )
-        Spacer(Modifier.height(Spacing.xs))
+        Spacer(Modifier.height(Spacing.sm))
         Text(
-            subscription.amount?.let { f.money(it.amountMinor, it.currency, compact = true) } ?: "—",
-            style = MaterialTheme.typography.titleMedium,
+            subscription.amount?.let { f.money(it.amountMinor, it.currency, compact = true) } ?: "\u2014",
+            style = MaterialTheme.typography.titleLarge,
             color = c.textPrimary,
             maxLines = 1,
         )

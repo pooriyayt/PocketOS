@@ -165,11 +165,20 @@ fun LockScreen() {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
     ) {
-        Box(Modifier.size(72.dp).glass(GlassLevel.L2, CircleShape), contentAlignment = Alignment.Center) {
-            Icon(Icons.Rounded.Lock, null, tint = c.accentHighlight, modifier = Modifier.size(32.dp))
+        val breath = app.pocketos.ui.design.rememberBreath()
+        Box(Modifier.size(132.dp), contentAlignment = Alignment.Center) {
+            androidx.compose.foundation.Canvas(Modifier.matchParentSize()) {
+                drawCircle(androidx.compose.ui.graphics.Brush.radialGradient(listOf(c.accent.copy(alpha = 0.35f + 0.2f * breath), androidx.compose.ui.graphics.Color.Transparent)))
+            }
+            Box(
+                Modifier.size(80.dp).clip(androidx.compose.foundation.shape.RoundedCornerShape(26.dp)).background(c.brandGradient),
+                contentAlignment = Alignment.Center,
+            ) {
+                Icon(Icons.Rounded.Lock, null, tint = c.onAccent, modifier = Modifier.size(36.dp))
+            }
         }
         Spacer(Modifier.height(Spacing.lg))
-        Text(stringResource(R.string.pocketos_locked), style = MaterialTheme.typography.headlineSmall, color = c.textPrimary)
+        Text(stringResource(R.string.pocketos_locked), style = MaterialTheme.typography.headlineMedium, color = c.textPrimary)
         Spacer(Modifier.height(Spacing.xs))
         Text(stringResource(R.string.enter_pin), style = MaterialTheme.typography.bodyMedium, color = c.textSecondary)
         Spacer(Modifier.height(Spacing.xl))
@@ -179,7 +188,12 @@ fun LockScreen() {
         ) {
             repeat(maxOf(4, pin.length)) { i ->
                 val filled by animateFloatAsState(if (i < pin.length) 1f else 0f, motion.press(), label = "pinDot")
-                Box(Modifier.size(14.dp).clip(CircleShape).background(if (filled > 0.5f) c.accent else c.textTertiary.copy(alpha = 0.3f)))
+                Box(
+                    Modifier.size(16.dp).clip(CircleShape).background(c.textTertiary.copy(alpha = 0.25f)),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Box(Modifier.size(16.dp * filled).clip(CircleShape).background(c.brandGradient))
+                }
             }
         }
         Spacer(Modifier.height(Spacing.md))
@@ -216,8 +230,8 @@ private fun PinPad(enabled: Boolean, onDigit: (String) -> Unit, onBackspace: () 
                 row.forEach { key ->
                     when (key) {
                         "⌫" -> PadKey(stringResource(R.string.delete_digit), enabled, onBackspace) { Icon(Icons.AutoMirrored.Rounded.Backspace, null, tint = LocalPocketColors.current.textSecondary) }
-                        "✓" -> PadKey(stringResource(R.string.unlock), enabled && submitEnabled, onSubmit) {
-                            Icon(Icons.Rounded.Check, null, tint = if (submitEnabled) LocalPocketColors.current.accent else LocalPocketColors.current.textTertiary)
+                        "✓" -> PadKey(stringResource(R.string.unlock), enabled && submitEnabled, onSubmit, highlighted = submitEnabled) {
+                            Icon(Icons.Rounded.Check, null, tint = if (submitEnabled) LocalPocketColors.current.onAccent else LocalPocketColors.current.textTertiary)
                         }
                         else -> PadKey(key, enabled, { onDigit(key) }) {
                             Text(app.pocketos.ui.format.LocalFormatter.current.localizeDigits(key), style = MaterialTheme.typography.headlineSmall, color = LocalPocketColors.current.textPrimary)
@@ -230,12 +244,13 @@ private fun PinPad(enabled: Boolean, onDigit: (String) -> Unit, onBackspace: () 
 }
 
 @Composable
-private fun PadKey(label: String, enabled: Boolean, onClick: () -> Unit, content: @Composable () -> Unit) {
+private fun PadKey(label: String, enabled: Boolean, onClick: () -> Unit, highlighted: Boolean = false, content: @Composable () -> Unit) {
     val interaction = remember { MutableInteractionSource() }
+    val c = LocalPocketColors.current
     Box(
         Modifier.size(76.dp)
             .pressFeedback(interaction, CircleShape, enabled)
-            .glass(GlassLevel.L1, CircleShape)
+            .then(if (highlighted) Modifier.clip(CircleShape).background(c.brandGradient) else Modifier.glass(GlassLevel.L2, CircleShape))
             .selectable(false, enabled = enabled, role = Role.Button, interactionSource = interaction, indication = null, onClick = onClick)
             .semantics { contentDescription = label },
         contentAlignment = Alignment.Center,

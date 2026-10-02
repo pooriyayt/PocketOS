@@ -15,7 +15,7 @@ import kotlinx.coroutines.flow.map
 import java.time.LocalTime
 
 enum class ThemeMode { SYSTEM, LIGHT, DARK }
-enum class AccentColor { EMERALD, VIOLET, INDIGO, BLUE, TEAL, ROSE, AMBER }
+enum class AccentColor { AURORA, EMERALD, VIOLET, INDIGO, BLUE, TEAL, ROSE, AMBER }
 enum class MotionPreference { SYSTEM, REDUCED, FULL }
 enum class HapticsPreference { ON, REDUCED, OFF }
 enum class GlassIntensity { SUBTLE, BALANCED, VIVID }
@@ -31,7 +31,7 @@ enum class DashboardSection { ATTENTION, OVERVIEW, TIMELINE, RENEWALS, SUGGESTIO
  */
 data class AppSettings(
     val themeMode: ThemeMode = ThemeMode.SYSTEM,
-    val accent: AccentColor = AccentColor.EMERALD,
+    val accent: AccentColor = AccentColor.AURORA,
     val dynamicColor: Boolean = false,
     val motion: MotionPreference = MotionPreference.SYSTEM,
     val haptics: HapticsPreference = HapticsPreference.ON,
@@ -69,7 +69,8 @@ class SettingsRepository(private val store: DataStore<Preferences>) {
 
     private object K {
         val theme = stringPreferencesKey("theme")
-        val accent = stringPreferencesKey("accent")
+        // v2: the Aurora redesign resets everyone to the new signature accent once.
+        val accent = stringPreferencesKey("accent_v2")
         val dynamic = booleanPreferencesKey("dynamic_color")
         val motion = stringPreferencesKey("motion")
         val haptics = stringPreferencesKey("haptics")

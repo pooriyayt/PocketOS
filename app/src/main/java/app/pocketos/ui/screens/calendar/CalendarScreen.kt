@@ -262,7 +262,7 @@ private fun DayCell(date: LocalDate, today: LocalDate, selected: Boolean, entrie
             .fillMaxSize()
             .padding(2.dp)
             .clip(CircleShape)
-            .then(if (selected) Modifier.background(c.accent) else if (isToday) Modifier.border(1.5.dp, c.accent, CircleShape) else Modifier)
+            .then(if (selected) Modifier.background(c.brandGradient) else if (isToday) Modifier.border(1.5.dp, c.brandGradient, CircleShape) else Modifier)
             .selectable(selected, role = Role.Button, interactionSource = remember { MutableInteractionSource() }, indication = null, onClick = onClick)
             .semantics { contentDescription = description },
         horizontalAlignment = Alignment.CenterHorizontally,

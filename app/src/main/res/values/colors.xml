@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="pocket_background">#F5F9F7</color>
-    <color name="pocket_accent">#059669</color>
-    <color name="launcher_background">#08120D</color>
+    <color name="pocket_background">#F5F6FB</color>
+    <color name="pocket_accent">#5A48F0</color>
+    <color name="launcher_background">#0B0C1A</color>
 </resources>

@@ -1,5 +1,6 @@
 package app.pocketos.ui.screens.subscriptions
 
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.togetherWith
@@ -409,16 +410,31 @@ private fun AmountSection(form: SubscriptionForm, vm: SubscriptionEditorViewMode
     Row(verticalAlignment = Alignment.Top) {
         GlassTextField(
             form.amountText,
-            { v -> vm.update { it.copy(amountText = v.filter { ch -> ch.isDigit() || ch in ".,٫٬" }.take(18), amountError = false) } },
+            { v -> vm.update { it.copy(amountText = app.pocketos.ui.components.AmountInput.sanitize(v, it.currency), amountError = false) } },
             modifier = Modifier.weight(1f),
             placeholder = stringResource(R.string.amount_hint),
             keyboardType = KeyboardType.Decimal,
             imeAction = ImeAction.Done,
             error = if (form.amountError) stringResource(R.string.error_amount_invalid) else null,
             textStyle = MaterialTheme.typography.headlineSmall,
+            visualTransformation = remember(f.locale) { app.pocketos.ui.components.AmountInput.Grouping(f.locale.language == "fa") },
         )
         Spacer(Modifier.width(Spacing.sm))
-        PocketButton(form.currency, { currencySheet = true }, style = ButtonStyle.Glass, modifier = Modifier.padding(top = 4.dp))
+        app.pocketos.ui.design.GlassCard(
+            Modifier.padding(top = 2.dp),
+            level = app.pocketos.ui.design.GlassLevel.L1,
+            shape = app.pocketos.ui.theme.Shapes.field,
+            contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = Spacing.md, vertical = 14.dp),
+            onClick = { currencySheet = true },
+            onClickLabel = stringResource(R.string.currency),
+        ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                app.pocketos.ui.components.CurrencyFlag(form.currency, size = 24.dp)
+                Spacer(Modifier.width(Spacing.sm))
+                Text(form.currency, style = MaterialTheme.typography.titleSmall, color = c.textPrimary)
+                Icon(Icons.Rounded.ExpandMore, null, tint = c.textTertiary, modifier = Modifier.size(18.dp))
+            }
+        }
     }
     Text(stringResource(R.string.amount_optional_note), style = MaterialTheme.typography.bodySmall, color = c.textTertiary, modifier = Modifier.padding(top = Spacing.xs, start = Spacing.xs))
     Spacer(Modifier.height(Spacing.lg))
@@ -464,14 +480,14 @@ private fun AmountSection(form: SubscriptionForm, vm: SubscriptionEditorViewMode
     }
     if (currencySheet) {
         GlassBottomSheet(onDismiss = { currencySheet = false }, title = stringResource(R.string.currency)) {
-            FlowRow(horizontalArrangement = Arrangement.spacedBy(Spacing.sm), verticalArrangement = Arrangement.spacedBy(Spacing.sm)) {
-                Currencies.common.forEach { code ->
-                    GlassChip("$code · ${Currencies.displayName(code, f.locale)}", form.currency == code, {
-                        vm.update { it.copy(currency = code) }
-                        currencySheet = false
-                    })
-                }
-            }
+            app.pocketos.ui.components.CurrencyPickerList(
+                selected = form.currency,
+                onPick = { code ->
+                    vm.update { it.copy(currency = code, amountText = app.pocketos.ui.components.AmountInput.adapt(it.amountText, code)) }
+                    currencySheet = false
+                },
+                modifier = Modifier.heightIn(max = 480.dp).verticalScroll(rememberScrollState()),
+            )
             Spacer(Modifier.height(Spacing.md))
             Text(stringResource(R.string.currency_no_conversion), style = MaterialTheme.typography.bodySmall, color = c.textTertiary)
         }
@@ -589,8 +605,8 @@ private fun IconCustomizerSheet(
         "#8B5CF6", "#EC4899", "#F59E0B", "#EF4444", "#64748B"
     )
 
-    GlassBottomSheet(onDismiss = onDismiss, title = "Customize Icon & Style") {
-        Text("Accent Color", style = MaterialTheme.typography.labelLarge, color = c.textSecondary)
+    GlassBottomSheet(onDismiss = onDismiss, title = stringResource(R.string.customize_icon_title)) {
+        Text(stringResource(R.string.accent_color), style = MaterialTheme.typography.labelLarge, color = c.textSecondary)
         Spacer(Modifier.height(Spacing.sm))
         Row(
             Modifier.fillMaxWidth(),
@@ -623,7 +639,7 @@ private fun IconCustomizerSheet(
         }
 
         Spacer(Modifier.height(Spacing.lg))
-        Text("Built-in Symbol Library", style = MaterialTheme.typography.labelLarge, color = c.textSecondary)
+        Text(stringResource(R.string.symbol_library), style = MaterialTheme.typography.labelLarge, color = c.textSecondary)
         Spacer(Modifier.height(Spacing.sm))
         FlowRow(
             horizontalArrangement = Arrangement.spacedBy(Spacing.xs),
@@ -644,7 +660,7 @@ private fun IconCustomizerSheet(
         }
 
         Spacer(Modifier.height(Spacing.lg))
-        Text("Search Catalog Brand Icons", style = MaterialTheme.typography.labelLarge, color = c.textSecondary)
+        Text(stringResource(R.string.search_brand_icons), style = MaterialTheme.typography.labelLarge, color = c.textSecondary)
         Spacer(Modifier.height(Spacing.sm))
         GlassTextField(
             value = catalogSearch,

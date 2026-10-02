@@ -50,11 +50,11 @@ import app.pocketos.R
  */
 
 private object WidgetColors {
-    val text: GlanceColorProvider = ColorProvider(day = Color(0xFF0F172A), night = Color(0xFFF8FAFC))
-    val secondary: GlanceColorProvider = ColorProvider(day = Color(0xFF475569), night = Color(0xFF9CA3AF))
-    val accent: GlanceColorProvider = ColorProvider(day = Color(0xFF059669), night = Color(0xFF34D399))
+    val text: GlanceColorProvider = ColorProvider(day = Color(0xFF13152B), night = Color(0xFFF5F6FF))
+    val secondary: GlanceColorProvider = ColorProvider(day = Color(0xFF545A7A), night = Color(0xFFA6AAC6))
+    val accent: GlanceColorProvider = ColorProvider(day = Color(0xFF5A48F0), night = Color(0xFFA394FF))
     val warning: GlanceColorProvider = ColorProvider(day = Color(0xFFB45309), night = Color(0xFFFBBF24))
-    val chip: GlanceColorProvider = ColorProvider(day = Color(0x1A10B981), night = Color(0x3310B981))
+    val chip: GlanceColorProvider = ColorProvider(day = Color(0x1A5A48F0), night = Color(0x337B6CFF))
 }
 
 private fun openIntent(context: Context, uri: String) =

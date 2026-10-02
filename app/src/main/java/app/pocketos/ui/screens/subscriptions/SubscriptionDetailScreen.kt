@@ -1,5 +1,8 @@
 package app.pocketos.ui.screens.subscriptions
 
+import androidx.compose.ui.draw.clip
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.width
 import android.content.Intent
 import android.net.Uri
 import androidx.compose.foundation.Canvas
@@ -101,38 +104,61 @@ fun SubscriptionDetailScreen(nav: NavController, id: String) {
                     val s = value
                     val service = catalog.find(s.serviceId)
                     val brand = parseHex(s.color) ?: parseHex(service?.color) ?: c.accent
-                    // Hero: brand-tinted glow behind the service icon.
-                    Box(Modifier.fillMaxWidth().height(200.dp), contentAlignment = Alignment.Center) {
-                        Canvas(Modifier.fillMaxSize()) {
-                            drawCircle(Brush.radialGradient(listOf(brand.copy(alpha = 0.45f), Color.Transparent)), radius = size.minDimension * 0.6f)
-                        }
-                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            ServiceIcon(service, s.name, s.category, size = 76.dp, customColor = s.color)
-                            Spacer(Modifier.height(Spacing.md))
-                            Text(s.name, style = MaterialTheme.typography.headlineSmall, color = c.textPrimary, textAlign = TextAlign.Center, modifier = Modifier.semantics { heading() })
-                            Spacer(Modifier.height(Spacing.xs))
-                            val (statusText, statusColor) = when (s.status) {
-                                SubscriptionStatus.ACTIVE -> stringResource(R.string.status_active) to c.success
-                                SubscriptionStatus.PAUSED -> stringResource(R.string.status_paused) to c.warning
-                                SubscriptionStatus.CANCELLED -> stringResource(R.string.status_cancelled) to c.textSecondary
-                                SubscriptionStatus.EXPIRED -> stringResource(R.string.status_expired) to c.textSecondary
+                    // Hero: a card painted in the service's own brand colours.
+                    val brandEnd = androidx.compose.ui.graphics.lerp(brand, Color(0xFF0B0C1A), 0.45f)
+                    app.pocketos.ui.components.GradientCard(
+                        Modifier.fillMaxWidth().padding(bottom = Spacing.md),
+                        colors = listOf(brand, brandEnd),
+                    ) {
+                        Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+                            Box(
+                                Modifier.clip(androidx.compose.foundation.shape.RoundedCornerShape(26.dp))
+                                    .background(Color.White.copy(alpha = 0.18f)).padding(6.dp),
+                            ) {
+                                ServiceIcon(service, s.name, s.category, size = 76.dp, customColor = s.color)
                             }
-                            StatusPill(statusText, statusColor)
+                            Spacer(Modifier.height(Spacing.md))
+                            Text(s.name, style = MaterialTheme.typography.headlineMedium, color = Color.White, textAlign = TextAlign.Center, modifier = Modifier.semantics { heading() })
+                            Spacer(Modifier.height(Spacing.xs))
+                            Text(
+                                s.amount?.let { f.money(it.amountMinor, it.currency) } ?: stringResource(R.string.amount_unknown),
+                                style = MaterialTheme.typography.displaySmall,
+                                color = Color.White,
+                            )
+                            Text(f.billing(s.billing), style = MaterialTheme.typography.bodyMedium, color = Color.White.copy(alpha = 0.8f))
+                            Spacer(Modifier.height(Spacing.md))
+                            val badge = app.pocketos.ui.components.subscriptionBadge(s, today)
+                            Row(
+                                Modifier.clip(androidx.compose.foundation.shape.CircleShape).background(Color.White.copy(alpha = 0.18f))
+                                    .padding(horizontal = Spacing.md, vertical = 6.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                            ) {
+                                Box(Modifier.size(8.dp).clip(androidx.compose.foundation.shape.CircleShape).background(badge.color))
+                                Spacer(Modifier.width(6.dp))
+                                Text(
+                                    if (badge.detail != badge.label) "${badge.label} · ${badge.detail}" else badge.label,
+                                    style = MaterialTheme.typography.labelLarge,
+                                    color = Color.White,
+                                )
+                            }
                         }
                     }
                     GlassCard(Modifier.fillMaxWidth(), level = GlassLevel.L2) {
-                        Row(verticalAlignment = Alignment.Bottom) {
-                            Column(Modifier.weight(1f)) {
-                                Text(stringResource(R.string.amount), style = MaterialTheme.typography.labelLarge, color = c.textSecondary)
-                                Text(s.amount?.let { f.money(it.amountMinor, it.currency) } ?: stringResource(R.string.amount_unknown), style = MaterialTheme.typography.headlineMedium, color = c.textPrimary)
-                                Text(f.billing(s.billing), style = MaterialTheme.typography.bodyMedium, color = c.textSecondary)
-                            }
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            app.pocketos.ui.components.ToneIcon(Icons.Rounded.Event, c.tones.violet, size = 44.dp)
+                            Spacer(Modifier.width(Spacing.md))
                             if (s.isActive) {
-                                Column(horizontalAlignment = Alignment.End) {
+                                Column(Modifier.weight(1f)) {
                                     Text(stringResource(R.string.renews), style = MaterialTheme.typography.labelLarge, color = c.textSecondary)
-                                    Text(f.relative(s.nextRenewal, today), style = MaterialTheme.typography.titleLarge, color = c.accentHighlight)
+                                    Text(
+                                        f.relative(s.nextRenewal, today),
+                                        style = MaterialTheme.typography.titleLarge,
+                                        color = if (s.nextRenewal.isBefore(today)) c.danger else if (c.isDark) c.accentHighlight else c.accent,
+                                    )
                                     Text(f.date(s.nextRenewal), style = MaterialTheme.typography.bodySmall, color = c.textSecondary)
                                 }
+                            } else {
+                                Text(f.billing(s.billing), style = MaterialTheme.typography.titleMedium, color = c.textSecondary, modifier = Modifier.weight(1f))
                             }
                         }
                         s.amount?.let { amount ->
@@ -204,6 +230,6 @@ private fun EstimateTile(label: String, value: String, modifier: Modifier) {
     val c = LocalPocketColors.current
     GlassCard(modifier, level = GlassLevel.L1, contentPadding = androidx.compose.foundation.layout.PaddingValues(Spacing.md)) {
         Text(label, style = MaterialTheme.typography.labelSmall, color = c.textSecondary)
-        Text(value, style = MaterialTheme.typography.titleMedium, color = c.textPrimary)
+        Text(value, style = MaterialTheme.typography.titleMedium, fontWeight = androidx.compose.ui.text.font.FontWeight.Bold, color = c.textPrimary)
     }
 }

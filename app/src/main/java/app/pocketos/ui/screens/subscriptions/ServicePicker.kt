@@ -140,7 +140,7 @@ fun ServicePicker(
                                     Spacer(Modifier.width(Spacing.xs))
                                     Icon(Icons.Rounded.AutoAwesome, null, tint = c.accentHighlight, modifier = Modifier.size(16.dp))
                                 }
-                                Text("Auto-recognized service", style = MaterialTheme.typography.bodySmall, color = c.accentHighlight)
+                                Text(stringResource(R.string.auto_recognized_service), style = MaterialTheme.typography.bodySmall, color = c.accentHighlight)
                             }
                         }
                     }

@@ -43,6 +43,9 @@ import app.pocketos.ui.design.GlassToolbar
 import app.pocketos.ui.design.HapticType
 import app.pocketos.ui.design.LocalHaptics
 import app.pocketos.ui.theme.LocalPocketColors
+import app.pocketos.ui.components.ToneIcon
+import app.pocketos.ui.components.autoTone
+import androidx.compose.ui.text.font.FontWeight
 import app.pocketos.ui.theme.Sizes
 import app.pocketos.ui.theme.Spacing
 
@@ -65,9 +68,9 @@ fun SettingsPage(title: String, nav: NavController, content: @Composable ColumnS
 fun SettingsGroup(title: String? = null, footer: String? = null, content: @Composable ColumnScope.() -> Unit) {
     val c = LocalPocketColors.current
     title?.let {
-        Text(it, style = MaterialTheme.typography.labelLarge, color = c.textSecondary, modifier = Modifier.padding(start = Spacing.xs, top = Spacing.xl, bottom = Spacing.sm).semantics { heading() })
+        Text(it.uppercase(), style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.SemiBold, color = c.textTertiary, modifier = Modifier.padding(start = Spacing.xs, top = Spacing.xxl, bottom = Spacing.sm).semantics { heading() })
     }
-    GlassCard(Modifier.fillMaxWidth(), level = GlassLevel.L1, contentPadding = PaddingValues(vertical = Spacing.xs), content = content)
+    GlassCard(Modifier.fillMaxWidth(), level = GlassLevel.L2, contentPadding = PaddingValues(vertical = Spacing.xs), content = content)
     footer?.let {
         Text(it, style = MaterialTheme.typography.bodySmall, color = c.textTertiary, modifier = Modifier.padding(start = Spacing.xs, end = Spacing.xs, top = Spacing.sm))
     }
@@ -98,11 +101,11 @@ fun SettingsRow(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         icon?.let {
-            Icon(it, null, tint = tint ?: c.accent, modifier = Modifier.size(Sizes.icon))
+            ToneIcon(it, tint ?: autoTone(it, c.tones), size = 38.dp)
             Spacer(Modifier.width(Spacing.md))
         }
         Column(Modifier.weight(1f)) {
-            Text(title, style = MaterialTheme.typography.bodyLarge, color = tint ?: c.textPrimary)
+            Text(title, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Medium, color = tint ?: c.textPrimary)
             subtitle?.let { Text(it, style = MaterialTheme.typography.bodySmall, color = c.textSecondary) }
         }
         when {
@@ -111,3 +114,4 @@ fun SettingsRow(
         }
     }
 }
+

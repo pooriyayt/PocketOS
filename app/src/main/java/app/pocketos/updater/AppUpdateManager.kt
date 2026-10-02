@@ -69,6 +69,8 @@ class AppUpdateManager(
 
     /** Non-blocking update check against the official GitHub releases. */
     fun checkForUpdates(isManual: Boolean = false) {
+        // Store builds are updated by the store, never by the app itself.
+        if (!BuildConfig.SELF_UPDATE) return
         if (_state.value is UpdateState.Checking || _state.value is UpdateState.Downloading) return
 
         scope.launch {

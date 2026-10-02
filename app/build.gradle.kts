@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
@@ -14,10 +16,45 @@ android {
         applicationId = "app.pocketos"
         minSdk = 26
         targetSdk = 36
-        versionCode = 1
-        versionName = "1.0.0"
+        versionCode = 2
+        versionName = "1.1.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
+    }
+
+    // Release signing comes from signing.properties (git-ignored, never committed):
+    //   storeFile=..., storePassword=..., keyAlias=..., keyPassword=...
+    val signingProps = Properties().apply {
+        val f = rootProject.file("signing.properties")
+        if (f.exists()) f.inputStream().use { load(it) }
+    }
+    signingConfigs {
+        if (signingProps.getProperty("storeFile") != null) {
+            create("release") {
+                storeFile = file(signingProps.getProperty("storeFile"))
+                storePassword = signingProps.getProperty("storePassword")
+                keyAlias = signingProps.getProperty("keyAlias")
+                keyPassword = signingProps.getProperty("keyPassword")
+                enableV1Signing = true
+                enableV2Signing = true
+                enableV3Signing = true
+            }
+        }
+    }
+
+    // play:   Google Play build - no self-updater, no install-packages or internet permission
+    //         (Play policy forbids self-updates; also keeps antivirus heuristics quiet).
+    // github: sideloaded build that updates itself from official GitHub releases.
+    flavorDimensions += "distribution"
+    productFlavors {
+        create("play") {
+            dimension = "distribution"
+            buildConfigField("boolean", "SELF_UPDATE", "false")
+        }
+        create("github") {
+            dimension = "distribution"
+            buildConfigField("boolean", "SELF_UPDATE", "true")
+        }
     }
 
     buildTypes {
@@ -29,6 +66,7 @@ android {
             isMinifyEnabled = true
             isShrinkResources = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            signingConfig = signingConfigs.findByName("release")
         }
     }
 

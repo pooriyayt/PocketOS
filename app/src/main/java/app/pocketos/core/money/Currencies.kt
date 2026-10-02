@@ -50,6 +50,22 @@ object Currencies {
         )
     }
 
+    /** Currencies whose code doesn't start with their issuer's ISO 3166 region. */
+    private val flagRegions = mapOf("EUR" to "EU", "IRT" to "IR", "IRR" to "IR", "ANG" to "CW", "XCD" to "AG")
+    private val isoRegions: Set<String> by lazy { Locale.getISOCountries().toSet() }
+
+    /**
+     * Flag emoji for a currency (USD -> US flag, EUR -> EU flag, IRT -> Iran
+     * flag), or a globe for supranational / commodity codes without a flag.
+     */
+    fun flag(code: String): String {
+        val upper = code.uppercase(Locale.ROOT)
+        val region = flagRegions[upper]
+            ?: upper.take(2).takeIf { upper.length == 3 && !upper.startsWith("X") && it in isoRegions }
+            ?: return "🌐"
+        return buildString { region.forEach { ch -> appendCodePoint(0x1F1E6 + (ch - 'A')) } }
+    }
+
     fun displayName(code: String, locale: Locale): String {
         val info = info(code)
         return if (locale.language == "fa") info.persianName else info.englishName
