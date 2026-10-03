@@ -121,3 +121,34 @@ data class MetaEntity(
     @PrimaryKey val key: String,
     val value: String,
 )
+
+/** Accounting: a wallet (cash, bank account, card, savings). */
+@Entity(tableName = "wallets")
+data class WalletEntity(
+    @PrimaryKey val id: String,
+    val name: String,
+    val type: String,
+    val currency: String,
+    val openingBalanceMinor: Long,
+    val color: String?,
+    val sortOrder: Int,
+    val archived: Boolean,
+    val createdAt: Long,
+    val updatedAt: Long,
+)
+
+/** Accounting: one income, expense or transfer. [date] is ISO yyyy-MM-dd. */
+@Entity(tableName = "transactions", indices = [Index("date"), Index("walletId")])
+data class TransactionEntity(
+    @PrimaryKey val id: String,
+    val type: String,
+    val amountMinor: Long,
+    val currency: String,
+    val walletId: String,
+    val toWalletId: String?,
+    val category: String,
+    val note: String?,
+    val date: String,
+    val createdAt: Long,
+    val updatedAt: Long,
+)

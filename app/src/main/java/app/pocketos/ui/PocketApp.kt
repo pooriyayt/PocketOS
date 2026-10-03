@@ -1,5 +1,9 @@
 package app.pocketos.ui
 
+import app.pocketos.ui.screens.finance.TransactionSheet
+import app.pocketos.ui.screens.finance.WalletScreen
+import androidx.compose.material.icons.rounded.Autorenew
+import androidx.compose.material.icons.outlined.Autorenew
 import android.net.Uri
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Box
@@ -121,7 +125,8 @@ fun PocketApp(container: AppContainer, settings: AppSettings, deepLinks: Mutable
     }
 }
 
-private val topLevel = listOf(Routes.Home, Routes.Reminders, Routes.Subscriptions, Routes.Insights, Routes.Settings)
+// Settings lives behind the avatar / gear buttons; the dock holds the five daily spaces.
+private val topLevel = listOf(Routes.Home, Routes.Reminders, Routes.Wallet, Routes.Subscriptions, Routes.Insights)
 
 @Composable
 private fun MainScaffold(settings: AppSettings, deepLinks: StateFlow<Uri?>, onDeepLinkHandled: () -> Unit) {
@@ -136,9 +141,9 @@ private fun MainScaffold(settings: AppSettings, deepLinks: StateFlow<Uri?>, onDe
     val selected = when {
         destination?.hasRoute(Routes.Home::class) == true -> 0
         destination?.hasRoute(Routes.Reminders::class) == true -> 1
-        destination?.hasRoute(Routes.Subscriptions::class) == true -> 2
-        destination?.hasRoute(Routes.Insights::class) == true -> 3
-        destination?.hasRoute(Routes.Settings::class) == true -> 4
+        destination?.hasRoute(Routes.Wallet::class) == true -> 2
+        destination?.hasRoute(Routes.Subscriptions::class) == true -> 3
+        destination?.hasRoute(Routes.Insights::class) == true -> 4
         else -> -1
     }
     val pending by deepLinks.collectAsState()
@@ -165,6 +170,7 @@ private fun MainScaffold(settings: AppSettings, deepLinks: StateFlow<Uri?>, onDe
                     composable<Routes.Home> { HomeScreen(nav) }
                     composable<Routes.Reminders> { RemindersScreen(nav) }
                     composable<Routes.Subscriptions> { SubscriptionsScreen(nav) }
+                    composable<Routes.Wallet> { WalletScreen(nav) }
                     composable<Routes.Insights> { InsightsScreen(nav) }
                     composable<Routes.Settings> { SettingsScreen(nav) }
                     composable<Routes.ReminderDetail> { ReminderDetailScreen(nav, it.toRoute<Routes.ReminderDetail>().id) }
@@ -188,9 +194,9 @@ private fun MainScaffold(settings: AppSettings, deepLinks: StateFlow<Uri?>, onDe
                     items = listOf(
                         NavItem(stringResource(R.string.nav_home), Icons.Outlined.Home, Icons.Rounded.Home),
                         NavItem(stringResource(R.string.nav_reminders), Icons.Outlined.CheckCircle, Icons.Rounded.CheckCircle),
-                        NavItem(stringResource(R.string.nav_subscriptions), Icons.Outlined.AccountBalanceWallet, Icons.Rounded.AccountBalanceWallet),
+                        NavItem(stringResource(R.string.nav_wallet), Icons.Outlined.AccountBalanceWallet, Icons.Rounded.AccountBalanceWallet),
+                        NavItem(stringResource(R.string.nav_subscriptions), Icons.Outlined.Autorenew, Icons.Rounded.Autorenew),
                         NavItem(stringResource(R.string.nav_insights), Icons.Outlined.Insights, Icons.Rounded.Insights),
-                        NavItem(stringResource(R.string.nav_settings), Icons.Outlined.Settings, Icons.Rounded.Settings),
                     ),
                     selectedIndex = selected,
                     onSelect = { index ->
@@ -203,7 +209,7 @@ private fun MainScaffold(settings: AppSettings, deepLinks: StateFlow<Uri?>, onDe
                 )
             }
             AnimatedVisibility(
-                selected in 0..3,
+                selected >= 0,
                 enter = motion.popEnter(),
                 exit = motion.popExit(),
                 modifier = Modifier.align(Alignment.BottomEnd).navigationBarsPadding().padding(end = 20.dp, bottom = 96.dp),
@@ -211,7 +217,7 @@ private fun MainScaffold(settings: AppSettings, deepLinks: StateFlow<Uri?>, onDe
                 GlassFloatingActionButton(
                     icon = Icons.Rounded.Add,
                     contentDescription = stringResource(R.string.quick_add),
-                    onClick = { ui.openQuickAdd() },
+                    onClick = { if (selected == 2) ui.openTransaction() else ui.openQuickAdd() },
                 )
             }
         }
@@ -232,6 +238,10 @@ private fun MainScaffold(settings: AppSettings, deepLinks: StateFlow<Uri?>, onDe
         )
     }
 
+    ui.transaction?.let { request ->
+        TransactionSheet(request, onDismiss = { ui.closeTransaction() })
+    }
+
     UpdateOverlay(container.updateManager, updateState)
 }
 
@@ -246,10 +256,13 @@ private fun handleDeepLink(uri: Uri, nav: NavHostController, ui: AppUiController
         "calendar" -> nav.navigate(Routes.Calendar)
         "search" -> nav.navigate(Routes.Search)
         "home" -> nav.navigate(Routes.Home) { launchSingleTop = true }
+        "wallet" -> nav.navigate(Routes.Wallet) { launchSingleTop = true }
         "add" -> when (uri.getQueryParameter("type")) {
             "reminder" -> nav.navigate(Routes.ReminderEditor())
             "subscription" -> nav.navigate(Routes.SubscriptionEditor())
             "task" -> nav.navigate(Routes.ReminderEditor(kind = "task"))
+            "expense" -> ui.openTransaction(app.pocketos.domain.finance.TxType.EXPENSE)
+            "income" -> ui.openTransaction(app.pocketos.domain.finance.TxType.INCOME)
             else -> ui.openQuickAdd()
         }
     }

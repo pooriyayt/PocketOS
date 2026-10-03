@@ -1,5 +1,8 @@
 package app.pocketos.ui.screens.home
 
+import androidx.compose.material.icons.rounded.Autorenew
+import androidx.compose.material.icons.rounded.South
+import androidx.compose.material.icons.rounded.North
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.foundation.layout.widthIn
@@ -524,18 +527,20 @@ private fun FirstRunCard(onPick: (String) -> Unit, onDismiss: () -> Unit) {
     }
 }
 
-private data class QuickAction(val icon: ImageVector, val label: Int, val tone: Color, val go: (NavController) -> Unit)
+private data class QuickAction(val icon: ImageVector, val label: Int, val tone: Color, val go: () -> Unit)
 
 @Composable
 private fun QuickActions(nav: NavController) {
     val c = LocalPocketColors.current
+    val ui = LocalAppUi.current
     val t = c.tones
     val actions = listOf(
-        QuickAction(Icons.Rounded.NotificationsActive, R.string.qa_reminder, t.amber) { it.navigate(Routes.ReminderEditor()) },
-        QuickAction(Icons.Rounded.AccountBalanceWallet, R.string.qa_subscription, t.violet) { it.navigate(Routes.SubscriptionEditor()) },
-        QuickAction(Icons.Rounded.Payments, R.string.qa_payment, t.green) { it.navigate(Routes.SubscriptionEditor(serviceId = "")) },
-        QuickAction(Icons.Rounded.TaskAlt, R.string.qa_task, t.blue) { it.navigate(Routes.ReminderEditor(kind = "task")) },
-        QuickAction(Icons.Rounded.CalendarMonth, R.string.qa_schedule, t.pink) { it.navigate(Routes.Calendar) },
+        QuickAction(Icons.Rounded.North, R.string.qa_payment, t.red) { ui.openTransaction(app.pocketos.domain.finance.TxType.EXPENSE) },
+        QuickAction(Icons.Rounded.South, R.string.qa_income, t.green) { ui.openTransaction(app.pocketos.domain.finance.TxType.INCOME) },
+        QuickAction(Icons.Rounded.NotificationsActive, R.string.qa_reminder, t.amber) { nav.navigate(Routes.ReminderEditor()) },
+        QuickAction(Icons.Rounded.Autorenew, R.string.qa_subscription, t.violet) { nav.navigate(Routes.SubscriptionEditor()) },
+        QuickAction(Icons.Rounded.TaskAlt, R.string.qa_task, t.blue) { nav.navigate(Routes.ReminderEditor(kind = "task")) },
+        QuickAction(Icons.Rounded.CalendarMonth, R.string.qa_schedule, t.pink) { nav.navigate(Routes.Calendar) },
     )
     Column {
         SectionHeader(stringResource(R.string.section_quick_actions))
@@ -545,7 +550,7 @@ private fun QuickActions(nav: NavController) {
             items(actions, key = { it.label }) { a ->
                 GlassCard(
                     Modifier.width(112.dp),
-                    onClick = { a.go(nav) },
+                    onClick = a.go,
                     contentPadding = PaddingValues(start = Spacing.sm, end = Spacing.sm, top = Spacing.lg, bottom = Spacing.md),
                 ) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.align(Alignment.CenterHorizontally)) {

@@ -7,6 +7,7 @@ object Routes {
     @Serializable data object Home
     @Serializable data object Reminders
     @Serializable data object Subscriptions
+    @Serializable data object Wallet
     @Serializable data object Insights
     @Serializable data object Settings
 

@@ -25,6 +25,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.Info
 import androidx.compose.material.icons.rounded.Language
 import androidx.compose.material.icons.rounded.Lock
@@ -61,12 +62,21 @@ fun SettingsScreen(nav: NavController) {
     LazyColumn(Modifier.fillMaxSize(), contentPadding = PaddingValues(horizontal = Spacing.gutter)) {
         item { Spacer(Modifier.statusBarsPadding().height(Spacing.lg)) }
         item {
-            Text(
-                stringResource(R.string.nav_settings),
-                style = MaterialTheme.typography.headlineMedium,
-                color = c.textPrimary,
-                modifier = Modifier.padding(top = Spacing.xl).semantics { heading() },
-            )
+            Row(Modifier.padding(top = Spacing.md), verticalAlignment = Alignment.CenterVertically) {
+                app.pocketos.ui.design.GlassIconButton(
+                    androidx.compose.material.icons.Icons.AutoMirrored.Rounded.ArrowBack,
+                    stringResource(R.string.back),
+                    { nav.popBackStack() },
+                    level = app.pocketos.ui.design.GlassLevel.L1,
+                )
+                Spacer(Modifier.width(Spacing.sm))
+                Text(
+                    stringResource(R.string.nav_settings),
+                    style = MaterialTheme.typography.headlineMedium,
+                    color = c.textPrimary,
+                    modifier = Modifier.semantics { heading() },
+                )
+            }
         }
         item {
             GradientCard(Modifier.fillMaxWidth().padding(top = Spacing.lg)) {

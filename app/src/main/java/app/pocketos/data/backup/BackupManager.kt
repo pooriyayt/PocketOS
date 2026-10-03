@@ -1,5 +1,7 @@
 package app.pocketos.data.backup
 
+import app.pocketos.data.local.TransactionEntity
+import app.pocketos.data.local.WalletEntity
 import android.content.ContentResolver
 import android.net.Uri
 import app.pocketos.core.AppClock
@@ -44,6 +46,8 @@ data class BackupStats(
     val subscriptionsCount: Int,
     val categoriesCount: Int,
     val exportedAt: String,
+    val walletsCount: Int = 0,
+    val transactionsCount: Int = 0,
 )
 
 /**
@@ -71,6 +75,8 @@ class BackupManager(
         val reminders = db.reminders().allActive()
         val subscriptions = db.subscriptions().allActive()
         val categories = db.categories().everything().filter { it.deletedAt == null }
+        val wallets = db.wallets().everything()
+        val transactions = db.transactions().everything()
 
         val root = buildJsonObject {
             put("format", FORMAT_NAME)
@@ -119,6 +125,37 @@ class BackupManager(
                     s.color?.let { put("color", it) }
                     put("created_at", s.createdAt)
                     put("updated_at", s.updatedAt)
+                }
+            }))
+
+            put("wallets", JsonArray(wallets.map { w ->
+                buildJsonObject {
+                    put("id", w.id)
+                    put("name", w.name)
+                    put("type", w.type)
+                    put("currency", w.currency)
+                    put("opening_balance_minor", w.openingBalanceMinor)
+                    w.color?.let { put("color", it) }
+                    put("sort_order", w.sortOrder)
+                    put("archived", w.archived)
+                    put("created_at", w.createdAt)
+                    put("updated_at", w.updatedAt)
+                }
+            }))
+
+            put("transactions", JsonArray(transactions.map { t ->
+                buildJsonObject {
+                    put("id", t.id)
+                    put("type", t.type)
+                    put("amount_minor", t.amountMinor)
+                    put("currency", t.currency)
+                    put("wallet_id", t.walletId)
+                    t.toWalletId?.let { put("to_wallet_id", it) }
+                    put("category", t.category)
+                    t.note?.let { put("note", it) }
+                    put("date", t.date)
+                    put("created_at", t.createdAt)
+                    put("updated_at", t.updatedAt)
                 }
             }))
 
@@ -300,11 +337,52 @@ class BackupManager(
             categoriesCount++
         }
 
+        val now = clock.now().toEpochMilli()
+        val wallets = root["wallets"]?.jsonArray.orEmpty().mapNotNull { item ->
+            val obj = item as? JsonObject ?: return@mapNotNull null
+            val id = obj["id"]?.jsonPrimitive?.contentOrNull ?: return@mapNotNull null
+            WalletEntity(
+                id = id,
+                name = obj["name"]?.jsonPrimitive?.contentOrNull ?: return@mapNotNull null,
+                type = obj["type"]?.jsonPrimitive?.contentOrNull ?: "cash",
+                currency = obj["currency"]?.jsonPrimitive?.contentOrNull ?: "USD",
+                openingBalanceMinor = obj["opening_balance_minor"]?.jsonPrimitive?.longOrNull ?: 0,
+                color = obj["color"]?.jsonPrimitive?.contentOrNull,
+                sortOrder = obj["sort_order"]?.jsonPrimitive?.intOrNull ?: 0,
+                archived = obj["archived"]?.jsonPrimitive?.booleanOrNull ?: false,
+                createdAt = obj["created_at"]?.jsonPrimitive?.longOrNull ?: now,
+                updatedAt = obj["updated_at"]?.jsonPrimitive?.longOrNull ?: now,
+            )
+        }
+        wallets.forEach { db.wallets().upsert(it) }
+        val walletIds = db.wallets().everything().map { it.id }.toSet()
+        val transactions = root["transactions"]?.jsonArray.orEmpty().mapNotNull { item ->
+            val obj = item as? JsonObject ?: return@mapNotNull null
+            val id = obj["id"]?.jsonPrimitive?.contentOrNull ?: return@mapNotNull null
+            val walletId = obj["wallet_id"]?.jsonPrimitive?.contentOrNull?.takeIf { it in walletIds } ?: return@mapNotNull null
+            TransactionEntity(
+                id = id,
+                type = obj["type"]?.jsonPrimitive?.contentOrNull ?: "expense",
+                amountMinor = obj["amount_minor"]?.jsonPrimitive?.longOrNull?.takeIf { it > 0 } ?: return@mapNotNull null,
+                currency = obj["currency"]?.jsonPrimitive?.contentOrNull ?: "USD",
+                walletId = walletId,
+                toWalletId = obj["to_wallet_id"]?.jsonPrimitive?.contentOrNull?.takeIf { it in walletIds },
+                category = obj["category"]?.jsonPrimitive?.contentOrNull ?: "other_expense",
+                note = obj["note"]?.jsonPrimitive?.contentOrNull,
+                date = obj["date"]?.jsonPrimitive?.contentOrNull ?: clock.today().toString(),
+                createdAt = obj["created_at"]?.jsonPrimitive?.longOrNull ?: now,
+                updatedAt = obj["updated_at"]?.jsonPrimitive?.longOrNull ?: now,
+            )
+        }
+        transactions.forEach { db.transactions().upsert(it) }
+
         BackupStats(
             remindersCount = remindersCount,
             subscriptionsCount = subscriptionsCount,
             categoriesCount = categoriesCount,
             exportedAt = exportedAt,
+            walletsCount = wallets.size,
+            transactionsCount = transactions.size,
         )
     }
 
@@ -314,6 +392,8 @@ class BackupManager(
         db.reminders().clear()
         db.subscriptions().clear()
         db.categories().clear()
+        db.transactions().clear()
+        db.wallets().clear()
     }
 
     suspend fun writeBytesTo(resolver: ContentResolver, uri: Uri, bytes: ByteArray) = withContext(Dispatchers.IO) {

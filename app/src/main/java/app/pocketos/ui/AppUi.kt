@@ -1,5 +1,7 @@
 package app.pocketos.ui
 
+import app.pocketos.ui.screens.finance.TransactionRequest
+import app.pocketos.domain.finance.TxType
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
@@ -33,6 +35,18 @@ class AppUiController(val snackbar: SnackbarHostState, private val scope: Corout
 
     fun closeQuickAdd() {
         quickAdd = null
+    }
+
+    /** Money entry sheet (accounting); [editId] opens an existing transaction. */
+    var transaction by mutableStateOf<TransactionRequest?>(null)
+        private set
+
+    fun openTransaction(type: TxType = TxType.EXPENSE, editId: String? = null) {
+        transaction = TransactionRequest(type, editId)
+    }
+
+    fun closeTransaction() {
+        transaction = null
     }
 
     fun message(text: String) {

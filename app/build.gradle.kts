@@ -16,8 +16,8 @@ android {
         applicationId = "app.pocketos"
         minSdk = 26
         targetSdk = 36
-        versionCode = 2
-        versionName = "1.1.0"
+        versionCode = 3
+        versionName = "1.2.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
     }
@@ -42,12 +42,13 @@ android {
         }
     }
 
-    // play:   Google Play build - no self-updater, no install-packages or internet permission
-    //         (Play policy forbids self-updates; also keeps antivirus heuristics quiet).
+    // myket:  store build (Myket) - updates come from the store, so no self-updater and
+    //         no install-packages / internet permission. Nothing in it looks like a
+    //         dropper to Play Protect or antivirus heuristics.
     // github: sideloaded build that updates itself from official GitHub releases.
     flavorDimensions += "distribution"
     productFlavors {
-        create("play") {
+        create("myket") {
             dimension = "distribution"
             buildConfigField("boolean", "SELF_UPDATE", "false")
         }

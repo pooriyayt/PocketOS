@@ -98,6 +98,18 @@ class UiFormatter(private val context: Context, val locale: Locale, val solarHij
     fun money(amountMinor: Long, currency: String, compact: Boolean = false): String =
         MoneyFormatter.format(amountMinor, currency, locale, compact)
 
+    /** Just the grouped number ("32,000,000"), for places where the currency is already shown. */
+    fun amount(amountMinor: Long, currency: String): String {
+        val digits = app.pocketos.core.money.Currencies.info(currency).fractionDigits
+        val value = java.math.BigDecimal.valueOf(amountMinor).movePointLeft(digits)
+        val nf = java.text.NumberFormat.getNumberInstance(locale).apply {
+            maximumFractionDigits = digits
+            minimumFractionDigits = if (value.stripTrailingZeros().scale() > 0) digits else 0
+        }
+        return nf.format(value)
+    }
+
+
     fun billing(cycle: BillingCycle): String {
         val n = cycle.interval
         return when (cycle.unit) {

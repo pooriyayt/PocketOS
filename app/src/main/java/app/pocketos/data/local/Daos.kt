@@ -225,3 +225,51 @@ interface MetaDao {
 }
 
 suspend fun MetaDao.set(key: String, value: String) = put(MetaEntity(key, value))
+
+@Dao
+interface WalletDao {
+    @Query("SELECT * FROM wallets ORDER BY archived, sortOrder, createdAt")
+    fun observeAll(): Flow<List<WalletEntity>>
+
+    @Query("SELECT * FROM wallets")
+    suspend fun everything(): List<WalletEntity>
+
+    @Query("SELECT * FROM wallets WHERE id = :id")
+    suspend fun get(id: String): WalletEntity?
+
+    @Query("SELECT COUNT(*) FROM wallets")
+    suspend fun count(): Int
+
+    @Upsert
+    suspend fun upsert(entity: WalletEntity)
+
+    @Query("DELETE FROM wallets WHERE id = :id")
+    suspend fun delete(id: String)
+
+    @Query("DELETE FROM wallets")
+    suspend fun clear()
+}
+
+@Dao
+interface TransactionDao {
+    @Query("SELECT * FROM transactions ORDER BY date DESC, createdAt DESC")
+    fun observeAll(): Flow<List<TransactionEntity>>
+
+    @Query("SELECT * FROM transactions")
+    suspend fun everything(): List<TransactionEntity>
+
+    @Query("SELECT * FROM transactions WHERE id = :id")
+    suspend fun get(id: String): TransactionEntity?
+
+    @Upsert
+    suspend fun upsert(entity: TransactionEntity)
+
+    @Query("DELETE FROM transactions WHERE id = :id")
+    suspend fun delete(id: String)
+
+    @Query("DELETE FROM transactions WHERE walletId = :walletId OR toWalletId = :walletId")
+    suspend fun deleteForWallet(walletId: String)
+
+    @Query("DELETE FROM transactions")
+    suspend fun clear()
+}

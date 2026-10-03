@@ -16,6 +16,7 @@ import app.pocketos.data.prefs.AppSettings
 import app.pocketos.data.prefs.SettingsRepository
 import app.pocketos.data.repository.CatalogRepository
 import app.pocketos.data.repository.CategoryRepository
+import app.pocketos.data.repository.FinanceRepository
 import app.pocketos.data.repository.ReminderRepository
 import app.pocketos.data.repository.SideEffects
 import app.pocketos.data.repository.SubscriptionRepository
@@ -65,6 +66,7 @@ class AppContainer(val app: Application) {
     val reminders = ReminderRepository(databases, clock, effects)
     val subscriptions = SubscriptionRepository(databases, clock, effects)
     val categories = CategoryRepository(databases, clock, effects)
+    val finance = FinanceRepository(databases, clock, effects)
     val catalog = CatalogRepository(app)
     val backupManager = BackupManager(databases, clock)
     val updateManager = AppUpdateManager(app, scope)
