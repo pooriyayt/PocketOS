@@ -292,6 +292,50 @@ private fun InstallmentCard(plan: InstallmentPlan, today: LocalDate, onEdit: () 
             )
             Text(stringResource(R.string.ends_on, f.date(plan.lastDue, withYear = true)), style = MaterialTheme.typography.labelMedium, color = c.textTertiary)
         }
+        Spacer(Modifier.height(Spacing.sm))
+        // Per-installment remaining breakdown
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(12.dp))
+                .background(c.surfaceElevated.copy(alpha = 0.65f))
+                .padding(horizontal = Spacing.md, vertical = Spacing.sm),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Column {
+                Text(
+                    stringResource(R.string.remaining_loan_amount),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = c.textSecondary,
+                )
+                Text(
+                    f.money(plan.remainingMinor, plan.currency),
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = if (plan.isFinished) c.success else c.warning,
+                )
+            }
+            Column(horizontalAlignment = Alignment.End) {
+                Text(
+                    stringResource(R.string.total_loan_amount),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = c.textTertiary,
+                )
+                Text(
+                    f.money(plan.amountMinor * plan.totalCount, plan.currency, compact = true),
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.SemiBold,
+                    color = c.textPrimary,
+                )
+                Text(
+                    stringResource(R.string.remaining_installments_badge, plan.remainingCount, plan.totalCount).let(f::localizeDigits),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = tone,
+                    fontWeight = FontWeight.Medium,
+                )
+            }
+        }
         if (due != null) {
             Spacer(Modifier.height(Spacing.md))
             Row(verticalAlignment = Alignment.CenterVertically) {

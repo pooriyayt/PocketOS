@@ -16,18 +16,16 @@
 <p align="center">
   <img src="docs/images/home.png" width="230" alt="Home Dashboard" />
   &nbsp;
-  <img src="docs/images/wallet.png" width="230" alt="Wallet & Balances" />
+  <img src="docs/images/wallet.png" width="230" alt="Wallet &amp; Balances" />
   &nbsp;
   <img src="docs/images/quick_add.png" width="230" alt="Smart Quick Add" />
 </p>
 <p align="center">
-  <img src="docs/images/checks.png" width="230" alt="Check Management" />
+  <img src="docs/images/home_actions.png" width="230" alt="Quick Actions &amp; Support" />
   &nbsp;
-  <img src="docs/images/installments.png" width="230" alt="Installments & Loans" />
+  <img src="docs/images/quick_add_suggest.png" width="230" alt="Quick Add Suggestions" />
   &nbsp;
-  <img src="docs/images/debts.png" width="230" alt="Debts & Receivables" />
-  &nbsp;
-  <img src="docs/images/subscriptions.png" width="230" alt="Subscriptions" />
+  <img src="docs/images/onboarding.png" width="230" alt="Onboarding" />
 </p>
 
 [English](#english) • [فارسی](#فارسی)

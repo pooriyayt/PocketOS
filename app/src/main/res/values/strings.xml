@@ -121,6 +121,9 @@
     <string name="qa_reminder">Reminder</string>
     <string name="qa_subscription">Subscription</string>
     <string name="qa_payment">Expense</string>
+    <string name="qa_installment">Installments</string>
+    <string name="qa_check">Checks</string>
+    <string name="qa_debt">Debts</string>
     <string name="qa_task">Task</string>
     <string name="qa_schedule">Schedule</string>
     <string name="first_run_title">Let\'s set up your first item</string>
@@ -1137,6 +1140,9 @@
     <string name="upcoming_obligations">Upcoming Obligations</string>
     <string name="no_upcoming_obligations">No obligations or checks due in the coming days</string>
     <string name="total_installments_debt">Total Installments Debt</string>
+    <string name="remaining_loan_amount">Remaining on this loan</string>
+    <string name="total_loan_amount">Total loan</string>
+    <string name="remaining_installments_badge">%1$d of %2$d remaining</string>
     <string name="check_pass_btn">Cleared ✅</string>
     <string name="check_bounce_btn">Bounced ❌</string>
     <string name="notif_check_due_today_issued">Issued check \"%1$s\" is due today - has it cleared?</string>

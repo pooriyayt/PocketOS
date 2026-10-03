@@ -44,10 +44,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.LinearOutSlowInEasing
+import androidx.compose.animation.core.tween
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.heading
@@ -91,41 +96,58 @@ fun SupportScreen(nav: NavController) {
     val state by ads.rewarded.collectAsState()
     val count by ads.supportCount.collectAsState()
     val thanks by ads.thanks.collectAsState()
+    var lastThanks by remember { androidx.compose.runtime.mutableIntStateOf(ads.thanks.value) }
+    var celebrating by remember { mutableStateOf(false) }
     var showThanksDialog by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) { ads.prepareRewarded(context) }
-    // After each completed ad, celebrate with haptic pattern and dialog
+    // After each newly completed ad, celebrate with hearts animation, haptic pattern and dialog
     LaunchedEffect(thanks) {
-        if (thanks > 0) {
+        if (thanks > lastThanks) {
+            lastThanks = thanks
             haptics.perform(HapticType.Success)
+            celebrating = true
             showThanksDialog = true
             ads.prepareRewarded(context)
         }
     }
 
-    if (showThanksDialog) {
-        app.pocketos.ui.design.GlassDialog(
-            onDismiss = { showThanksDialog = false },
-            title = stringResource(R.string.thanks_dialog_title),
-            message = stringResource(R.string.thanks_dialog_body),
-            confirmText = stringResource(R.string.thanks_dialog_dismiss),
-            onConfirm = {
-                haptics.perform(HapticType.Confirm)
-                showThanksDialog = false
-            },
-            dismissText = "",
+    Box(Modifier.fillMaxSize()) {
+        SupportContent(
+            state = state,
+            supportCount = count,
+            celebrating = celebrating,
+            onBack = { nav.popBackStack() },
+            onWatch = { ads.showRewarded(context) },
+            onRetry = { ads.prepareRewarded(context) },
+            showNative = true,
         )
-    }
 
-    SupportContent(
-        state = state,
-        supportCount = count,
-        celebrating = thanks > 0,
-        onBack = { nav.popBackStack() },
-        onWatch = { ads.showRewarded(context) },
-        onRetry = { ads.prepareRewarded(context) },
-        showNative = true,
-    )
+        if (celebrating) {
+            FloatingHeartsOverlay(
+                active = true,
+                onFinished = { celebrating = false },
+            )
+        }
+
+        if (showThanksDialog) {
+            app.pocketos.ui.design.GlassDialog(
+                onDismiss = {
+                    showThanksDialog = false
+                    celebrating = false
+                },
+                title = stringResource(R.string.thanks_dialog_title),
+                message = stringResource(R.string.thanks_dialog_body),
+                confirmText = stringResource(R.string.thanks_dialog_dismiss),
+                onConfirm = {
+                    haptics.perform(HapticType.Confirm)
+                    showThanksDialog = false
+                    celebrating = false
+                },
+                dismissText = "",
+            )
+        }
+    }
 }
 
 @Composable
@@ -299,3 +321,88 @@ fun NativeAdCard(modifier: Modifier = Modifier) {
         )
     }
 }
+
+private data class HeartParticle(
+    val initialXRatio: Float,
+    val speed: Float,
+    val swayAmplitude: Float,
+    val swayFrequency: Float,
+    val size: Float,
+    val color: Color,
+    val initialDelay: Float,
+)
+
+@Composable
+fun FloatingHeartsOverlay(
+    active: Boolean,
+    onFinished: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    if (!active) return
+    val anim = remember { Animatable(0f) }
+    val colors = listOf(
+        Color(0xFFF43F5E), // Rose
+        Color(0xFFFB7185), // Soft rose
+        Color(0xFFE11D48), // Crimson
+        Color(0xFFA855F7), // Purple
+        Color(0xFFEC4899), // Pink
+        Color(0xFFF59E0B), // Amber
+        Color(0xFF06B6D4), // Cyan
+    )
+
+    val particles = remember {
+        List(30) { i ->
+            val rand = kotlin.random.Random(i * 37 + 11)
+            HeartParticle(
+                initialXRatio = 0.08f + rand.nextFloat() * 0.84f,
+                speed = 0.75f + rand.nextFloat() * 0.55f,
+                swayAmplitude = 25f + rand.nextFloat() * 35f,
+                swayFrequency = 2.5f + rand.nextFloat() * 3f,
+                size = 28f + rand.nextFloat() * 30f,
+                color = colors[i % colors.size],
+                initialDelay = rand.nextFloat() * 0.35f,
+            )
+        }
+    }
+
+    LaunchedEffect(active) {
+        anim.animateTo(
+            targetValue = 1f,
+            animationSpec = tween(durationMillis = 2800, easing = LinearOutSlowInEasing),
+        )
+        onFinished()
+    }
+
+    Canvas(
+        modifier = modifier
+            .fillMaxSize()
+            .pointerInput(Unit) {}
+    ) {
+        val w = size.width
+        val h = size.height
+        val t = anim.value
+
+        particles.forEach { p ->
+            val localT = ((t - p.initialDelay) / (1f - p.initialDelay)).coerceIn(0f, 1f)
+            if (localT > 0f && localT < 1f) {
+                val startX = w * p.initialXRatio
+                val startY = h * 0.9f
+                val y = startY - (localT * p.speed * h * 0.95f)
+                val x = startX + kotlin.math.sin(localT * p.swayFrequency * Math.PI.toFloat()) * p.swayAmplitude
+                val alpha = if (localT < 0.15f) (localT / 0.15f) else (1f - localT)
+                val scale = if (localT < 0.15f) (localT / 0.15f) else 1f
+
+                val heartSize = p.size * scale
+                val path = Path().apply {
+                    val half = heartSize / 2f
+                    moveTo(x, y + half * 0.4f)
+                    cubicTo(x - half, y - half * 0.5f, x - heartSize, y + half * 0.2f, x, y + heartSize)
+                    cubicTo(x + heartSize, y + half * 0.2f, x + half, y - half * 0.5f, x, y + half * 0.4f)
+                    close()
+                }
+                drawPath(path, color = p.color.copy(alpha = alpha.coerceIn(0f, 1f)))
+            }
+        }
+    }
+}
+

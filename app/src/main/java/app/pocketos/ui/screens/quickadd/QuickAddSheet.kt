@@ -111,7 +111,10 @@ fun QuickAddSheet(request: QuickAddRequest, onDismiss: () -> Unit, onOpenEditor:
     val addedTask = stringResource(R.string.task_added)
     val addedExpense = stringResource(R.string.expense_added)
     val addedIncome = stringResource(R.string.income_added)
-    LaunchedEffect(Unit) { runCatching { focus.requestFocus() } }
+    LaunchedEffect(request) {
+        vm.reset(request.prefill, request.preferredType)
+        runCatching { focus.requestFocus() }
+    }
 
     GlassBottomSheet(onDismiss = onDismiss) {
         Text(stringResource(R.string.quick_add_title), style = MaterialTheme.typography.titleLarge, color = c.textPrimary)

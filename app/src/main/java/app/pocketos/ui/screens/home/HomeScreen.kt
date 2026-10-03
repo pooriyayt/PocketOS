@@ -44,6 +44,7 @@ import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material.icons.rounded.Done
 import androidx.compose.material.icons.rounded.EventRepeat
 import androidx.compose.material.icons.rounded.Favorite
+import androidx.compose.material.icons.rounded.Handshake
 import app.pocketos.domain.finance.CheckDirection
 import app.pocketos.domain.finance.CheckItem
 import app.pocketos.domain.finance.InstallmentPlan
@@ -170,6 +171,14 @@ fun HomeScreen(nav: NavController) {
 
             item(key = "summary") { Summary(state) }
 
+            val upcomingPlan = ObligationCalculator.upcoming(installments).firstOrNull()
+            val upcomingCheck = ObligationCalculator.upcomingChecks(checks).firstOrNull()
+            if (upcomingPlan != null || upcomingCheck != null) {
+                item(key = "home_obligations") {
+                    HomeObligationsSection(installments, checks, state.today, nav)
+                }
+            }
+
             if (model.isEmpty && !state.settings.firstRunHintDismissed) {
                 item(key = "firstRun") { FirstRunCard(onPick = { ui.openQuickAdd(it) }, onDismiss = vm::dismissFirstRunHint) }
             }
@@ -198,7 +207,6 @@ fun HomeScreen(nav: NavController) {
                     }
                     DashboardSection.OVERVIEW -> if (!model.isEmpty) item(key = "overview") {
                         Overview(state)
-                        HomeObligationsSection(installments, checks, state.today, nav)
                     }
                     DashboardSection.TIMELINE -> if (model.timeline.isNotEmpty()) {
                         item(key = "timeline_h") { SectionHeader(stringResource(R.string.section_coming_up), action = stringResource(R.string.view_schedule), onAction = { nav.navigate(Routes.Calendar) }) }
@@ -555,6 +563,9 @@ private fun QuickActions(nav: NavController) {
     val actions = listOf(
         QuickAction(Icons.Rounded.North, R.string.qa_payment, t.red) { ui.openTransaction(app.pocketos.domain.finance.TxType.EXPENSE) },
         QuickAction(Icons.Rounded.South, R.string.qa_income, t.green) { ui.openTransaction(app.pocketos.domain.finance.TxType.INCOME) },
+        QuickAction(Icons.Rounded.EventRepeat, R.string.qa_installment, t.blue) { nav.navigate(Routes.Installments) },
+        QuickAction(Icons.Rounded.AccountBalance, R.string.qa_check, t.cyan) { nav.navigate(Routes.Checks) },
+        QuickAction(Icons.Rounded.Handshake, R.string.qa_debt, t.orange) { nav.navigate(Routes.Debts) },
         QuickAction(Icons.Rounded.NotificationsActive, R.string.qa_reminder, t.amber) { nav.navigate(Routes.ReminderEditor()) },
         QuickAction(Icons.Rounded.Autorenew, R.string.qa_subscription, t.violet) { nav.navigate(Routes.SubscriptionEditor()) },
         QuickAction(Icons.Rounded.TaskAlt, R.string.qa_task, t.blue) { nav.navigate(Routes.ReminderEditor(kind = "task")) },

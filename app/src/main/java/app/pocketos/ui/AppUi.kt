@@ -21,7 +21,11 @@ import kotlinx.coroutines.launch
 val LocalAppContainer = staticCompositionLocalOf<AppContainer> { error("AppContainer not provided") }
 val LocalAppUi = staticCompositionLocalOf<AppUiController> { error("AppUiController not provided") }
 
-data class QuickAddRequest(val prefill: String = "", val preferredType: QuickAddType? = null)
+data class QuickAddRequest(
+    val prefill: String = "",
+    val preferredType: QuickAddType? = null,
+    val requestId: Long = System.currentTimeMillis()
+)
 
 /** App-wide UI services: snackbars with undo, and the Quick Add sheet. */
 @Stable

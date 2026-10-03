@@ -79,6 +79,11 @@ class QuickAddViewModel(private val c: AppContainer, prefill: String, preferredT
         input.value = text.take(300)
     }
 
+    fun reset(prefill: String = "", preferredType: QuickAddType? = null) {
+        _state.value = QuickAddState(prefill.take(300))
+        input.value = prefill.take(300)
+    }
+
     private suspend fun reparse(text: String) {
         if (text.isBlank()) {
             _state.update { it.copy(draft = null) }

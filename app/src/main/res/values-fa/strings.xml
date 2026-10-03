@@ -115,6 +115,9 @@
     <string name="qa_reminder">یادآور</string>
     <string name="qa_subscription">اشتراک</string>
     <string name="qa_payment">هزینه</string>
+    <string name="qa_installment">اقساط</string>
+    <string name="qa_check">چک‌ها</string>
+    <string name="qa_debt">بدهی و طلب</string>
     <string name="qa_task">کار</string>
     <string name="qa_schedule">برنامه</string>
     <string name="first_run_title">بیایید اولین مورد را بسازیم</string>
@@ -1109,6 +1112,9 @@
     <string name="upcoming_obligations">تعهدات و چک‌های پیش‌رو</string>
     <string name="no_upcoming_obligations">تعهد مالی یا چکی در روزهای آینده ندارید</string>
     <string name="total_installments_debt">کل بدهی اقساط</string>
+    <string name="remaining_loan_amount">مانده این وام</string>
+    <string name="total_loan_amount">مبلغ کل وام</string>
+    <string name="remaining_installments_badge">%1$d از %2$d قسط باقی‌مانده</string>
     <string name="check_pass_btn">پاس شد ✅</string>
     <string name="check_bounce_btn">برگشت خورد ❌</string>
     <string name="notif_check_due_today_issued">موعد چک پرداختی «%1$s» امروز است - آیا پاس شد؟</string>
