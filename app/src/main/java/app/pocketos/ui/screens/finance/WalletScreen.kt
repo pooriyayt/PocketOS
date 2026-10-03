@@ -1,5 +1,7 @@
 package app.pocketos.ui.screens.finance
 
+import androidx.compose.material.icons.rounded.Handshake
+import androidx.compose.material.icons.rounded.EventRepeat
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -87,7 +89,7 @@ import app.pocketos.ui.LocalAppUi
 import app.pocketos.ui.components.AmountInput
 import app.pocketos.ui.components.BottomClearance
 import app.pocketos.ui.components.ChartSlice
-import app.pocketos.ui.components.CurrencyPickerList
+import app.pocketos.ui.components.CurrencyPickerSheet
 import app.pocketos.ui.components.DonutChart
 import app.pocketos.ui.components.EmptyState
 import app.pocketos.ui.components.GradientCard
@@ -133,9 +135,15 @@ fun WalletScreen(nav: NavController) {
     var editingWallet by remember { mutableStateOf<Wallet?>(null) }
     var creatingWallet by remember { mutableStateOf(false) }
 
+    val plans by container.finance.installments.collectAsState(initial = emptyList())
+    val debts by container.finance.debts.collectAsState(initial = emptyList())
     WalletContent(
         wallets = wallets,
         transactions = transactions,
+        installments = plans,
+        debts = debts,
+        onInstallments = { nav.navigate(Routes.Installments) },
+        onDebts = { nav.navigate(Routes.Debts) },
         defaultCurrency = settings.defaultCurrency,
         today = container.clock.today(),
         onSettings = { nav.navigate(Routes.Settings) },
@@ -166,6 +174,10 @@ fun WalletScreen(nav: NavController) {
 internal fun WalletContent(
     wallets: List<Wallet>?,
     transactions: List<Transaction>?,
+    installments: List<app.pocketos.domain.finance.InstallmentPlan>,
+    debts: List<app.pocketos.domain.finance.Debt>,
+    onInstallments: () -> Unit,
+    onDebts: () -> Unit,
     defaultCurrency: String,
     today: LocalDate,
     onSettings: () -> Unit,
@@ -178,7 +190,7 @@ internal fun WalletContent(
     val c = LocalPocketColors.current
     val f = LocalFormatter.current
     var offset by rememberSaveable { mutableStateOf(0) }
-    val period = MonthPeriod.of(today, f.solarHijri).plus(offset)
+    val period = MonthPeriod.of(today, f.calendar).plus(offset)
 
     val allWallets = wallets.orEmpty()
     val txs = transactions.orEmpty()
@@ -204,7 +216,7 @@ internal fun WalletContent(
                 GlassIconButton(Icons.Rounded.Settings, stringResource(R.string.nav_settings), onSettings)
             }
             Spacer(Modifier.height(Spacing.sm))
-            MonthSwitcher(f.monthTitle(period.year, period.month, gregorian = !period.jalali), canGoNext = offset < 0, onPrev = { offset-- }, onNext = { offset++ })
+            MonthSwitcher(f.monthTitle(period.year, period.month, period.calendar), canGoNext = offset < 0, onPrev = { offset-- }, onNext = { offset++ })
         }
 
         // ---- Hero: balance + month flow + trend
@@ -252,6 +264,25 @@ internal fun WalletContent(
                 ActionTile(Icons.Rounded.North, stringResource(R.string.expense), txTone(TxType.EXPENSE), Modifier.weight(1f)) { onAdd(TxType.EXPENSE) }
                 ActionTile(Icons.Rounded.South, stringResource(R.string.income), txTone(TxType.INCOME), Modifier.weight(1f)) { onAdd(TxType.INCOME) }
                 ActionTile(Icons.Rounded.SwapHoriz, stringResource(R.string.transfer), txTone(TxType.TRANSFER), Modifier.weight(1f)) { onAdd(TxType.TRANSFER) }
+            }
+        }
+
+        // ---- Installments & debts
+        item(key = "obligations") {
+            val nextPlan = app.pocketos.domain.finance.ObligationCalculator.upcoming(installments).firstOrNull()
+            val debtSummary = app.pocketos.domain.finance.ObligationCalculator.debtSummary(debts).firstOrNull { it.currency == primaryCurrency }
+            Row(Modifier.fillMaxWidth().padding(top = Spacing.md).appear(2), horizontalArrangement = Arrangement.spacedBy(Spacing.sm)) {
+                FeatureTile(
+                    Icons.Rounded.EventRepeat, c.tones.blue, stringResource(R.string.installments),
+                    nextPlan?.nextDue?.let { f.dayLabel(it, today) + " \u00b7 " + f.money(nextPlan.amountMinor, nextPlan.currency, compact = true) }
+                        ?: stringResource(R.string.add_installment),
+                    Modifier.weight(1f), onInstallments,
+                )
+                FeatureTile(
+                    Icons.Rounded.Handshake, c.tones.cyan, stringResource(R.string.debts_title),
+                    debtSummary?.let { f.money(it.netMinor, it.currency, compact = true) } ?: stringResource(R.string.add_debt),
+                    Modifier.weight(1f), onDebts,
+                )
             }
         }
 
@@ -391,6 +422,24 @@ private fun ActionTile(icon: ImageVector, label: String, tone: Color, modifier: 
             Spacer(Modifier.width(Spacing.sm))
             Text(label, style = MaterialTheme.typography.labelLarge, fontWeight = FontWeight.Bold, color = c.textPrimary, maxLines = 1, overflow = TextOverflow.Ellipsis)
         }
+    }
+}
+
+@Composable
+private fun FeatureTile(icon: ImageVector, tone: Color, title: String, subtitle: String, modifier: Modifier = Modifier, onClick: () -> Unit) {
+    val c = LocalPocketColors.current
+    GlassCard(
+        modifier,
+        onClick = onClick,
+        contentPadding = PaddingValues(Spacing.md),
+        decoration = {
+            drawRect(Brush.radialGradient(listOf(tone.copy(alpha = if (c.isDark) 0.20f else 0.10f), Color.Transparent), center = Offset(size.width, 0f), radius = size.width))
+        },
+    ) {
+        ToneIcon(icon, tone, size = 40.dp, filled = true)
+        Spacer(Modifier.height(Spacing.md))
+        Text(title, style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold, color = c.textPrimary, maxLines = 1, overflow = TextOverflow.Ellipsis)
+        Text(subtitle, style = MaterialTheme.typography.bodySmall, color = c.textSecondary, maxLines = 1, overflow = TextOverflow.Ellipsis)
     }
 }
 
@@ -562,7 +611,8 @@ private fun WalletEditorSheet(existing: Wallet?, defaultCurrency: String, onDism
                 GlassCard(
                     level = GlassLevel.L1,
                     contentPadding = PaddingValues(horizontal = Spacing.md, vertical = 14.dp),
-                    onClick = if (existing == null) ({ pickCurrency = true }) else null,
+                    // Currency can change until money has moved through the wallet.
+                    onClick = if (existing == null || transactions.none { it.walletId == existing.id || it.toWalletId == existing.id }) ({ pickCurrency = true }) else null,
                 ) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Text(Currencies.flag(currency), fontSize = 18.sp)
@@ -622,17 +672,15 @@ private fun WalletEditorSheet(existing: Wallet?, defaultCurrency: String, onDism
     }
 
     if (pickCurrency) {
-        GlassBottomSheet(onDismiss = { pickCurrency = false }, title = stringResource(R.string.currency)) {
-            CurrencyPickerList(
-                selected = currency,
-                onPick = {
-                    currency = it
-                    balance = AmountInput.adapt(balance, it)
-                    pickCurrency = false
-                },
-                modifier = Modifier.heightIn(max = 480.dp).verticalScroll(rememberScrollState()),
-            )
-        }
+        CurrencyPickerSheet(
+            selected = currency,
+            onPick = {
+                currency = it
+                balance = AmountInput.adapt(balance, it)
+                pickCurrency = false
+            },
+            onDismiss = { pickCurrency = false },
+        )
     }
     if (confirmDelete && existing != null) {
         GlassDialog(

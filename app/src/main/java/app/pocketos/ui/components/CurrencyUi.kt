@@ -1,5 +1,16 @@
 package app.pocketos.ui.components
 
+import app.pocketos.ui.design.GlassTextField
+import app.pocketos.ui.design.GlassBottomSheet
+import app.pocketos.R
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.res.stringResource
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.material.icons.rounded.Search
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -74,49 +85,76 @@ fun CurrencyChip(code: String, selected: Boolean, onClick: () -> Unit, modifier:
     GlassChip(code, selected, onClick, modifier, leading = { Text(Currencies.flag(code), fontSize = 15.sp) })
 }
 
-/**
- * Full currency picker: one row per currency with its flag, code and local
- * name, and a check on the selected one. Sized for a bottom sheet.
- */
+/** One selectable currency row: flag, code, local name, check when selected. */
 @Composable
-fun CurrencyPickerList(selected: String, onPick: (String) -> Unit, modifier: Modifier = Modifier, codes: List<String> = Currencies.common) {
+fun CurrencyRow(code: String, isSelected: Boolean, onPick: (String) -> Unit) {
     val c = LocalPocketColors.current
     val f = LocalFormatter.current
     val haptics = LocalHaptics.current
     val motion = LocalMotion.current
-    Column(modifier.fillMaxWidth().selectableGroup(), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-        codes.forEach { code ->
-            val isSelected = code == selected
-            val bg by animateColorAsState(if (isSelected) c.accent.copy(alpha = if (c.isDark) 0.18f else 0.09f) else Color.Transparent, motion.standard(), label = "curBg")
-            val outline by animateColorAsState(if (isSelected) c.accent.copy(alpha = 0.5f) else c.divider, motion.standard(), label = "curOutline")
-            Row(
-                Modifier
-                    .fillMaxWidth()
-                    .heightIn(min = 56.dp)
-                    .clip(Shapes.field)
-                    .background(bg)
-                    .border(1.dp, outline, Shapes.field)
-                    .selectable(isSelected, role = Role.RadioButton, interactionSource = remember { MutableInteractionSource() }, indication = null) {
-                        haptics.perform(HapticType.Selection)
-                        onPick(code)
-                    }
-                    .padding(horizontal = Spacing.md, vertical = Spacing.sm),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                CurrencyFlag(code, size = 36.dp)
-                Spacer(Modifier.width(Spacing.md))
-                Column(Modifier.weight(1f)) {
-                    Text(code, style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.SemiBold, color = c.textPrimary)
-                    Text(
-                        Currencies.displayName(code, f.locale),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = c.textSecondary,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                    )
-                }
-                if (isSelected) Icon(Icons.Rounded.CheckCircle, null, tint = c.accent, modifier = Modifier.size(22.dp))
+    val bg by animateColorAsState(if (isSelected) c.accent.copy(alpha = if (c.isDark) 0.18f else 0.09f) else Color.Transparent, motion.standard(), label = "curBg")
+    val outline by animateColorAsState(if (isSelected) c.accent.copy(alpha = 0.5f) else c.divider, motion.standard(), label = "curOutline")
+    Row(
+        Modifier
+            .fillMaxWidth()
+            .heightIn(min = 56.dp)
+            .clip(Shapes.field)
+            .background(bg)
+            .border(1.dp, outline, Shapes.field)
+            .selectable(isSelected, role = Role.RadioButton, interactionSource = remember { MutableInteractionSource() }, indication = null) {
+                haptics.perform(HapticType.Selection)
+                onPick(code)
             }
+            .padding(horizontal = Spacing.md, vertical = Spacing.sm),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        CurrencyFlag(code, size = 36.dp)
+        Spacer(Modifier.width(Spacing.md))
+        Column(Modifier.weight(1f)) {
+            Text(code, style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.SemiBold, color = c.textPrimary)
+            Text(
+                Currencies.displayName(code, f.locale),
+                style = MaterialTheme.typography.bodySmall,
+                color = c.textSecondary,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
         }
+        if (isSelected) Icon(Icons.Rounded.CheckCircle, null, tint = c.accent, modifier = Modifier.size(22.dp))
+    }
+}
+
+/** Short fixed list of currencies (used where only the common ones make sense). */
+@Composable
+fun CurrencyPickerList(selected: String, onPick: (String) -> Unit, modifier: Modifier = Modifier, codes: List<String> = Currencies.common) {
+    Column(modifier.fillMaxWidth().selectableGroup(), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+        codes.forEach { code -> CurrencyRow(code, code == selected, onPick) }
+    }
+}
+
+/**
+ * Every currency in the world in a searchable sheet. Search matches the
+ * code, the currency name (English or Persian) or a country name.
+ */
+@Composable
+fun CurrencyPickerSheet(selected: String, onPick: (String) -> Unit, onDismiss: () -> Unit) {
+    val c = LocalPocketColors.current
+    val f = LocalFormatter.current
+    var query by remember { mutableStateOf("") }
+    val codes = remember(query, f.locale) { Currencies.search(query, f.locale) }
+    GlassBottomSheet(onDismiss = onDismiss, title = stringResource(R.string.currency)) {
+        GlassTextField(
+            query,
+            { query = it },
+            placeholder = stringResource(R.string.currency_search_hint),
+            leading = { Icon(Icons.Rounded.Search, null, tint = c.textTertiary) },
+            imeAction = ImeAction.Search,
+        )
+        Spacer(Modifier.height(Spacing.md))
+        LazyColumn(Modifier.fillMaxWidth().height(460.dp).selectableGroup(), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+            items(codes, key = { it }) { code -> CurrencyRow(code, code == selected, onPick) }
+        }
+        Spacer(Modifier.height(Spacing.sm))
+        Text(stringResource(R.string.currency_no_conversion), style = MaterialTheme.typography.bodySmall, color = c.textTertiary)
     }
 }

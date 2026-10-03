@@ -964,4 +964,125 @@
     <string name="fin_cat_refund">بازگشت وجه</string>
     <string name="fin_cat_other_income">سایر</string>
     <string name="fin_cat_transfer">انتقال</string>
+    <string-array name="hijri_months">
+        <item>محرم</item>
+        <item>صفر</item>
+        <item>ربیع‌الاول</item>
+        <item>ربیع‌الثانی</item>
+        <item>جمادی‌الاول</item>
+        <item>جمادی‌الثانی</item>
+        <item>رجب</item>
+        <item>شعبان</item>
+        <item>رمضان</item>
+        <item>شوال</item>
+        <item>ذی‌القعده</item>
+        <item>ذی‌الحجه</item>
+    </string-array>
+    <string name="calendar_lunar_hijri">قمری</string>
+    <string name="currency_search_hint">جستجوی ارز یا کشور</string>
+    <string name="onboarding_calendar_title">تقویم و ارز</string>
+    <string name="onboarding_calendar_subtitle">تاریخ‌ها، گزارش‌های ماهانه و سررسید اقساط بر اساس انتخاب شما نمایش داده می‌شوند.</string>
+    <string name="default_currency_label">ارز اصلی</string>
+    <string name="notif_installment_today">امروز سررسید قسط «%1$s» است</string>
+    <string name="installment_n_of_m">قسط %1$d از %2$d</string>
+    <string name="notif_payment_public_title">پرداخت پیش رو</string>
+    <string name="notif_debt_pay_today">امروز باید بدهی %1$s را بدهید</string>
+    <string name="notif_debt_collect_today">امروز %1$s باید طلبتان را بدهد</string>
+    <string name="notif_debt_pay_soon">فردا موعد پرداخت بدهی به %1$s است</string>
+    <string name="notif_debt_collect_soon">فردا موعد طلب شما از %1$s است</string>
+    <plurals name="notif_installment_in_days">
+        <item quantity="one">%2$d روز دیگر سررسید قسط «%1$s» است</item>
+        <item quantity="other">%2$d روز دیگر سررسید قسط «%1$s» است</item>
+    </plurals>
+    <!-- Installments, debts, support -->
+    <string name="installments">اقساط</string>
+    <string name="debts_title">بدهی و طلب</string>
+    <string name="add_installment">قسط جدید</string>
+    <string name="edit_installment">ویرایش قسط</string>
+    <string name="installment_title">عنوان</string>
+    <string name="installment_title_hint">مثلاً وام خودرو، گوشی</string>
+    <string name="lender_optional">وام‌دهنده (اختیاری)</string>
+    <string name="lender_hint">بانک، فروشگاه، شخص…</string>
+    <string name="amount_per_installment">مبلغ هر قسط</string>
+    <string name="installments_count">تعداد کل اقساط</string>
+    <string name="already_paid">پرداخت‌شده تا الان</string>
+    <string name="next_installment_date">تاریخ قسط بعدی</string>
+    <string name="repeat_every">تکرار</string>
+    <string name="every_month">ماهانه</string>
+    <string name="every_n_months">هر %1$s ماه</string>
+    <string name="days_before_n">%1$s روز قبل</string>
+    <string name="pay_from_wallet">پرداخت از کیف پول</string>
+    <string name="pay_from_wallet_hint">هر پرداخت به‌عنوان هزینه هم ثبت می‌شود</string>
+    <string name="no_wallet">ثبت نشود</string>
+    <string name="mark_paid">پرداخت شد</string>
+    <string name="installment_paid">پرداخت قسط ثبت شد</string>
+    <string name="remaining_to_pay">باقی‌مانده</string>
+    <string name="due_this_month">سررسید این ماه</string>
+    <string name="next_due">سررسید بعدی</string>
+    <string name="paid_off">تسویه شد</string>
+    <string name="no_installments_title">هنوز قسطی ثبت نشده</string>
+    <string name="no_installments_message">یک بار وام یا خرید قسطی را ثبت کنید. PocketOS اقساط را می‌شمارد و قبل از هر کدام یادآوری می‌کند.</string>
+    <string name="finished">تمام‌شده</string>
+    <string name="delete_installment_title">این قسط حذف شود؟</string>
+    <string name="paid_of_total">%1$s از %2$s پرداخت شده</string>
+    <string name="ends_on">پایان: %1$s</string>
+    <string name="i_owe">بدهکارم</string>
+    <string name="owed_to_me">طلبکارم</string>
+    <string name="i_borrowed">قرض گرفتم</string>
+    <string name="i_lent">قرض دادم</string>
+    <string name="person">شخص</string>
+    <string name="person_hint">نام</string>
+    <string name="due_date_optional">موعد بازپرداخت (اختیاری)</string>
+    <string name="no_due_date">بدون موعد</string>
+    <string name="record_payment">ثبت پرداخت</string>
+    <string name="settle_fully">تسویه کامل</string>
+    <string name="settled">تسویه‌شده</string>
+    <string name="remaining">باقی‌مانده</string>
+    <string name="you_owe_total">بدهی شما</string>
+    <string name="owed_to_you_total">طلب شما</string>
+    <string name="no_debts_title">بدهی یا طلبی ثبت نشده</string>
+    <string name="no_debts_message">پول‌هایی که قرض می‌دهید یا می‌گیرید و بازپرداخت‌ها را اینجا نگه دارید.</string>
+    <string name="record_in_wallet">پول در کیف پول هم جابه‌جا شود</string>
+    <string name="add_debt">ثبت جدید</string>
+    <string name="edit_debt">ویرایش</string>
+    <string name="delete_debt_title">این مورد حذف شود؟</string>
+    <string name="payment_amount">مبلغ پرداخت‌شده</string>
+    <string name="payment_recorded">پرداخت ثبت شد</string>
+    <string name="open_items">باز</string>
+    <string name="all_label">همه</string>
+    <string name="fin_cat_installments">اقساط</string>
+    <string name="fin_cat_lent">قرض داده</string>
+    <string name="fin_cat_borrowed">قرض گرفته</string>
+    <string name="fin_cat_debt_paid">بازپرداخت بدهی</string>
+    <string name="fin_cat_debt_received">دریافت طلب</string>
+    <string name="support_title">حمایت از PocketOS</string>
+    <string name="support_headline">کمک کنید PocketOS رایگان بماند</string>
+    <string name="support_body">PocketOS رایگان است؛ بدون بخش پولی و بدون اشتراک. دیدن یک تبلیغ کوتاه در همین صفحه ساده‌ترین راه حمایت از ادامهٔ ساخت آن است. از شما ممنونیم!</string>
+    <string name="watch_ad">دیدن تبلیغ</string>
+    <string name="ad_loading">در حال آماده‌سازی تبلیغ…</string>
+    <string name="ad_unavailable">الان تبلیغی در دسترس نیست. کمی بعد دوباره امتحان کنید.</string>
+    <string name="support_thanks">ممنون که حمایت کردید!</string>
+    <string name="ad_label">تبلیغ</string>
+    <string name="support_privacy">تبلیغات توسط عدیوری نمایش داده می‌شوند. داده‌های مالی شما هرگز از این گوشی خارج نمی‌شود.</string>
+    <string name="support_entry_sub">با دیدن یک تبلیغ از ما حمایت کنید</string>
+    <string name="supporter_count_zero">هر تبلیغی که می‌بینید کمک می‌کند.</string>
+    <string name="try_again">تلاش دوباره</string>
+    <plurals name="supported_times">
+        <item quantity="one">%1$d بار از ما حمایت کرده‌اید</item>
+        <item quantity="other">%1$d بار از ما حمایت کرده‌اید</item>
+    </plurals>
+    <plurals name="open_installments">
+        <item quantity="one">%1$d قسط فعال</item>
+        <item quantity="other">%1$d قسط فعال</item>
+    </plurals>
+    <plurals name="open_debts">
+        <item quantity="one">%1$d مورد باز</item>
+        <item quantity="other">%1$d مورد باز</item>
+    </plurals>
+    <string name="expense_added">هزینه ثبت شد</string>
+    <string name="income_added">درآمد ثبت شد</string>
+    <string name="amount_scaled_note">به هزار تومان خوانده شد؛ برای تغییر لمس کنید</string>
+    <string name="enter_amount">مبلغ را وارد کنید</string>
+    <string name="example_expense">۱۵۰ تومن ساندویچ</string>
+    <string name="example_income">حقوق ۲۵ میلیون تومان</string>
 </resources>

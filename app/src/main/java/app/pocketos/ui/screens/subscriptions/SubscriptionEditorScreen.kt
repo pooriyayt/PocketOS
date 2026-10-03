@@ -479,18 +479,14 @@ private fun AmountSection(form: SubscriptionForm, vm: SubscriptionEditorViewMode
         }
     }
     if (currencySheet) {
-        GlassBottomSheet(onDismiss = { currencySheet = false }, title = stringResource(R.string.currency)) {
-            app.pocketos.ui.components.CurrencyPickerList(
-                selected = form.currency,
-                onPick = { code ->
-                    vm.update { it.copy(currency = code, amountText = app.pocketos.ui.components.AmountInput.adapt(it.amountText, code)) }
-                    currencySheet = false
-                },
-                modifier = Modifier.heightIn(max = 480.dp).verticalScroll(rememberScrollState()),
-            )
-            Spacer(Modifier.height(Spacing.md))
-            Text(stringResource(R.string.currency_no_conversion), style = MaterialTheme.typography.bodySmall, color = c.textTertiary)
-        }
+        app.pocketos.ui.components.CurrencyPickerSheet(
+            selected = form.currency,
+            onPick = { code ->
+                vm.update { it.copy(currency = code, amountText = app.pocketos.ui.components.AmountInput.adapt(it.amountText, code)) }
+                currencySheet = false
+            },
+            onDismiss = { currencySheet = false },
+        )
     }
 }
 

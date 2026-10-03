@@ -85,14 +85,11 @@ import java.time.YearMonth
 import java.time.temporal.WeekFields
 import java.util.Locale
 
-/** A month in either calendar system, expressed as its Gregorian dates. */
-data class CalendarMonthKey(val year: Int, val month: Int, val jalali: Boolean) {
-    fun days(): List<LocalDate> = if (jalali) {
-        val first = JalaliCalendar.toGregorian(year, month, 1)
-        (0 until JalaliCalendar.monthLength(year, month)).map { first.plusDays(it.toLong()) }
-    } else {
-        val ym = YearMonth.of(year, month)
-        (1..ym.lengthOfMonth()).map { ym.atDay(it) }
+/** A month in the user's calendar, expressed as its Gregorian dates. */
+data class CalendarMonthKey(val year: Int, val month: Int, val kind: app.pocketos.core.time.CalendarKind) {
+    fun days(): List<LocalDate> {
+        val first = app.pocketos.core.time.CalendarMath.toDate(kind, year, month, 1)
+        return (0 until app.pocketos.core.time.CalendarMath.monthLength(kind, year, month)).map { first.plusDays(it.toLong()) }
     }
 
     fun plus(months: Int): CalendarMonthKey {
@@ -101,9 +98,8 @@ data class CalendarMonthKey(val year: Int, val month: Int, val jalali: Boolean) 
     }
 
     companion object {
-        fun of(date: LocalDate, jalali: Boolean): CalendarMonthKey =
-            if (jalali) JalaliCalendar.fromGregorian(date).let { CalendarMonthKey(it.year, it.month, true) }
-            else CalendarMonthKey(date.year, date.monthValue, false)
+        fun of(date: LocalDate, kind: app.pocketos.core.time.CalendarKind): CalendarMonthKey =
+            app.pocketos.core.time.CalendarMath.fromDate(date, kind).let { CalendarMonthKey(it.year, it.month, kind) }
     }
 }
 
@@ -125,11 +121,11 @@ fun CalendarScreen(nav: NavController) {
     val actions = rememberItemActions()
     val rtl = LocalLayoutDirection.current == LayoutDirection.Rtl
     val today = container.clock.today()
-    val jalali = f.solarHijri
+    val calendarKind = f.calendar
     var monthOffset by rememberSaveable { mutableStateOf(0) }
     var selected by rememberSaveable { mutableStateOf(today.toEpochDay()) }
     var menuFor by remember { mutableStateOf<Reminder?>(null) }
-    val month = CalendarMonthKey.of(today, jalali).plus(monthOffset)
+    val month = CalendarMonthKey.of(today, calendarKind).plus(monthOffset)
     val days = remember(month) { month.days() }
 
     // Everything happening in the visible month, including repeating occurrences.
@@ -156,7 +152,7 @@ fun CalendarScreen(nav: NavController) {
             item {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     AnimatedContent(month, transitionSpec = { motion.tabEnter() togetherWith motion.tabExit() }, label = "monthTitle", modifier = Modifier.weight(1f)) { m ->
-                        Text(f.monthTitle(m.year, m.month, gregorian = !m.jalali), style = MaterialTheme.typography.headlineSmall, color = c.textPrimary)
+                        Text(f.monthTitle(m.year, m.month, m.kind), style = MaterialTheme.typography.headlineSmall, color = c.textPrimary)
                     }
                     if (monthOffset != 0 || selected != today.toEpochDay()) {
                         PocketButton(stringResource(R.string.today), { monthOffset = 0; selected = today.toEpochDay() }, style = ButtonStyle.Text)

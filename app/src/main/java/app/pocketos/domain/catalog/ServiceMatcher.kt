@@ -83,7 +83,7 @@ class ServiceMatcher(private val catalog: ServiceCatalog) {
             if (categoryName != null && q.length >= 3 && (categoryName.startsWith(q) || categoryName.split(' ').any { it.startsWith(q) })) offer(s, 30)
         }
         return scores.values
-            .sortedWith(compareByDescending<Match> { it.score }.thenBy { it.service.generic }.thenBy { it.service.name.length })
+            .sortedWith(compareByDescending<Match> { it.score }.thenBy { it.service.generic }.thenBy { it.service.name.length }.thenBy { it.service.name })
             .take(limit)
     }
 }

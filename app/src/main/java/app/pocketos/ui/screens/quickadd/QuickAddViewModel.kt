@@ -1,5 +1,8 @@
 package app.pocketos.ui.screens.quickadd
 
+import app.pocketos.domain.finance.TxType
+import app.pocketos.domain.finance.Transaction
+import app.pocketos.domain.finance.FinanceKeywords
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import app.pocketos.AppContainer
@@ -39,6 +42,7 @@ data class QuickDraft(
     val service: ServiceInfo? = null,
     val amount: Money? = null,
     val currencyAssumed: Boolean = false,
+    val amountScaled: Boolean = false,
     val date: LocalDate? = null,
     val dateAssumed: Boolean = false,
     val time: LocalTime? = null,
@@ -51,7 +55,8 @@ data class QuickDraft(
     val offsets: List<Int> = emptyList(),
     val touched: Set<DraftField> = emptySet(),
 ) {
-    val canAdd: Boolean get() = title.isNotBlank()
+    val isMoney: Boolean get() = type == QuickAddType.EXPENSE || type == QuickAddType.INCOME
+    val canAdd: Boolean get() = if (isMoney) (amount?.amountMinor ?: 0) > 0 else title.isNotBlank()
 }
 
 data class QuickAddState(val text: String = "", val draft: QuickDraft? = null)
@@ -101,6 +106,7 @@ class QuickAddViewModel(private val c: AppContainer, prefill: String, preferredT
             service = r.service,
             amount = pick(DraftField.AMOUNT, r.amount, old?.amount),
             currencyAssumed = if (DraftField.AMOUNT in touched) false else r.currencyAssumed,
+            amountScaled = if (DraftField.AMOUNT in touched) false else r.amountScaled,
             date = pick(DraftField.DATE, r.date, old?.date),
             dateAssumed = if (DraftField.DATE in touched) false else r.dateAssumed,
             time = pick(DraftField.TIME, r.time, old?.time),
@@ -128,7 +134,16 @@ class QuickAddViewModel(private val c: AppContainer, prefill: String, preferredT
     /** Converts a draft between reminder/task/subscription, carrying over compatible values. */
     private fun convert(d: QuickDraft, type: QuickAddType): QuickDraft {
         val today = c.clock.today()
+        val fromMoney = d.isMoney
+        val nonMoneyCategory = if (fromMoney) null else d.category
         return when (type) {
+            QuickAddType.EXPENSE, QuickAddType.INCOME -> {
+                val tx = if (type == QuickAddType.INCOME) TxType.INCOME else TxType.EXPENSE
+                d.copy(
+                    type = type, date = d.date ?: today, time = null, recurrence = null, billing = null,
+                    category = if (fromMoney && d.type == type) d.category else FinanceKeywords.categoryFor(d.title, tx),
+                )
+            }
             QuickAddType.SUBSCRIPTION -> {
                 val billing = d.billing ?: d.recurrence?.let { rule ->
                     when (rule.frequency) {
@@ -141,7 +156,7 @@ class QuickAddViewModel(private val c: AppContainer, prefill: String, preferredT
                 val date = d.date ?: BillingCalculator.occurrence(today, billing, 1)
                 d.copy(
                     type = type, billing = billing, date = date, time = null,
-                    category = d.service?.category ?: if (d.category in reminderOnly) "other" else d.category,
+                    category = d.service?.category ?: if (nonMoneyCategory == null || nonMoneyCategory in reminderOnly) "other" else nonMoneyCategory,
                     offsets = d.offsets.ifEmpty { SmartDefaults.subscriptionReminderOffsets(billing, date, today) },
                 )
             }
@@ -158,9 +173,9 @@ class QuickAddViewModel(private val c: AppContainer, prefill: String, preferredT
                     )
                 }
                 d.copy(type = type, recurrence = rule, date = d.date ?: today, time = d.time ?: c.latestSettings.reminderDefaultTime,
-                    category = if (d.category in subscriptionOnly) "finance" else d.category)
+                    category = if (nonMoneyCategory == null) "finance" else if (nonMoneyCategory in subscriptionOnly) "finance" else nonMoneyCategory)
             }
-            QuickAddType.TASK -> d.copy(type = type, category = if (d.category in subscriptionOnly) "personal" else d.category)
+            QuickAddType.TASK -> d.copy(type = type, category = if (nonMoneyCategory == null || nonMoneyCategory in subscriptionOnly) "personal" else nonMoneyCategory)
         }
     }
 
@@ -170,6 +185,25 @@ class QuickAddViewModel(private val c: AppContainer, prefill: String, preferredT
         if (!d.canAdd) return null
         val now = c.clock.now()
         when (d.type) {
+            QuickAddType.EXPENSE, QuickAddType.INCOME -> {
+                val money = d.amount ?: return null
+                val wallet = c.finance.walletFor(money.currency, c.app.getString(app.pocketos.R.string.default_wallet_name))
+                c.finance.saveTransaction(
+                    Transaction(
+                        id = c.finance.newId(),
+                        type = if (d.type == QuickAddType.INCOME) TxType.INCOME else TxType.EXPENSE,
+                        amountMinor = money.amountMinor,
+                        currency = money.currency,
+                        walletId = wallet.id,
+                        toWalletId = null,
+                        category = d.category,
+                        note = d.title.trim().ifEmpty { null },
+                        date = d.date ?: c.clock.today(),
+                        createdAt = now,
+                        updatedAt = now,
+                    )
+                )
+            }
             QuickAddType.SUBSCRIPTION -> {
                 val billing = d.billing ?: BillingCycle.MONTHLY
                 val renewal = d.date ?: BillingCalculator.occurrence(c.clock.today(), billing, 1)

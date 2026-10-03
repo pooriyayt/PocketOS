@@ -1,6 +1,7 @@
 package app.pocketos.domain.finance
 
-import app.pocketos.core.time.JalaliCalendar
+import app.pocketos.core.time.CalendarKind
+import app.pocketos.core.time.CalendarMath
 import java.time.Instant
 import java.time.LocalDate
 
@@ -53,11 +54,21 @@ data class Transaction(
     val updatedAt: Instant,
 )
 
-/** Built-in money category; the UI maps [id] to an icon and a name. */
-data class FinanceCategory(val id: String, val type: TxType, val color: Long)
+/**
+ * Built-in money category; the UI maps [id] to an icon and a name.
+ * [hidden] categories are written by the app (debts) and not offered in the
+ * picker; [isSpending] false keeps them out of income/spending reports while
+ * they still move wallet balances.
+ */
+data class FinanceCategory(val id: String, val type: TxType, val color: Long, val hidden: Boolean = false, val isSpending: Boolean = true)
 
 object FinanceCategories {
     const val TRANSFER = "transfer"
+    const val INSTALLMENTS = "installments"
+    const val LENT = "lent"
+    const val BORROWED = "borrowed"
+    const val DEBT_PAID = "debt_paid"
+    const val DEBT_RECEIVED = "debt_received"
 
     val expense = listOf(
         FinanceCategory("food", TxType.EXPENSE, 0xFFF97316),
@@ -72,7 +83,10 @@ object FinanceCategories {
         FinanceCategory("travel", TxType.EXPENSE, 0xFF14B8A6),
         FinanceCategory("gifts", TxType.EXPENSE, 0xFFF43F5E),
         FinanceCategory("subscriptions", TxType.EXPENSE, 0xFF6366F1),
+        FinanceCategory("installments", TxType.EXPENSE, 0xFF0EA5E9),
         FinanceCategory("other_expense", TxType.EXPENSE, 0xFF94A3B8),
+        FinanceCategory(LENT, TxType.EXPENSE, 0xFF14B8A6, hidden = true, isSpending = false),
+        FinanceCategory(DEBT_PAID, TxType.EXPENSE, 0xFF14B8A6, hidden = true, isSpending = false),
     )
 
     val income = listOf(
@@ -83,15 +97,20 @@ object FinanceCategories {
         FinanceCategory("gift_income", TxType.INCOME, 0xFFEC4899),
         FinanceCategory("refund", TxType.INCOME, 0xFF3B82F6),
         FinanceCategory("other_income", TxType.INCOME, 0xFF94A3B8),
+        FinanceCategory(BORROWED, TxType.INCOME, 0xFF14B8A6, hidden = true, isSpending = false),
+        FinanceCategory(DEBT_RECEIVED, TxType.INCOME, 0xFF14B8A6, hidden = true, isSpending = false),
     )
 
     fun forType(type: TxType): List<FinanceCategory> = when (type) {
-        TxType.EXPENSE -> expense
-        TxType.INCOME -> income
+        TxType.EXPENSE -> expense.filterNot { it.hidden }
+        TxType.INCOME -> income.filterNot { it.hidden }
         TxType.TRANSFER -> emptyList()
     }
 
     fun find(id: String): FinanceCategory? = (expense + income).firstOrNull { it.id == id }
+
+    /** Does a transaction in [id] count as real income/spending in reports? */
+    fun isSpending(id: String): Boolean = find(id)?.isSpending ?: true
 
     fun defaultFor(type: TxType): String = when (type) {
         TxType.EXPENSE -> "food"
@@ -101,16 +120,15 @@ object FinanceCategories {
 }
 
 /**
- * A calendar month in the user's calendar system (Solar Hijri or
- * Gregorian), with its inclusive date range.
+ * A calendar month in the user's calendar (Gregorian, Solar Hijri or
+ * lunar Hijri), with its inclusive date range.
  */
-data class MonthPeriod(val year: Int, val month: Int, val jalali: Boolean) {
+data class MonthPeriod(val year: Int, val month: Int, val calendar: CalendarKind) {
     val start: LocalDate
-        get() = if (jalali) JalaliCalendar.toGregorian(year, month, 1) else LocalDate.of(year, month, 1)
+        get() = CalendarMath.toDate(calendar, year, month, 1)
 
     val end: LocalDate
-        get() = if (jalali) JalaliCalendar.toGregorian(year, month, JalaliCalendar.monthLength(year, month))
-        else start.withDayOfMonth(start.lengthOfMonth())
+        get() = CalendarMath.toDate(calendar, year, month, CalendarMath.monthLength(calendar, year, month))
 
     operator fun contains(date: LocalDate): Boolean = !date.isBefore(start) && !date.isAfter(end)
 
@@ -120,9 +138,8 @@ data class MonthPeriod(val year: Int, val month: Int, val jalali: Boolean) {
     }
 
     companion object {
-        fun of(date: LocalDate, jalali: Boolean): MonthPeriod =
-            if (jalali) JalaliCalendar.fromGregorian(date).let { MonthPeriod(it.year, it.month, true) }
-            else MonthPeriod(date.year, date.monthValue, false)
+        fun of(date: LocalDate, calendar: CalendarKind): MonthPeriod =
+            CalendarMath.fromDate(date, calendar).let { MonthPeriod(it.year, it.month, calendar) }
     }
 }
 
@@ -159,7 +176,7 @@ object FinanceCalculator {
 
     /** Income and spending inside [period], per currency (transfers excluded). */
     fun totals(transactions: List<Transaction>, period: MonthPeriod): List<CurrencyTotals> =
-        transactions.filter { it.date in period && it.type != TxType.TRANSFER }
+        transactions.filter { it.date in period && it.type != TxType.TRANSFER && FinanceCategories.isSpending(it.category) }
             .groupBy { it.currency }
             .map { (currency, list) ->
                 CurrencyTotals(
@@ -172,7 +189,7 @@ object FinanceCalculator {
 
     /** Spending by category in [period] for one [currency], largest first. */
     fun spendingByCategory(transactions: List<Transaction>, period: MonthPeriod, currency: String): List<CategoryShare> {
-        val spent = transactions.filter { it.type == TxType.EXPENSE && it.currency == currency && it.date in period }
+        val spent = transactions.filter { it.type == TxType.EXPENSE && it.currency == currency && it.date in period && FinanceCategories.isSpending(it.category) }
         val total = spent.sumOf { it.amountMinor }.takeIf { it > 0 } ?: return emptyList()
         return spent.groupBy { it.category }
             .map { (cat, list) -> list.sumOf { it.amountMinor }.let { CategoryShare(cat, it, it.toFloat() / total) } }
@@ -190,7 +207,7 @@ object FinanceCalculator {
         val start = period.start
         val days = (period.end.toEpochDay() - start.toEpochDay() + 1).toInt()
         val out = LongArray(days)
-        transactions.filter { it.type == TxType.EXPENSE && it.currency == currency && it.date in period }
+        transactions.filter { it.type == TxType.EXPENSE && it.currency == currency && it.date in period && FinanceCategories.isSpending(it.category) }
             .forEach { out[(it.date.toEpochDay() - start.toEpochDay()).toInt()] += it.amountMinor }
         return out.toList()
     }

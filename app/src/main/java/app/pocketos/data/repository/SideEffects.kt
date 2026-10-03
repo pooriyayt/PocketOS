@@ -10,6 +10,11 @@ interface SideEffects {
 
     suspend fun onSubscriptionChanged(id: String, deleted: Boolean) {}
 
+    /** An installment plan / debt changed: reschedule its due-date notification. */
+    suspend fun onInstallmentChanged(id: String) {}
+
+    suspend fun onDebtChanged(id: String) {}
+
     /** Any user data changed: refresh widgets and schedule a sync. */
     fun onDataChanged() {}
 

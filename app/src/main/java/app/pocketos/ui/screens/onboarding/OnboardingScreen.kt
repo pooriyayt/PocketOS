@@ -1,5 +1,10 @@
 package app.pocketos.ui.screens.onboarding
 
+import androidx.compose.material.icons.rounded.UnfoldMore
+import androidx.compose.material.icons.rounded.Public
+import androidx.compose.material.icons.rounded.NightsStay
+import androidx.compose.material.icons.rounded.WbSunny
+import app.pocketos.data.prefs.CalendarSystem
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateDpAsState
@@ -103,10 +108,10 @@ import app.pocketos.ui.theme.darkPocketColors
 import app.pocketos.ui.theme.lightPocketColors
 import kotlinx.coroutines.launch
 
-private const val STEPS = 4
+private const val STEPS = 5
 
 /**
- * First-run setup: welcome, language, theme, focus.
+ * First-run setup: welcome, language, theme, calendar & currency, focus.
  *
  * Language and theme are written to settings the moment they are picked, so
  * the whole app re-renders live in the new language / theme. The step is
@@ -127,12 +132,28 @@ fun OnboardingScreen(onCompleted: () -> Unit = {}) {
     fun setLanguage(lang: AppLanguage) {
         haptics.perform(HapticType.Selection)
         // MainActivity applies the locale whenever settings.language changes.
-        scope.launch { container.settings.update { it.copy(language = lang) } }
+        scope.launch {
+            container.settings.update {
+                // Persian users almost always count in Toman; switch the untouched USD default.
+                val currency = if (lang == AppLanguage.PERSIAN && it.defaultCurrency == "USD") "IRT" else it.defaultCurrency
+                it.copy(language = lang, defaultCurrency = currency)
+            }
+        }
     }
 
     fun setTheme(mode: ThemeMode) {
         haptics.perform(HapticType.Selection)
         scope.launch { container.settings.update { it.copy(themeMode = mode) } }
+    }
+
+    fun setCalendar(cal: CalendarSystem) {
+        haptics.perform(HapticType.Selection)
+        scope.launch { container.settings.update { it.copy(calendarSystem = cal) } }
+    }
+
+    fun setCurrency(code: String) {
+        haptics.perform(HapticType.Selection)
+        scope.launch { container.settings.update { it.copy(defaultCurrency = code) } }
     }
 
     fun finish() {
@@ -168,6 +189,7 @@ fun OnboardingScreen(onCompleted: () -> Unit = {}) {
                             0 -> WelcomeStep()
                             1 -> LanguageStep(settings.language, ::setLanguage)
                             2 -> ThemeStep(settings.themeMode, settings.accent, ::setTheme)
+                            3 -> CalendarCurrencyStep(settings.calendarSystem, settings.defaultCurrency, ::setCalendar, ::setCurrency)
                             else -> FocusStep(selectedFocus) {
                                 haptics.perform(HapticType.Selection)
                                 selectedFocus = it
@@ -423,6 +445,60 @@ private fun ThemePreviewCard(palette: PocketColors, icon: ImageVector, title: St
                 SelectionMark(selected, size = 22.dp)
             }
         }
+    }
+}
+
+@Composable
+private fun CalendarCurrencyStep(calendar: CalendarSystem, currency: String, onCalendar: (CalendarSystem) -> Unit, onCurrency: (String) -> Unit) {
+    val c = LocalPocketColors.current
+    val context = androidx.compose.ui.platform.LocalContext.current
+    val f = LocalFormatter.current
+    val today = java.time.LocalDate.now()
+    var pickCurrency by remember { mutableStateOf(false) }
+    // AUTO resolves to the language default; show it as that concrete choice.
+    val effective = when (calendar) {
+        CalendarSystem.AUTO -> if (f.locale.language == "fa") CalendarSystem.SOLAR_HIJRI else CalendarSystem.GREGORIAN
+        else -> calendar
+    }
+    StepHeader(stringResource(R.string.onboarding_calendar_title), stringResource(R.string.onboarding_calendar_subtitle))
+    Column(verticalArrangement = Arrangement.spacedBy(Spacing.md)) {
+        listOf(
+            Triple(CalendarSystem.SOLAR_HIJRI, R.string.calendar_solar_hijri, Icons.Rounded.WbSunny to c.tones.amber),
+            Triple(CalendarSystem.LUNAR_HIJRI, R.string.calendar_lunar_hijri, Icons.Rounded.NightsStay to c.tones.violet),
+            Triple(CalendarSystem.GREGORIAN, R.string.calendar_gregorian, Icons.Rounded.Public to c.tones.blue),
+        ).forEachIndexed { i, (system, label, visual) ->
+            val preview = remember(system, f.locale) {
+                app.pocketos.ui.format.UiFormatter(context, f.locale, system.resolve(f.locale.language)).date(today, withYear = true, withWeekday = true)
+            }
+            SelectableSurface(effective == system, { onCalendar(system) }, Modifier.fillMaxWidth().appear(2 + i)) {
+                Row(Modifier.padding(Spacing.lg), verticalAlignment = Alignment.CenterVertically) {
+                    ToneIcon(visual.first, visual.second, size = 44.dp, filled = effective == system)
+                    Spacer(Modifier.width(Spacing.md))
+                    Column(Modifier.weight(1f)) {
+                        Text(stringResource(label), style = MaterialTheme.typography.titleMedium, color = c.textPrimary)
+                        Text(preview, style = MaterialTheme.typography.bodySmall, color = c.textSecondary)
+                    }
+                    SelectionMark(effective == system)
+                }
+            }
+        }
+    }
+    Spacer(Modifier.height(Spacing.xl))
+    Text(stringResource(R.string.default_currency_label), style = MaterialTheme.typography.titleMedium, color = c.textPrimary, modifier = Modifier.appear(5))
+    Spacer(Modifier.height(Spacing.sm))
+    SelectableSurface(true, { pickCurrency = true }, Modifier.fillMaxWidth().appear(6)) {
+        Row(Modifier.padding(Spacing.lg), verticalAlignment = Alignment.CenterVertically) {
+            app.pocketos.ui.components.CurrencyFlag(currency, size = 44.dp)
+            Spacer(Modifier.width(Spacing.md))
+            Column(Modifier.weight(1f)) {
+                Text(app.pocketos.core.money.Currencies.displayName(currency, f.locale), style = MaterialTheme.typography.titleMedium, color = c.textPrimary)
+                Text(currency, style = MaterialTheme.typography.bodySmall, color = c.textSecondary)
+            }
+            Icon(Icons.Rounded.UnfoldMore, null, tint = c.textTertiary)
+        }
+    }
+    if (pickCurrency) {
+        app.pocketos.ui.components.CurrencyPickerSheet(currency, { onCurrency(it); pickCurrency = false }, { pickCurrency = false })
     }
 }
 

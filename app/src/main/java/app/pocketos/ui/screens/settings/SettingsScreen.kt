@@ -26,6 +26,7 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
+import androidx.compose.material.icons.rounded.Favorite
 import androidx.compose.material.icons.rounded.Info
 import androidx.compose.material.icons.rounded.Language
 import androidx.compose.material.icons.rounded.Lock
@@ -101,6 +102,16 @@ fun SettingsScreen(nav: NavController) {
                         Text(stringResource(R.string.privacy_first_tagline), style = MaterialTheme.typography.bodySmall, color = Color.White.copy(alpha = 0.8f))
                     }
                 }
+            }
+        }
+        item {
+            SettingsGroup {
+                SettingsRow(
+                    Icons.Rounded.Favorite,
+                    stringResource(R.string.support_title),
+                    stringResource(R.string.support_entry_sub),
+                    tint = c.tones.pink,
+                ) { nav.navigate(Routes.Support) }
             }
         }
         item {

@@ -1,5 +1,7 @@
 package app.pocketos.ui.format
 
+import app.pocketos.core.time.CalendarMath
+import app.pocketos.core.time.CalendarKind
 import android.content.Context
 import androidx.compose.runtime.staticCompositionLocalOf
 import app.pocketos.R
@@ -25,7 +27,8 @@ import java.util.Locale
  * app locale (digits, separators, RTL) and the chosen calendar system, while
  * every amount keeps its own currency.
  */
-class UiFormatter(private val context: Context, val locale: Locale, val solarHijri: Boolean) {
+class UiFormatter(private val context: Context, val locale: Locale, val calendar: CalendarKind) {
+    val solarHijri: Boolean get() = calendar == CalendarKind.SOLAR_HIJRI
     private val res = context.resources
     private val isPersian = locale.language == "fa"
     private val decimalStyle = DecimalStyle.of(locale)
@@ -42,9 +45,9 @@ class UiFormatter(private val context: Context, val locale: Locale, val solarHij
 
     /** "12 Oct" / "12 Oct 2027" (Gregorian) or "۲۰ مهر" (Solar Hijri). */
     fun date(d: LocalDate, withYear: Boolean = d.year != LocalDate.now().year, withWeekday: Boolean = false): String {
-        val core = if (solarHijri) {
-            val j = JalaliCalendar.fromGregorian(d)
-            val month = res.getStringArray(R.array.jalali_months)[j.month - 1]
+        val core = if (calendar != CalendarKind.GREGORIAN) {
+            val j = CalendarMath.fromDate(d, calendar)
+            val month = monthNames(calendar)[j.month - 1]
             buildString {
                 append(digits(j.day.toString())).append(' ').append(month)
                 if (withYear) append(' ').append(digits(j.year.toString()))
@@ -57,13 +60,17 @@ class UiFormatter(private val context: Context, val locale: Locale, val solarHij
         return if (withWeekday) "${weekdayShort(d.dayOfWeek)}، $core".let { if (isPersian) it else it.replace("،", ",") } else core
     }
 
-    fun monthTitle(year: Int, month: Int, gregorian: Boolean = !solarHijri): String = if (!gregorian) {
-        "${res.getStringArray(R.array.jalali_months)[month - 1]} ${digits(year.toString())}"
+    private fun monthNames(kind: CalendarKind): Array<String> = res.getStringArray(
+        if (kind == CalendarKind.LUNAR_HIJRI) R.array.hijri_months else R.array.jalali_months
+    )
+
+    fun monthTitle(year: Int, month: Int, kind: CalendarKind = calendar): String = if (kind != CalendarKind.GREGORIAN) {
+        "${monthNames(kind)[month - 1]} ${digits(year.toString())}"
     } else {
         DateTimeFormatter.ofPattern("LLLL yyyy", locale).withDecimalStyle(decimalStyle).format(LocalDate.of(year, month, 1))
     }
 
-    fun dayOfMonth(d: LocalDate): String = digits(if (solarHijri) JalaliCalendar.fromGregorian(d).day.toString() else d.dayOfMonth.toString())
+    fun dayOfMonth(d: LocalDate): String = digits(CalendarMath.fromDate(d, calendar).day.toString())
 
     /** "Today", "Tomorrow", "Yesterday", weekday name within a week, else a date. */
     fun dayLabel(d: LocalDate, today: LocalDate): String {

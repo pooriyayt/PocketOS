@@ -81,7 +81,6 @@ import app.pocketos.ui.design.PocketButton
 import app.pocketos.ui.design.glass
 import app.pocketos.ui.design.pressFeedback
 import app.pocketos.ui.format.LocalFormatter
-import app.pocketos.ui.screens.common.PocketDatePickerDialog
 import app.pocketos.ui.theme.LocalPocketColors
 import app.pocketos.ui.theme.Shapes
 import app.pocketos.ui.theme.Spacing
@@ -291,10 +290,10 @@ internal fun TransactionEditor(
     }
 
     if (pickDate) {
-        PocketDatePickerDialog(date, onDismiss = { pickDate = false }) {
+        app.pocketos.ui.components.CalendarDatePickerSheet(date, onPick = {
             dateEpoch = it.toEpochDay()
             pickDate = false
-        }
+        }, onDismiss = { pickDate = false })
     }
 }
 

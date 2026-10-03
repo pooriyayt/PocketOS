@@ -16,10 +16,22 @@ android {
         applicationId = "app.pocketos"
         minSdk = 26
         targetSdk = 36
-        versionCode = 3
-        versionName = "1.2.0"
+        versionCode = 4
+        versionName = "1.3.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
+
+        val localProps = Properties().apply {
+            val f = rootProject.file("local.properties")
+            if (f.exists()) f.inputStream().use { load(it) }
+        }
+        val adiveryAppId = (localProps.getProperty("adivery.appId") ?: System.getenv("ADIVERY_APP_ID") ?: "").trim()
+        val adiveryRewarded = (localProps.getProperty("adivery.rewardedPlacement") ?: System.getenv("ADIVERY_REWARDED_PLACEMENT") ?: "").trim()
+        val adiveryNative = (localProps.getProperty("adivery.nativePlacement") ?: System.getenv("ADIVERY_NATIVE_PLACEMENT") ?: "").trim()
+
+        buildConfigField("String", "ADIVERY_APP_ID", "\"$adiveryAppId\"")
+        buildConfigField("String", "ADIVERY_REWARDED_PLACEMENT", "\"$adiveryRewarded\"")
+        buildConfigField("String", "ADIVERY_NATIVE_PLACEMENT", "\"$adiveryNative\"")
     }
 
     // Release signing comes from signing.properties (git-ignored, never committed):
@@ -153,6 +165,7 @@ dependencies {
 
     implementation(libs.haze)
     implementation(libs.haze.blur)
+    implementation(libs.adivery.sdk)
 
     testImplementation(libs.junit)
     testImplementation(libs.kotlinx.coroutines.test)

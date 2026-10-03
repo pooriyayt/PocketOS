@@ -20,7 +20,17 @@ enum class MotionPreference { SYSTEM, REDUCED, FULL }
 enum class HapticsPreference { ON, REDUCED, OFF }
 enum class GlassIntensity { SUBTLE, BALANCED, VIVID }
 enum class AppLanguage(val tag: String?) { SYSTEM(null), ENGLISH("en"), PERSIAN("fa") }
-enum class CalendarSystem { AUTO, GREGORIAN, SOLAR_HIJRI }
+enum class CalendarSystem {
+    AUTO, GREGORIAN, SOLAR_HIJRI, LUNAR_HIJRI;
+
+    /** The concrete calendar to use; AUTO follows the app language (Persian -> Solar Hijri). */
+    fun resolve(language: String): app.pocketos.core.time.CalendarKind = when (this) {
+        AUTO -> if (language == "fa") app.pocketos.core.time.CalendarKind.SOLAR_HIJRI else app.pocketos.core.time.CalendarKind.GREGORIAN
+        GREGORIAN -> app.pocketos.core.time.CalendarKind.GREGORIAN
+        SOLAR_HIJRI -> app.pocketos.core.time.CalendarKind.SOLAR_HIJRI
+        LUNAR_HIJRI -> app.pocketos.core.time.CalendarKind.LUNAR_HIJRI
+    }
+}
 enum class OnboardingFocus { REMINDERS, TASKS, SUBSCRIPTIONS, ORGANIZATION, EXPENSES, ALL }
 
 enum class DashboardSection { ATTENTION, OVERVIEW, TIMELINE, RENEWALS, SUGGESTIONS, QUICK_ACTIONS }

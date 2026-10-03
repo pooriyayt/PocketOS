@@ -1,5 +1,6 @@
 package app.pocketos
 
+import app.pocketos.ads.AdsManager
 import android.app.Application
 import app.pocketos.core.AppClock
 import app.pocketos.core.ConnectivityMonitor
@@ -58,6 +59,8 @@ class AppContainer(val app: Application) {
     private val effects = object : SideEffects {
         override suspend fun onReminderChanged(id: String, deleted: Boolean) = notificationScheduler.scheduleReminder(id)
         override suspend fun onSubscriptionChanged(id: String, deleted: Boolean) = notificationScheduler.scheduleRenewal(id)
+        override suspend fun onInstallmentChanged(id: String) = notificationScheduler.scheduleInstallment(id)
+        override suspend fun onDebtChanged(id: String) = notificationScheduler.scheduleDebt(id)
         override fun onDataChanged() {
             widgetUpdater.requestUpdate()
         }
@@ -70,6 +73,7 @@ class AppContainer(val app: Application) {
     val catalog = CatalogRepository(app)
     val backupManager = BackupManager(databases, clock)
     val updateManager = AppUpdateManager(app, scope)
+    val ads = AdsManager(app)
     val maintenance = MaintenanceScheduler(app)
 
     val pinVault = PinVault(app, KeystorePinMac())
@@ -78,6 +82,7 @@ class AppContainer(val app: Application) {
 
     fun start() {
         notifier.ensureChannels()
+        ads.init()
         maintenance.schedule()
         scope.launch { catalog.load() }
         scope.launch {

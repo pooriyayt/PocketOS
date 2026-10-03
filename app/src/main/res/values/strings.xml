@@ -992,4 +992,125 @@
     <string name="fin_cat_refund">Refund</string>
     <string name="fin_cat_other_income">Other</string>
     <string name="fin_cat_transfer">Transfer</string>
+    <string-array name="hijri_months">
+        <item>Muharram</item>
+        <item>Safar</item>
+        <item>Rabi al-Awwal</item>
+        <item>Rabi al-Thani</item>
+        <item>Jumada al-Ula</item>
+        <item>Jumada al-Akhirah</item>
+        <item>Rajab</item>
+        <item>Shaban</item>
+        <item>Ramadan</item>
+        <item>Shawwal</item>
+        <item>Dhu al-Qadah</item>
+        <item>Dhu al-Hijjah</item>
+    </string-array>
+    <string name="calendar_lunar_hijri">Lunar Hijri</string>
+    <string name="currency_search_hint">Search a currency or country</string>
+    <string name="onboarding_calendar_title">Calendar &amp; currency</string>
+    <string name="onboarding_calendar_subtitle">Dates, monthly reports and installment due dates follow your choice.</string>
+    <string name="default_currency_label">Main currency</string>
+    <string name="notif_installment_today">Installment due today: %1$s</string>
+    <string name="installment_n_of_m">Installment %1$d of %2$d</string>
+    <string name="notif_payment_public_title">Upcoming payment</string>
+    <string name="notif_debt_pay_today">Pay %1$s back today</string>
+    <string name="notif_debt_collect_today">%1$s should pay you back today</string>
+    <string name="notif_debt_pay_soon">Due tomorrow: paying %1$s back</string>
+    <string name="notif_debt_collect_soon">Due tomorrow: %1$s pays you back</string>
+    <plurals name="notif_installment_in_days">
+        <item quantity="one">Installment "%1$s" is due in %2$d day</item>
+        <item quantity="other">Installment "%1$s" is due in %2$d days</item>
+    </plurals>
+    <!-- Installments, debts, support -->
+    <string name="installments">Installments</string>
+    <string name="debts_title">Debts &amp; loans</string>
+    <string name="add_installment">New installment</string>
+    <string name="edit_installment">Edit installment</string>
+    <string name="installment_title">Title</string>
+    <string name="installment_title_hint">e.g. Car loan, New phone</string>
+    <string name="lender_optional">Lender (optional)</string>
+    <string name="lender_hint">Bank, store, person…</string>
+    <string name="amount_per_installment">Each installment</string>
+    <string name="installments_count">Number of installments</string>
+    <string name="already_paid">Already paid</string>
+    <string name="next_installment_date">Next installment date</string>
+    <string name="repeat_every">Repeats</string>
+    <string name="every_month">Monthly</string>
+    <string name="every_n_months">Every %1$s months</string>
+    <string name="days_before_n">%1$s days before</string>
+    <string name="pay_from_wallet">Pay from wallet</string>
+    <string name="pay_from_wallet_hint">Each payment is also recorded as an expense</string>
+    <string name="no_wallet">Don’t record</string>
+    <string name="mark_paid">Paid</string>
+    <string name="installment_paid">Installment marked as paid</string>
+    <string name="remaining_to_pay">Left to pay</string>
+    <string name="due_this_month">Due this month</string>
+    <string name="next_due">Next due</string>
+    <string name="paid_off">Paid off</string>
+    <string name="no_installments_title">No installments yet</string>
+    <string name="no_installments_message">Add a loan or purchase once. PocketOS counts the payments and reminds you before each one.</string>
+    <string name="finished">Finished</string>
+    <string name="delete_installment_title">Delete this installment plan?</string>
+    <string name="paid_of_total">%1$s of %2$s paid</string>
+    <string name="ends_on">Ends %1$s</string>
+    <string name="i_owe">I owe</string>
+    <string name="owed_to_me">Owed to me</string>
+    <string name="i_borrowed">I borrowed</string>
+    <string name="i_lent">I lent</string>
+    <string name="person">Person</string>
+    <string name="person_hint">Name</string>
+    <string name="due_date_optional">Pay-back date (optional)</string>
+    <string name="no_due_date">No date</string>
+    <string name="record_payment">Record payment</string>
+    <string name="settle_fully">Settle all</string>
+    <string name="settled">Settled</string>
+    <string name="remaining">Remaining</string>
+    <string name="you_owe_total">You owe</string>
+    <string name="owed_to_you_total">Owed to you</string>
+    <string name="no_debts_title">No debts or loans</string>
+    <string name="no_debts_message">Track money you lend or borrow and who has paid back, without awkward reminders.</string>
+    <string name="record_in_wallet">Also move the money in a wallet</string>
+    <string name="add_debt">New record</string>
+    <string name="edit_debt">Edit record</string>
+    <string name="delete_debt_title">Delete this record?</string>
+    <string name="payment_amount">Amount paid</string>
+    <string name="payment_recorded">Payment recorded</string>
+    <string name="open_items">Open</string>
+    <string name="all_label">All</string>
+    <string name="fin_cat_installments">Installments</string>
+    <string name="fin_cat_lent">Lent</string>
+    <string name="fin_cat_borrowed">Borrowed</string>
+    <string name="fin_cat_debt_paid">Debt paid back</string>
+    <string name="fin_cat_debt_received">Loan repaid to me</string>
+    <string name="support_title">Support PocketOS</string>
+    <string name="support_headline">Keep PocketOS free</string>
+    <string name="support_body">PocketOS is free, with no paywalls and no subscriptions. Watching a short ad here is the simplest way to help it keep growing. Thank you!</string>
+    <string name="watch_ad">Watch an ad</string>
+    <string name="ad_loading">Preparing an ad…</string>
+    <string name="ad_unavailable">No ad available right now. Please try again in a little while.</string>
+    <string name="support_thanks">Thank you for supporting us!</string>
+    <string name="ad_label">Ad</string>
+    <string name="support_privacy">Ads are served by Adivery. Your financial data never leaves this phone.</string>
+    <string name="support_entry_sub">Watch an ad to help us keep going</string>
+    <string name="supporter_count_zero">Every ad you watch helps.</string>
+    <string name="try_again">Try again</string>
+    <plurals name="supported_times">
+        <item quantity="one">You have supported us %1$d time</item>
+        <item quantity="other">You have supported us %1$d times</item>
+    </plurals>
+    <plurals name="open_installments">
+        <item quantity="one">%1$d active plan</item>
+        <item quantity="other">%1$d active plans</item>
+    </plurals>
+    <plurals name="open_debts">
+        <item quantity="one">%1$d open record</item>
+        <item quantity="other">%1$d open records</item>
+    </plurals>
+    <string name="expense_added">Expense added</string>
+    <string name="income_added">Income added</string>
+    <string name="amount_scaled_note">Read as thousand Toman — tap to change</string>
+    <string name="enter_amount">Add an amount</string>
+    <string name="example_expense">Lunch 12 dollars</string>
+    <string name="example_income">Salary 3000 dollars</string>
 </resources>

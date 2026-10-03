@@ -94,8 +94,20 @@ fun AppearanceScreen(nav: NavController) {
             { stringResource(when (it) { AppLanguage.SYSTEM -> R.string.language_system; AppLanguage.ENGLISH -> R.string.language_english; AppLanguage.PERSIAN -> R.string.language_persian }) })
 
         Label(stringResource(R.string.calendar_system))
-        GlassSegmentedControl(CalendarSystem.entries, settings.calendarSystem, { cs -> set { it.copy(calendarSystem = cs) } },
-            { stringResource(when (it) { CalendarSystem.AUTO -> R.string.calendar_auto; CalendarSystem.GREGORIAN -> R.string.calendar_gregorian; CalendarSystem.SOLAR_HIJRI -> R.string.calendar_solar_hijri }) })
+        androidx.compose.foundation.layout.FlowRow(horizontalArrangement = Arrangement.spacedBy(Spacing.sm), verticalArrangement = Arrangement.spacedBy(Spacing.sm)) {
+            CalendarSystem.entries.forEach { cs ->
+                app.pocketos.ui.design.GlassChip(
+                    stringResource(when (cs) {
+                        CalendarSystem.AUTO -> R.string.calendar_auto
+                        CalendarSystem.GREGORIAN -> R.string.calendar_gregorian
+                        CalendarSystem.SOLAR_HIJRI -> R.string.calendar_solar_hijri
+                        CalendarSystem.LUNAR_HIJRI -> R.string.calendar_lunar_hijri
+                    }),
+                    settings.calendarSystem == cs,
+                    { set { it.copy(calendarSystem = cs) } },
+                )
+            }
+        }
     }
 }
 

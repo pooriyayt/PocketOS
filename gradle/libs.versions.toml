@@ -23,6 +23,7 @@ coroutines = "1.11.0"
 retrofit = "3.0.0"
 okhttp = "5.5.0"
 haze = "2.0.1"
+adivery = "4.9.0"
 junit = "4.13.2"
 robolectric = "4.17"
 turbine = "1.2.1"
@@ -78,6 +79,7 @@ okhttp = { group = "com.squareup.okhttp3", name = "okhttp", version.ref = "okhtt
 okhttp-mockwebserver = { group = "com.squareup.okhttp3", name = "mockwebserver3", version.ref = "okhttp" }
 
 haze = { group = "dev.chrisbanes.haze", name = "haze", version.ref = "haze" }
+adivery-sdk = { group = "com.adivery", name = "sdk", version.ref = "adivery" }
 haze-blur = { group = "dev.chrisbanes.haze", name = "haze-blur", version.ref = "haze" }
 
 junit = { group = "junit", name = "junit", version.ref = "junit" }

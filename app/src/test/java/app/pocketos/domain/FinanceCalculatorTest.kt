@@ -1,5 +1,6 @@
 package app.pocketos.domain
 
+import app.pocketos.core.time.CalendarKind
 import app.pocketos.domain.finance.FinanceCalculator
 import app.pocketos.domain.finance.MonthPeriod
 import app.pocketos.domain.finance.Transaction
@@ -41,7 +42,7 @@ class FinanceCalculatorTest {
 
     @Test
     fun `monthly totals exclude transfers and other months`() {
-        val period = MonthPeriod.of(d, jalali = false)
+        val period = MonthPeriod.of(d, CalendarKind.GREGORIAN)
         val txs = listOf(
             tx("1", TxType.EXPENSE, 200_000, "cash", d),
             tx("2", TxType.EXPENSE, 100_000, "cash", d.minusMonths(1)),
@@ -56,7 +57,7 @@ class FinanceCalculatorTest {
 
     @Test
     fun `spending by category is sorted with shares`() {
-        val period = MonthPeriod.of(d, jalali = false)
+        val period = MonthPeriod.of(d, CalendarKind.GREGORIAN)
         val txs = listOf(
             tx("1", TxType.EXPENSE, 300, "cash", d, cat = "food"),
             tx("2", TxType.EXPENSE, 100, "cash", d, cat = "transport"),
@@ -69,20 +70,20 @@ class FinanceCalculatorTest {
 
     @Test
     fun `jalali month covers mehr 1405`() {
-        val mehr = MonthPeriod.of(d, jalali = true)
+        val mehr = MonthPeriod.of(d, CalendarKind.SOLAR_HIJRI)
         assertEquals(1405, mehr.year)
         assertEquals(7, mehr.month)
         assertEquals(LocalDate.of(2026, 9, 23), mehr.start)
         assertEquals(LocalDate.of(2026, 10, 22), mehr.end)
         assertTrue(d in mehr)
         assertFalse(LocalDate.of(2026, 10, 23) in mehr)
-        assertEquals(MonthPeriod(1406, 1, true), MonthPeriod(1405, 12, true).plus(1))
-        assertEquals(MonthPeriod(1405, 12, true), MonthPeriod(1406, 1, true).plus(-1))
+        assertEquals(MonthPeriod(1406, 1, CalendarKind.SOLAR_HIJRI), MonthPeriod(1405, 12, CalendarKind.SOLAR_HIJRI).plus(1))
+        assertEquals(MonthPeriod(1405, 12, CalendarKind.SOLAR_HIJRI), MonthPeriod(1406, 1, CalendarKind.SOLAR_HIJRI).plus(-1))
     }
 
     @Test
     fun `daily spending has one slot per day`() {
-        val period = MonthPeriod.of(d, jalali = false)
+        val period = MonthPeriod.of(d, CalendarKind.GREGORIAN)
         val series = FinanceCalculator.dailySpending(listOf(tx("1", TxType.EXPENSE, 50, "cash", d)), period, "IRT")
         assertEquals(31, series.size)
         assertEquals(50L, series[2])

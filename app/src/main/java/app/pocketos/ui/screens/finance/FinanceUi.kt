@@ -20,7 +20,9 @@ import androidx.compose.material.icons.rounded.CardGiftcard
 import androidx.compose.material.icons.rounded.Category
 import androidx.compose.material.icons.rounded.CreditCard
 import androidx.compose.material.icons.rounded.DirectionsCar
+import androidx.compose.material.icons.rounded.EventRepeat
 import androidx.compose.material.icons.rounded.Flight
+import androidx.compose.material.icons.rounded.Handshake
 import androidx.compose.material.icons.rounded.Home
 import androidx.compose.material.icons.rounded.LaptopMac
 import androidx.compose.material.icons.rounded.LocalGroceryStore
@@ -87,6 +89,8 @@ fun financeCategoryIcon(id: String): ImageVector = when (id) {
     "investment" -> Icons.AutoMirrored.Rounded.TrendingUp
     "refund" -> Icons.Rounded.Replay
     FinanceCategories.TRANSFER -> Icons.Rounded.SwapHoriz
+    FinanceCategories.INSTALLMENTS -> Icons.Rounded.EventRepeat
+    FinanceCategories.LENT, FinanceCategories.BORROWED, FinanceCategories.DEBT_PAID, FinanceCategories.DEBT_RECEIVED -> Icons.Rounded.Handshake
     else -> Icons.Rounded.Category
 }
 
@@ -117,6 +121,11 @@ fun financeCategoryName(id: String): String = stringResource(
         "refund" -> R.string.fin_cat_refund
         "other_income" -> R.string.fin_cat_other_income
         FinanceCategories.TRANSFER -> R.string.fin_cat_transfer
+        FinanceCategories.INSTALLMENTS -> R.string.fin_cat_installments
+        FinanceCategories.LENT -> R.string.fin_cat_lent
+        FinanceCategories.BORROWED -> R.string.fin_cat_borrowed
+        FinanceCategories.DEBT_PAID -> R.string.fin_cat_debt_paid
+        FinanceCategories.DEBT_RECEIVED -> R.string.fin_cat_debt_received
         else -> R.string.fin_cat_other_expense
     }
 )

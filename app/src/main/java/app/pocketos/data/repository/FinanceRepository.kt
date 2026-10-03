@@ -2,7 +2,14 @@ package app.pocketos.data.repository
 
 import app.pocketos.core.AppClock
 import app.pocketos.data.local.DatabaseManager
+import app.pocketos.core.time.CalendarKind
+import app.pocketos.data.local.DebtEntity
+import app.pocketos.data.local.InstallmentEntity
 import app.pocketos.data.local.TransactionEntity
+import app.pocketos.domain.finance.Debt
+import app.pocketos.domain.finance.DebtDirection
+import app.pocketos.domain.finance.FinanceCategories
+import app.pocketos.domain.finance.InstallmentPlan
 import app.pocketos.data.local.WalletEntity
 import app.pocketos.domain.finance.Transaction
 import app.pocketos.domain.finance.TxType
@@ -38,6 +45,16 @@ class FinanceRepository(
         if (db.wallets().count() > 0) return null
         val now = clock.now()
         return saveWallet(Wallet(newId(), name, WalletType.CASH, currency, 0, null, 0, false, now, now))
+    }
+
+    /** The first active wallet in [currency], creating a cash wallet for it when none exists. */
+    suspend fun walletFor(currency: String, defaultName: String): Wallet {
+        db.wallets().everything().map { it.toDomain() }
+            .filter { it.currency == currency && !it.archived }
+            .minByOrNull { it.sortOrder }
+            ?.let { return it }
+        val now = clock.now()
+        return saveWallet(Wallet(newId(), defaultName, WalletType.CASH, currency, 0, null, 0, false, now, now))
     }
 
     suspend fun saveWallet(wallet: Wallet): Wallet {
@@ -87,7 +104,178 @@ class FinanceRepository(
         db.transactions().upsert(tx.toEntity())
         effects.onDataChanged()
     }
+
+    // ----------------------------------------------------------- Installments
+
+    val installments: Flow<List<InstallmentPlan>> = databases.active.flatMapLatest { it.db.installments().observeAll() }
+        .map { list -> list.map { it.toDomain() } }
+
+    suspend fun saveInstallment(plan: InstallmentPlan): InstallmentPlan {
+        val existing = db.installments().get(plan.id)
+        val now = clock.now()
+        val total = plan.totalCount.coerceIn(1, 600)
+        val saved = plan.copy(
+            title = plan.title.trim().take(80),
+            lender = plan.lender?.trim()?.take(80)?.ifEmpty { null },
+            note = plan.note?.trim()?.take(500)?.ifEmpty { null },
+            totalCount = total,
+            paidCount = plan.paidCount.coerceIn(0, total),
+            createdAt = existing?.let { Instant.ofEpochMilli(it.createdAt) } ?: now,
+            updatedAt = now,
+        )
+        db.installments().upsert(saved.toEntity())
+        effects.onInstallmentChanged(saved.id)
+        effects.onDataChanged()
+        return saved
+    }
+
+    suspend fun deleteInstallment(id: String) {
+        db.installments().delete(id)
+        effects.onInstallmentChanged(id)
+        effects.onDataChanged()
+    }
+
+    /**
+     * Marks the next installment as paid. When the plan has a wallet the
+     * payment is also recorded there as an expense. Returns that
+     * transaction's id (if any) so the UI can undo both together.
+     */
+    suspend fun payInstallment(id: String, note: String): String? {
+        val plan = db.installments().get(id)?.toDomain()?.takeIf { !it.isFinished } ?: return null
+        saveInstallment(plan.copy(paidCount = plan.paidCount + 1))
+        val walletId = plan.walletId?.takeIf { db.wallets().get(it) != null } ?: return null
+        val now = clock.now()
+        return saveTransaction(
+            Transaction(newId(), TxType.EXPENSE, plan.amountMinor, plan.currency, walletId, null,
+                FinanceCategories.INSTALLMENTS, note, clock.today(), now, now)
+        ).id
+    }
+
+    suspend fun undoInstallmentPayment(id: String, transactionId: String?) {
+        val plan = db.installments().get(id)?.toDomain() ?: return
+        saveInstallment(plan.copy(paidCount = (plan.paidCount - 1).coerceAtLeast(0)))
+        transactionId?.let { deleteTransaction(it) }
+    }
+
+    // ------------------------------------------------------------------ Debts
+
+    val debts: Flow<List<Debt>> = databases.active.flatMapLatest { it.db.debts().observeAll() }
+        .map { list -> list.map { it.toDomain() } }
+
+    /**
+     * Saves a debt. For a new debt with [walletId], the money that changed
+     * hands is recorded in that wallet (lending takes it out, borrowing adds it).
+     */
+    suspend fun saveDebt(debt: Debt, walletId: String? = null): Debt {
+        val existing = db.debts().get(debt.id)
+        val now = clock.now()
+        val saved = debt.copy(
+            person = debt.person.trim().take(80),
+            note = debt.note?.trim()?.take(500)?.ifEmpty { null },
+            settledMinor = debt.settledMinor.coerceIn(0, debt.amountMinor),
+            createdAt = existing?.let { Instant.ofEpochMilli(it.createdAt) } ?: now,
+            updatedAt = now,
+        )
+        db.debts().upsert(saved.toEntity())
+        if (existing == null && walletId != null) {
+            val lent = saved.direction == DebtDirection.OWED_TO_ME
+            saveTransaction(
+                Transaction(newId(), if (lent) TxType.EXPENSE else TxType.INCOME, saved.amountMinor, saved.currency, walletId, null,
+                    if (lent) FinanceCategories.LENT else FinanceCategories.BORROWED, saved.person, saved.date, now, now)
+            )
+        }
+        effects.onDebtChanged(saved.id)
+        effects.onDataChanged()
+        return saved
+    }
+
+    /** Records a (partial) repayment; optionally moves the money through [walletId]. */
+    suspend fun repayDebt(id: String, amountMinor: Long, walletId: String?): Debt? {
+        val debt = db.debts().get(id)?.toDomain() ?: return null
+        val pay = amountMinor.coerceIn(0, debt.remainingMinor)
+        if (pay <= 0) return debt
+        val saved = saveDebt(debt.copy(settledMinor = debt.settledMinor + pay))
+        if (walletId != null) {
+            val now = clock.now()
+            val owedToMe = debt.direction == DebtDirection.OWED_TO_ME
+            saveTransaction(
+                Transaction(newId(), if (owedToMe) TxType.INCOME else TxType.EXPENSE, pay, debt.currency, walletId, null,
+                    if (owedToMe) FinanceCategories.DEBT_RECEIVED else FinanceCategories.DEBT_PAID, debt.person, clock.today(), now, now)
+            )
+        }
+        return saved
+    }
+
+    suspend fun deleteDebt(id: String) {
+        db.debts().delete(id)
+        effects.onDebtChanged(id)
+        effects.onDataChanged()
+    }
 }
+
+fun InstallmentEntity.toDomain() = InstallmentPlan(
+    id = id,
+    title = title,
+    lender = lender,
+    amountMinor = amountMinor,
+    currency = currency,
+    totalCount = totalCount,
+    paidCount = paidCount,
+    firstDue = runCatching { LocalDate.parse(firstDue) }.getOrElse { LocalDate.now() },
+    intervalMonths = intervalMonths.coerceAtLeast(1),
+    calendar = runCatching { CalendarKind.valueOf(calendar) }.getOrDefault(CalendarKind.GREGORIAN),
+    reminderDays = reminderDays,
+    walletId = walletId,
+    note = note,
+    createdAt = Instant.ofEpochMilli(createdAt),
+    updatedAt = Instant.ofEpochMilli(updatedAt),
+)
+
+fun InstallmentPlan.toEntity() = InstallmentEntity(
+    id = id,
+    title = title,
+    lender = lender,
+    amountMinor = amountMinor,
+    currency = currency,
+    totalCount = totalCount,
+    paidCount = paidCount,
+    firstDue = firstDue.toString(),
+    intervalMonths = intervalMonths,
+    calendar = calendar.name,
+    reminderDays = reminderDays,
+    walletId = walletId,
+    note = note,
+    createdAt = createdAt.toEpochMilli(),
+    updatedAt = updatedAt.toEpochMilli(),
+)
+
+fun DebtEntity.toDomain() = Debt(
+    id = id,
+    person = person,
+    direction = DebtDirection.fromWire(direction),
+    amountMinor = amountMinor,
+    currency = currency,
+    settledMinor = settledMinor,
+    date = runCatching { LocalDate.parse(date) }.getOrElse { LocalDate.now() },
+    dueDate = dueDate?.let { runCatching { LocalDate.parse(it) }.getOrNull() },
+    note = note,
+    createdAt = Instant.ofEpochMilli(createdAt),
+    updatedAt = Instant.ofEpochMilli(updatedAt),
+)
+
+fun Debt.toEntity() = DebtEntity(
+    id = id,
+    person = person,
+    direction = direction.wire,
+    amountMinor = amountMinor,
+    currency = currency,
+    settledMinor = settledMinor,
+    date = date.toString(),
+    dueDate = dueDate?.toString(),
+    note = note,
+    createdAt = createdAt.toEpochMilli(),
+    updatedAt = updatedAt.toEpochMilli(),
+)
 
 fun WalletEntity.toDomain() = Wallet(
     id = id,

@@ -48,7 +48,7 @@ object Categories {
 
     private val reminderKeywords: Map<String, List<String>> = mapOf(
         "work" to listOf("meeting", "email", "report", "client", "deadline", "presentation", "standup", "office", "boss", "project", "invoice client", "جلسه", "گزارش", "ایمیل", "مشتری", "پروژه", "کار"),
-        "health" to listOf("doctor", "dentist", "medicine", "pill", "pills", "vitamin", "gym", "workout", "run", "yoga", "appointment", "therapy", "پزشک", "دکتر", "دندانپزشک", "دارو", "قرص", "باشگاه", "ورزش", "نوبت"),
+        "health" to listOf("doctor", "dentist", "medicine", "pill", "pills", "vitamin", "vitamins", "gym", "workout", "run", "yoga", "appointment", "therapy", "پزشک", "دکتر", "دندانپزشک", "دارو", "قرص", "باشگاه", "ورزش", "نوبت"),
         "finance" to listOf("pay", "bill", "rent", "bank", "tax", "taxes", "invoice", "loan", "transfer", "insurance", "salary", "payment", "پرداخت", "قبض", "اجاره", "بانک", "مالیات", "قسط", "بیمه", "حقوق"),
         "home" to listOf("clean", "laundry", "trash", "garbage", "plants", "water plants", "fix", "repair", "cook", "dishes", "تمیز", "لباس", "زباله", "گلدان", "تعمیر", "آشپزی", "خانه"),
         "shopping" to listOf("buy", "groceries", "grocery", "order", "shop", "pick up", "milk", "bread", "خرید", "سفارش", "شیر", "نان"),

@@ -41,6 +41,7 @@ import androidx.compose.material.icons.rounded.AutoAwesome
 import androidx.compose.material.icons.rounded.CalendarMonth
 import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material.icons.rounded.Done
+import androidx.compose.material.icons.rounded.Favorite
 import androidx.compose.material.icons.rounded.KeyboardArrowDown
 import androidx.compose.material.icons.rounded.KeyboardArrowUp
 import androidx.compose.material.icons.rounded.NotificationsActive
@@ -121,6 +122,7 @@ import java.time.temporal.ChronoUnit
 @Composable
 fun HomeScreen(nav: NavController) {
     val vm = pocketViewModel { HomeViewModel(it) }
+    val container = LocalAppContainer.current
     val state by vm.state.collectAsState()
     val ui = LocalAppUi.current
     val actions = rememberItemActions()
@@ -227,6 +229,11 @@ fun HomeScreen(nav: NavController) {
                 }
             }
 
+            // The occasional, clearly labelled native ad (rare: see AdsManager.inlineAdsAllowed).
+            if (container.ads.inlineAdsAllowed) {
+                item(key = "native_ad") { app.pocketos.ui.screens.support.NativeAdCard(Modifier.fillMaxWidth().padding(top = Spacing.xl)) }
+            }
+            item(key = "support") { SupportCard { nav.navigate(Routes.Support) } }
             item(key = "customize") {
                 Row(Modifier.fillMaxWidth().padding(top = Spacing.xl), horizontalArrangement = Arrangement.Center) {
                     PocketButton(stringResource(R.string.customize_home), { customizing = true }, style = ButtonStyle.Tonal, icon = Icons.Rounded.Tune)
@@ -702,3 +709,24 @@ private fun GuidedTourCard(
 
 private data class Quintuple<A, B, C, D, E>(val first: A, val second: B, val third: C, val fourth: D, val fifth: E)
 
+/** Small, friendly invitation to the opt-in ads screen. */
+@Composable
+private fun SupportCard(onClick: () -> Unit) {
+    val c = LocalPocketColors.current
+    GlassCard(
+        Modifier.fillMaxWidth().padding(top = Spacing.xl),
+        onClick = onClick,
+        decoration = {
+            drawRect(Brush.radialGradient(listOf(c.tones.pink.copy(alpha = if (c.isDark) 0.22f else 0.10f), Color.Transparent), center = androidx.compose.ui.geometry.Offset(size.width, 0f), radius = size.width * 0.7f))
+        },
+    ) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            ToneIcon(Icons.Rounded.Favorite, c.tones.pink, size = 44.dp, filled = true)
+            Spacer(Modifier.width(Spacing.md))
+            Column(Modifier.weight(1f)) {
+                Text(stringResource(R.string.support_title), style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold, color = c.textPrimary)
+                Text(stringResource(R.string.support_entry_sub), style = MaterialTheme.typography.bodySmall, color = c.textSecondary)
+            }
+        }
+    }
+}

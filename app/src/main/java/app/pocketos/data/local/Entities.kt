@@ -152,3 +152,39 @@ data class TransactionEntity(
     val createdAt: Long,
     val updatedAt: Long,
 )
+
+/** Accounting: an installment plan. Dates are ISO yyyy-MM-dd; [calendar] is the CalendarKind name. */
+@Entity(tableName = "installments")
+data class InstallmentEntity(
+    @PrimaryKey val id: String,
+    val title: String,
+    val lender: String?,
+    val amountMinor: Long,
+    val currency: String,
+    val totalCount: Int,
+    val paidCount: Int,
+    val firstDue: String,
+    val intervalMonths: Int,
+    val calendar: String,
+    val reminderDays: Int,
+    val walletId: String?,
+    val note: String?,
+    val createdAt: Long,
+    val updatedAt: Long,
+)
+
+/** Accounting: money owed between the user and another person. */
+@Entity(tableName = "debts")
+data class DebtEntity(
+    @PrimaryKey val id: String,
+    val person: String,
+    val direction: String,
+    val amountMinor: Long,
+    val currency: String,
+    val settledMinor: Long,
+    val date: String,
+    val dueDate: String?,
+    val note: String?,
+    val createdAt: Long,
+    val updatedAt: Long,
+)

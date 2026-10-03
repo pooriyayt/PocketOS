@@ -109,6 +109,8 @@ fun QuickAddSheet(request: QuickAddRequest, onDismiss: () -> Unit, onOpenEditor:
     val addedReminder = stringResource(R.string.reminder_added)
     val addedSubscription = stringResource(R.string.subscription_added)
     val addedTask = stringResource(R.string.task_added)
+    val addedExpense = stringResource(R.string.expense_added)
+    val addedIncome = stringResource(R.string.income_added)
     LaunchedEffect(Unit) { runCatching { focus.requestFocus() } }
 
     GlassBottomSheet(onDismiss = onDismiss) {
@@ -137,7 +139,7 @@ fun QuickAddSheet(request: QuickAddRequest, onDismiss: () -> Unit, onOpenEditor:
                     Text(stringResource(R.string.try_saying), style = MaterialTheme.typography.labelLarge, color = c.textSecondary)
                     Spacer(Modifier.height(Spacing.sm))
                     FlowRow(horizontalArrangement = Arrangement.spacedBy(Spacing.sm), verticalArrangement = Arrangement.spacedBy(Spacing.sm)) {
-                        listOf(R.string.example_netflix, R.string.example_call_mom, R.string.example_domain, R.string.example_internet, R.string.example_hosting).forEach { res ->
+                        listOf(R.string.example_expense, R.string.example_income, R.string.example_netflix, R.string.example_call_mom, R.string.example_domain, R.string.example_internet).forEach { res ->
                             val text = stringResource(res)
                             GlassChip(text, false, { vm.setText(text) })
                         }
@@ -169,6 +171,8 @@ fun QuickAddSheet(request: QuickAddRequest, onDismiss: () -> Unit, onOpenEditor:
                                                 QuickAddType.SUBSCRIPTION -> addedSubscription
                                                 QuickAddType.TASK -> addedTask
                                                 QuickAddType.REMINDER -> addedReminder
+                                                QuickAddType.EXPENSE -> addedExpense
+                                                QuickAddType.INCOME -> addedIncome
                                             }
                                         )
                                         onDismiss()
@@ -213,12 +217,24 @@ private fun ConfirmationCard(draft: QuickDraft, vm: QuickAddViewModel) {
             Text(stringResource(R.string.understood_as), style = MaterialTheme.typography.labelLarge, color = c.accentHighlight)
         }
         Spacer(Modifier.height(Spacing.md))
-        GlassSegmentedControl(
-            options = listOf(QuickAddType.REMINDER, QuickAddType.TASK, QuickAddType.SUBSCRIPTION),
-            selected = draft.type,
-            onSelect = vm::changeType,
-            label = { stringResource(when (it) { QuickAddType.REMINDER -> R.string.kind_reminder; QuickAddType.TASK -> R.string.kind_task; QuickAddType.SUBSCRIPTION -> R.string.kind_subscription }) },
-        )
+        // Five kinds don't fit a segmented control; chips wrap gracefully in any language.
+        FlowRow(horizontalArrangement = Arrangement.spacedBy(Spacing.sm), verticalArrangement = Arrangement.spacedBy(Spacing.sm)) {
+            listOf(QuickAddType.EXPENSE, QuickAddType.INCOME, QuickAddType.REMINDER, QuickAddType.TASK, QuickAddType.SUBSCRIPTION).forEach { t ->
+                GlassChip(
+                    stringResource(
+                        when (t) {
+                            QuickAddType.REMINDER -> R.string.kind_reminder
+                            QuickAddType.TASK -> R.string.kind_task
+                            QuickAddType.SUBSCRIPTION -> R.string.kind_subscription
+                            QuickAddType.EXPENSE -> R.string.expense
+                            QuickAddType.INCOME -> R.string.income
+                        }
+                    ),
+                    draft.type == t,
+                    { vm.changeType(t) },
+                )
+            }
+        }
         Spacer(Modifier.height(Spacing.md))
 
         if (isSub && draft.service != null) {
@@ -231,8 +247,38 @@ private fun ConfirmationCard(draft: QuickDraft, vm: QuickAddViewModel) {
                 }
             }
         }
+        if (draft.isMoney) {
+            val txType = if (draft.type == QuickAddType.INCOME) app.pocketos.domain.finance.TxType.INCOME else app.pocketos.domain.finance.TxType.EXPENSE
+            DraftRow(
+                Icons.Rounded.Payments, stringResource(R.string.amount),
+                draft.amount?.let { f.money(it.amountMinor, it.currency) } ?: stringResource(R.string.enter_amount),
+                assumed = draft.amountScaled || draft.currencyAssumed,
+                assumedNote = stringResource(if (draft.amountScaled) R.string.amount_scaled_note else R.string.currency_assumed),
+                error = draft.amount == null,
+            ) { editing = DraftField.AMOUNT }
+            DraftRow(
+                Icons.Rounded.Category, stringResource(R.string.category),
+                app.pocketos.ui.screens.finance.financeCategoryName(draft.category),
+                assumed = DraftField.CATEGORY !in draft.touched, assumedNote = stringResource(R.string.suggested),
+                leading = {
+                    app.pocketos.ui.components.ToneIcon(
+                        app.pocketos.ui.screens.finance.financeCategoryIcon(draft.category),
+                        app.pocketos.ui.screens.finance.financeCategoryColor(draft.category), size = 24.dp, filled = true,
+                    )
+                },
+            ) { editing = DraftField.CATEGORY }
+            DraftRow(Icons.Rounded.Event, stringResource(R.string.date), draft.date?.let { f.dayLabel(it, today) } ?: stringResource(R.string.today), assumed = false) { editing = DraftField.DATE }
+            DraftRow(Icons.Rounded.Title, stringResource(R.string.note_optional), draft.title.ifBlank { "\u2014" }, assumed = false) { editing = DraftField.TITLE }
+            when (editing) {
+                DraftField.CATEGORY -> FinanceCategorySheet(txType, draft.category, { editing = null }) { cat -> vm.edit(DraftField.CATEGORY) { it.copy(category = cat) }; editing = null }
+                else -> Unit
+            }
+        } else {
         DraftRow(Icons.Rounded.Title, stringResource(if (isSub) R.string.name else R.string.title), draft.title.ifBlank { stringResource(R.string.add_a_title) }, assumed = false, error = draft.title.isBlank()) { editing = DraftField.TITLE }
-        if (isSub) {
+        }
+        if (draft.isMoney) {
+            // Money rows were rendered above.
+        } else if (isSub) {
             DraftRow(
                 Icons.Rounded.Payments, stringResource(R.string.amount),
                 draft.amount?.let { f.money(it.amountMinor, it.currency) } ?: stringResource(R.string.amount_unknown),
@@ -252,22 +298,24 @@ private fun ConfirmationCard(draft: QuickDraft, vm: QuickAddViewModel) {
                 DraftRow(Icons.Rounded.Repeat, stringResource(R.string.repeat), f.recurrence(draft.recurrence), assumed = false) { editing = DraftField.RECURRENCE }
             }
         }
-        DraftRow(Icons.Rounded.Category, stringResource(R.string.category), categoryLabel(kind, draft.category), assumed = DraftField.CATEGORY !in draft.touched, assumedNote = stringResource(R.string.suggested),
-            leading = { CategoryBadge(kind, draft.category, null, size = 24.dp) }) { editing = DraftField.CATEGORY }
+        if (!draft.isMoney) {
+            DraftRow(Icons.Rounded.Category, stringResource(R.string.category), categoryLabel(kind, draft.category), assumed = DraftField.CATEGORY !in draft.touched, assumedNote = stringResource(R.string.suggested),
+                leading = { CategoryBadge(kind, draft.category, null, size = 24.dp) }) { editing = DraftField.CATEGORY }
+        }
     }
 
     when (editing) {
         DraftField.TITLE -> TextEditDialog(stringResource(if (isSub) R.string.name else R.string.title), draft.title, KeyboardType.Text, { editing = null }) { v ->
             vm.edit(DraftField.TITLE) { it.copy(title = v.take(200)) }
         }
-        DraftField.AMOUNT -> AmountEditDialog(draft.amount, draft.amount?.currency ?: "USD", { editing = null }) { m -> vm.edit(DraftField.AMOUNT) { it.copy(amount = m, currencyAssumed = false) } }
-        DraftField.DATE -> PocketDatePickerDialog(draft.date ?: today, { editing = null }) { d -> vm.edit(DraftField.DATE) { it.copy(date = d, dateAssumed = false) }; editing = null }
+        DraftField.AMOUNT -> AmountEditDialog(draft.amount, draft.amount?.currency ?: app.pocketos.ui.LocalAppContainer.current.latestSettings.defaultCurrency, { editing = null }) { m -> vm.edit(DraftField.AMOUNT) { it.copy(amount = m, currencyAssumed = false, amountScaled = false) } }
+        DraftField.DATE -> app.pocketos.ui.components.CalendarDatePickerSheet(draft.date ?: today, { d -> vm.edit(DraftField.DATE) { it.copy(date = d, dateAssumed = false) }; editing = null }, { editing = null })
         DraftField.TIME -> PocketTimePickerDialog(draft.time ?: LocalTime.of(9, 0), android.text.format.DateFormat.is24HourFormat(context), { editing = null }) { t ->
             vm.edit(DraftField.TIME) { it.copy(time = t, timeAssumed = false) }; editing = null
         }
         DraftField.RECURRENCE -> RepeatSheet(draft.recurrence, draft.date ?: today, { editing = null }) { rule -> vm.edit(DraftField.RECURRENCE) { it.copy(recurrence = rule) }; editing = null }
         DraftField.BILLING -> BillingSheet(draft.billing, { editing = null }) { b -> vm.edit(DraftField.BILLING) { it.copy(billing = b, billingAssumed = false) }; editing = null }
-        DraftField.CATEGORY -> CategoryPickerSheet(kind, draft.category, { editing = null }) { cat -> vm.edit(DraftField.CATEGORY) { it.copy(category = cat) }; editing = null }
+        DraftField.CATEGORY -> if (!draft.isMoney) CategoryPickerSheet(kind, draft.category, { editing = null }) { cat -> vm.edit(DraftField.CATEGORY) { it.copy(category = cat) }; editing = null }
         DraftField.OFFSETS -> OffsetsSheet(draft.offsets, { editing = null }) { o -> vm.edit(DraftField.OFFSETS) { it.copy(offsets = o) }; editing = null }
         else -> Unit
     }
@@ -371,5 +419,28 @@ private fun OffsetsSheet(current: List<Int>, onDismiss: () -> Unit, onPick: (Lis
         }
         Spacer(Modifier.height(Spacing.lg))
         PocketButton(stringResource(R.string.done), { onPick(selected.sortedDescending()); onDismiss() }, modifier = Modifier.fillMaxWidth(), haptic = HapticType.Confirm)
+    }
+}
+
+/** Money category picker: tone icons in a wrapping grid. */
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun FinanceCategorySheet(type: app.pocketos.domain.finance.TxType, selected: String, onDismiss: () -> Unit, onPick: (String) -> Unit) {
+    GlassBottomSheet(onDismiss = onDismiss, title = stringResource(R.string.category)) {
+        FlowRow(horizontalArrangement = Arrangement.spacedBy(Spacing.sm), verticalArrangement = Arrangement.spacedBy(Spacing.sm)) {
+            app.pocketos.domain.finance.FinanceCategories.forType(type).forEach { cat ->
+                GlassChip(
+                    app.pocketos.ui.screens.finance.financeCategoryName(cat.id),
+                    cat.id == selected,
+                    { onPick(cat.id) },
+                    leading = {
+                        Icon(
+                            app.pocketos.ui.screens.finance.financeCategoryIcon(cat.id), null,
+                            tint = app.pocketos.ui.screens.finance.financeCategoryColor(cat.id), modifier = Modifier.size(16.dp),
+                        )
+                    },
+                )
+            }
+        }
     }
 }

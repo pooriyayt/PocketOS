@@ -273,3 +273,45 @@ interface TransactionDao {
     @Query("DELETE FROM transactions")
     suspend fun clear()
 }
+
+@Dao
+interface InstallmentDao {
+    @Query("SELECT * FROM installments ORDER BY createdAt")
+    fun observeAll(): Flow<List<InstallmentEntity>>
+
+    @Query("SELECT * FROM installments")
+    suspend fun everything(): List<InstallmentEntity>
+
+    @Query("SELECT * FROM installments WHERE id = :id")
+    suspend fun get(id: String): InstallmentEntity?
+
+    @Upsert
+    suspend fun upsert(entity: InstallmentEntity)
+
+    @Query("DELETE FROM installments WHERE id = :id")
+    suspend fun delete(id: String)
+
+    @Query("DELETE FROM installments")
+    suspend fun clear()
+}
+
+@Dao
+interface DebtDao {
+    @Query("SELECT * FROM debts ORDER BY createdAt DESC")
+    fun observeAll(): Flow<List<DebtEntity>>
+
+    @Query("SELECT * FROM debts")
+    suspend fun everything(): List<DebtEntity>
+
+    @Query("SELECT * FROM debts WHERE id = :id")
+    suspend fun get(id: String): DebtEntity?
+
+    @Upsert
+    suspend fun upsert(entity: DebtEntity)
+
+    @Query("DELETE FROM debts WHERE id = :id")
+    suspend fun delete(id: String)
+
+    @Query("DELETE FROM debts")
+    suspend fun clear()
+}

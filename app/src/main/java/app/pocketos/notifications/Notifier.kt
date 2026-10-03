@@ -143,6 +143,50 @@ class Notifier(private val context: Context) {
         post(id, builder)
     }
 
+    fun showInstallment(plan: app.pocketos.domain.finance.InstallmentPlan, daysUntil: Long, showSensitive: Boolean) {
+        if (!canPost()) return
+        val id = notificationId("i", plan.id)
+        val title = when {
+            daysUntil <= 0 -> context.getString(R.string.notif_installment_today, plan.title)
+            else -> context.resources.getQuantityString(R.plurals.notif_installment_in_days, daysUntil.toInt(), plan.title, daysUntil.toInt())
+        }
+        val number = context.getString(R.string.installment_n_of_m, plan.paidCount + 1, plan.totalCount)
+        val text = if (showSensitive) "$number \u00b7 " + MoneyFormatter.format(plan.amountMinor, plan.currency, Locale.getDefault()) else number
+        postDue(id, title, text, "pocketos://installments")
+    }
+
+    fun showDebt(debt: app.pocketos.domain.finance.Debt, daysUntil: Long, showSensitive: Boolean) {
+        if (!canPost()) return
+        val id = notificationId("d", debt.id)
+        val owe = debt.direction == app.pocketos.domain.finance.DebtDirection.I_OWE
+        val title = when {
+            daysUntil <= 0 -> context.getString(if (owe) R.string.notif_debt_pay_today else R.string.notif_debt_collect_today, debt.person)
+            else -> context.getString(if (owe) R.string.notif_debt_pay_soon else R.string.notif_debt_collect_soon, debt.person)
+        }
+        val text = if (showSensitive) MoneyFormatter.format(debt.remainingMinor, debt.currency, Locale.getDefault()) else context.getString(R.string.notif_renewal_generic)
+        postDue(id, title, text, "pocketos://debts")
+    }
+
+    private fun postDue(id: Int, title: String, text: String, uri: String) {
+        val publicVersion = NotificationCompat.Builder(context, CHANNEL_RENEWALS)
+            .setSmallIcon(R.drawable.ic_stat_pocketos)
+            .setContentTitle(context.getString(R.string.notif_payment_public_title))
+            .setContentText(context.getString(R.string.notif_unlock_to_view))
+            .build()
+        val builder = NotificationCompat.Builder(context, CHANNEL_RENEWALS)
+            .setSmallIcon(R.drawable.ic_stat_pocketos)
+            .setColor(0xFF7B6CFF.toInt())
+            .setContentTitle(title)
+            .setContentText(text)
+            .setCategory(NotificationCompat.CATEGORY_REMINDER)
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .setVisibility(NotificationCompat.VISIBILITY_PRIVATE)
+            .setPublicVersion(publicVersion)
+            .setAutoCancel(true)
+            .setContentIntent(openIntent(uri, id))
+        post(id, builder)
+    }
+
     fun cancel(prefix: String, itemId: String) = manager.cancel(notificationId(prefix, itemId))
 
     private fun post(id: Int, builder: NotificationCompat.Builder) {

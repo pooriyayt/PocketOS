@@ -97,12 +97,8 @@ fun PocketApp(container: AppContainer, settings: AppSettings, deepLinks: Mutable
         val context = LocalContext.current
         val configuration = LocalConfiguration.current
         val locale = ConfigurationCompat.getLocales(configuration)[0] ?: java.util.Locale.getDefault()
-        val solarHijri = when (settings.calendarSystem) {
-            CalendarSystem.AUTO -> locale.language == "fa"
-            CalendarSystem.SOLAR_HIJRI -> true
-            CalendarSystem.GREGORIAN -> false
-        }
-        val formatter = remember(locale, solarHijri) { UiFormatter(context, locale, solarHijri) }
+        val calendar = settings.calendarSystem.resolve(locale.language)
+        val formatter = remember(locale, calendar) { UiFormatter(context, locale, calendar) }
         val snackbar = remember { SnackbarHostState() }
         val scope = rememberCoroutineScope()
         val ui = remember { AppUiController(snackbar, scope) }
@@ -171,6 +167,9 @@ private fun MainScaffold(settings: AppSettings, deepLinks: StateFlow<Uri?>, onDe
                     composable<Routes.Reminders> { RemindersScreen(nav) }
                     composable<Routes.Subscriptions> { SubscriptionsScreen(nav) }
                     composable<Routes.Wallet> { WalletScreen(nav) }
+                    composable<Routes.Installments> { app.pocketos.ui.screens.finance.InstallmentsScreen(nav) }
+                    composable<Routes.Debts> { app.pocketos.ui.screens.finance.DebtsScreen(nav) }
+                    composable<Routes.Support> { app.pocketos.ui.screens.support.SupportScreen(nav) }
                     composable<Routes.Insights> { InsightsScreen(nav) }
                     composable<Routes.Settings> { SettingsScreen(nav) }
                     composable<Routes.ReminderDetail> { ReminderDetailScreen(nav, it.toRoute<Routes.ReminderDetail>().id) }
@@ -233,6 +232,8 @@ private fun MainScaffold(settings: AppSettings, deepLinks: StateFlow<Uri?>, onDe
                     QuickAddType.SUBSCRIPTION -> nav.navigate(Routes.SubscriptionEditor(serviceId = serviceId))
                     QuickAddType.TASK -> nav.navigate(Routes.ReminderEditor(kind = "task"))
                     QuickAddType.REMINDER -> nav.navigate(Routes.ReminderEditor())
+                    QuickAddType.EXPENSE -> ui.openTransaction(app.pocketos.domain.finance.TxType.EXPENSE)
+                    QuickAddType.INCOME -> ui.openTransaction(app.pocketos.domain.finance.TxType.INCOME)
                 }
             },
         )
@@ -257,6 +258,9 @@ private fun handleDeepLink(uri: Uri, nav: NavHostController, ui: AppUiController
         "search" -> nav.navigate(Routes.Search)
         "home" -> nav.navigate(Routes.Home) { launchSingleTop = true }
         "wallet" -> nav.navigate(Routes.Wallet) { launchSingleTop = true }
+        "installments" -> nav.navigate(Routes.Installments) { launchSingleTop = true }
+        "debts" -> nav.navigate(Routes.Debts) { launchSingleTop = true }
+        "support" -> nav.navigate(Routes.Support) { launchSingleTop = true }
         "add" -> when (uri.getQueryParameter("type")) {
             "reminder" -> nav.navigate(Routes.ReminderEditor())
             "subscription" -> nav.navigate(Routes.SubscriptionEditor())

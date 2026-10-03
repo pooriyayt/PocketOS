@@ -1,5 +1,6 @@
 package app.pocketos.notifications
 
+import app.pocketos.data.repository.toDomain
 import app.pocketos.core.AppClock
 import app.pocketos.data.local.DatabaseManager
 import app.pocketos.data.local.set
@@ -52,9 +53,51 @@ class NotificationScheduler(
         if (trigger == null) alarms.cancel(AlarmScheduler.Kind.RENEWAL, id) else alarms.schedule(AlarmScheduler.Kind.RENEWAL, id, trigger.toEpochMilli())
     }
 
+    /**
+     * Installments notify [InstallmentPlan.reminderDays] before the next due
+     * date and again on the day itself, at the user's renewal reminder time.
+     */
+    suspend fun scheduleInstallment(id: String) {
+        val plan = db.installments().get(id)?.toDomain()
+        val due = plan?.nextDue
+        if (plan == null || due == null) {
+            alarms.cancel(AlarmScheduler.Kind.INSTALLMENT, id)
+            notifier.cancel("i", id)
+            return
+        }
+        val trigger = nextDueTrigger(due, plan.reminderDays, notifiedKey("i", id))
+        if (trigger == null) alarms.cancel(AlarmScheduler.Kind.INSTALLMENT, id) else alarms.schedule(AlarmScheduler.Kind.INSTALLMENT, id, trigger.toEpochMilli())
+    }
+
+    /** Debts with a due date notify a day before and on the day, until settled. */
+    suspend fun scheduleDebt(id: String) {
+        val debt = db.debts().get(id)?.toDomain()
+        val due = debt?.dueDate
+        if (debt == null || due == null || debt.isSettled) {
+            alarms.cancel(AlarmScheduler.Kind.DEBT, id)
+            notifier.cancel("d", id)
+            return
+        }
+        val trigger = nextDueTrigger(due, 1, notifiedKey("d", id))
+        if (trigger == null) alarms.cancel(AlarmScheduler.Kind.DEBT, id) else alarms.schedule(AlarmScheduler.Kind.DEBT, id, trigger.toEpochMilli())
+    }
+
+    /** The first of (due - daysBefore, due) at the reminder time that is still ahead and not yet notified. */
+    private suspend fun nextDueTrigger(due: java.time.LocalDate, daysBefore: Int, key: String): Instant? {
+        val time = settings.current().renewalReminderTime
+        val now = clock.now()
+        val last = db.meta().get(key)?.toLongOrNull()?.let(Instant::ofEpochMilli)
+        return listOf(due.minusDays(daysBefore.toLong().coerceAtLeast(0)), due)
+            .distinct()
+            .map { it.atTime(time).atZone(clock.zone()).toInstant() }
+            .firstOrNull { it.isAfter(now) && (last == null || it.isAfter(last)) }
+    }
+
     suspend fun reconcileAll() {
         db.reminders().schedulable().forEach { scheduleReminder(it.id) }
         db.subscriptions().allActive().forEach { scheduleRenewal(it.id) }
+        db.installments().everything().forEach { scheduleInstallment(it.id) }
+        db.debts().everything().forEach { scheduleDebt(it.id) }
     }
 
     /** Handles a fired alarm: shows the notification, records it, schedules the next one. */
@@ -86,6 +129,20 @@ class NotificationScheduler(
                 db.meta().set(notifiedKey("s", id), now.toEpochMilli().toString())
                 db.meta().remove(snoozeKey(id))
                 scheduleRenewal(id)
+            }
+            AlarmScheduler.Kind.INSTALLMENT -> {
+                val plan = db.installments().get(id)?.toDomain() ?: return
+                val due = plan.nextDue ?: return
+                notifier.showInstallment(plan, ChronoUnit.DAYS.between(clock.today(), due), s.notificationsShowSensitive)
+                db.meta().set(notifiedKey("i", id), now.toEpochMilli().toString())
+                scheduleInstallment(id)
+            }
+            AlarmScheduler.Kind.DEBT -> {
+                val debt = db.debts().get(id)?.toDomain()?.takeIf { !it.isSettled } ?: return
+                val due = debt.dueDate ?: return
+                notifier.showDebt(debt, ChronoUnit.DAYS.between(clock.today(), due), s.notificationsShowSensitive)
+                db.meta().set(notifiedKey("d", id), now.toEpochMilli().toString())
+                scheduleDebt(id)
             }
         }
     }

@@ -34,6 +34,45 @@ object Currencies {
         "CHF" to "فرانک", "CNY" to "یوان", "RUB" to "روبل", "SAR" to "ریال سعودی",
     )
 
+    /**
+     * Every currency in circulation today: the current currency of each ISO
+     * country (so historic codes like FRF are excluded), plus Toman. Common
+     * ones first, the rest alphabetical.
+     */
+    val all: List<String> by lazy {
+        val current = Locale.getISOCountries().mapNotNull { country ->
+            runCatching { Currency.getInstance(Locale("", country))?.currencyCode }.getOrNull()
+        }.filter { it.length == 3 && it != "XXX" }.toSet()
+        common + (current + custom.keys - common.toSet()).sorted()
+    }
+
+    /** Matches code, English name, Persian name or a country's name (e.g. "japan" finds JPY). */
+    fun search(query: String, locale: Locale): List<String> {
+        val q = query.trim().lowercase(locale)
+        if (q.isEmpty()) return all
+        return all.filter { code ->
+            val info = info(code)
+            code.lowercase(Locale.ROOT).contains(q) ||
+                info.englishName.lowercase(Locale.ROOT).contains(q) ||
+                info.persianName.contains(q) ||
+                countryNames(code, locale).any { it.contains(q) }
+        }
+    }
+
+    private val countriesByCurrency: Map<String, List<String>> by lazy {
+        Locale.getISOCountries().groupBy { country ->
+            runCatching { Currency.getInstance(Locale("", country))?.currencyCode }.getOrNull() ?: ""
+        }
+    }
+
+    private fun countryNames(code: String, locale: Locale): List<String> {
+        val countries = countriesByCurrency[if (code == "IRT") "IRR" else code].orEmpty()
+        return countries.flatMap { c ->
+            val l = Locale("", c)
+            listOf(l.getDisplayCountry(Locale.ENGLISH).lowercase(Locale.ROOT), l.getDisplayCountry(locale).lowercase(locale))
+        }
+    }
+
     fun isSupported(code: String): Boolean =
         code in custom || runCatching { Currency.getInstance(code) }.isSuccess
 

@@ -4,6 +4,7 @@ import app.pocketos.core.money.Currencies
 import app.pocketos.core.money.Digits
 import app.pocketos.core.money.MoneyFormatter
 import app.pocketos.core.time.JalaliCalendar
+import app.pocketos.domain.finance.FinanceKeywords
 import app.pocketos.domain.catalog.ServiceInfo
 import app.pocketos.domain.catalog.ServiceMatcher
 import app.pocketos.domain.catalog.TextNormalizer
@@ -25,7 +26,7 @@ import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.temporal.TemporalAdjusters
 
-enum class QuickAddType { REMINDER, TASK, SUBSCRIPTION }
+enum class QuickAddType { REMINDER, TASK, SUBSCRIPTION, EXPENSE, INCOME }
 
 /**
  * The parser's interpretation of a sentence. "Assumed" flags mark values the
@@ -49,6 +50,8 @@ data class QuickAddResult(
     val category: String,
     val priority: Priority,
     val reminderOffsets: List<Int>,
+    /** Toman amount read colloquially ("150 تومن" = 150,000). */
+    val amountScaled: Boolean = false,
 ) {
     val isEmpty: Boolean get() = input.isBlank()
 }
@@ -69,6 +72,8 @@ class QuickAddParser(
     private class Work(original: String) {
         val original: String = original
         var text: String = normalizeForParsing(original)
+        /** True when the amount carried an explicit multiplier (هزار, k, million…). */
+        var multiplied: Boolean = false
         fun consume(range: IntRange) {
             val chars = text.toCharArray()
             for (i in range) if (i in chars.indices) chars[i] = ' '
@@ -101,8 +106,9 @@ class QuickAddParser(
         val serviceMatch = matcher.findIn(titleFrom(w))
         val service = serviceMatch?.service
 
+        val financeIntent = FinanceKeywords.detect(remaining)
         var currencyAssumed = false
-        if (money == null && (service != null || recurrence?.billing != null || hasPaymentWord)) {
+        if (money == null && (service != null || recurrence?.billing != null || hasPaymentWord || financeIntent != null)) {
             extractBareAmount(w)?.let {
                 money = it
                 currencyAssumed = true
@@ -142,6 +148,31 @@ class QuickAddParser(
             )
         }
 
+        // One-off money: "150 تومن ساندویچ", "حقوق ۲۵ میلیون", "lunch 12$".
+        val reminderIntent = FinanceKeywords.REMINDER_WORDS.containsMatchIn(w.original) ||
+            FinanceKeywords.REMINDER_WORDS.containsMatchIn(remaining)
+        val isTransaction = money != null && recurrence == null && !reminderIntent &&
+            (financeIntent != null || (date == null && time == null && service == null))
+        if (isTransaction) {
+            val type = financeIntent?.type ?: app.pocketos.domain.finance.TxType.EXPENSE
+            var amount = money!!
+            val scaled = amount.currency == "IRT" && !w.multiplied && amount.amountMinor in 1..999
+            if (scaled) amount = amount.copy(amountMinor = amount.amountMinor * 1000)
+            FinanceKeywords.SPEND_VERBS.findAll(w.text).toList().forEach { w.consume(it.range) }
+            FinanceKeywords.EARN_VERBS.findAll(w.text).toList().forEach { w.consume(it.range) }
+            val note = capitalize(titleFrom(w))
+            val category = financeIntent?.category ?: FinanceKeywords.categoryFor(note, type)
+            return QuickAddResult(
+                input = input,
+                type = if (type == app.pocketos.domain.finance.TxType.INCOME) QuickAddType.INCOME else QuickAddType.EXPENSE,
+                title = note, service = null, amount = amount, currencyAssumed = currencyAssumed,
+                date = date ?: today, time = null, dateAssumed = date == null, timeAssumed = false,
+                recurrence = null, billing = null, billingAssumed = false,
+                category = category, priority = priority, reminderOffsets = emptyList(),
+                amountScaled = scaled,
+            )
+        }
+
         val rule = recurrence?.rule
         var dateAssumed = false
         if (date == null && rule != null) {
@@ -174,6 +205,7 @@ class QuickAddParser(
             val m = pattern.regex.find(w.text) ?: continue
             val currency = pattern.currency(m) ?: continue
             val amount = toMinor(m.groups["num"]!!.value, m.groups["mult"]?.value, currency) ?: continue
+            w.multiplied = !m.groups["mult"]?.value.isNullOrBlank()
             w.consume(m.range)
             return Money(amount, currency)
         }
@@ -184,6 +216,7 @@ class QuickAddParser(
         val m = BARE_AMOUNT.find(w.text) ?: return null
         val amount = toMinor(m.groups["num"]!!.value, m.groups["mult"]?.value, defaultCurrency) ?: return null
         if (amount <= 0) return null
+        w.multiplied = !m.groups["mult"]?.value.isNullOrBlank()
         w.consume(m.range)
         return Money(amount, defaultCurrency)
     }

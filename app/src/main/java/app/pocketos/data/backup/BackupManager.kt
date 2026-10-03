@@ -1,5 +1,7 @@
 package app.pocketos.data.backup
 
+import app.pocketos.data.local.DebtEntity
+import app.pocketos.data.local.InstallmentEntity
 import app.pocketos.data.local.TransactionEntity
 import app.pocketos.data.local.WalletEntity
 import android.content.ContentResolver
@@ -77,6 +79,8 @@ class BackupManager(
         val categories = db.categories().everything().filter { it.deletedAt == null }
         val wallets = db.wallets().everything()
         val transactions = db.transactions().everything()
+        val installments = db.installments().everything()
+        val debts = db.debts().everything()
 
         val root = buildJsonObject {
             put("format", FORMAT_NAME)
@@ -156,6 +160,42 @@ class BackupManager(
                     put("date", t.date)
                     put("created_at", t.createdAt)
                     put("updated_at", t.updatedAt)
+                }
+            }))
+
+            put("installments", JsonArray(installments.map { i ->
+                buildJsonObject {
+                    put("id", i.id)
+                    put("title", i.title)
+                    i.lender?.let { put("lender", it) }
+                    put("amount_minor", i.amountMinor)
+                    put("currency", i.currency)
+                    put("total_count", i.totalCount)
+                    put("paid_count", i.paidCount)
+                    put("first_due", i.firstDue)
+                    put("interval_months", i.intervalMonths)
+                    put("calendar", i.calendar)
+                    put("reminder_days", i.reminderDays)
+                    i.walletId?.let { put("wallet_id", it) }
+                    i.note?.let { put("note", it) }
+                    put("created_at", i.createdAt)
+                    put("updated_at", i.updatedAt)
+                }
+            }))
+
+            put("debts", JsonArray(debts.map { d ->
+                buildJsonObject {
+                    put("id", d.id)
+                    put("person", d.person)
+                    put("direction", d.direction)
+                    put("amount_minor", d.amountMinor)
+                    put("currency", d.currency)
+                    put("settled_minor", d.settledMinor)
+                    put("date", d.date)
+                    d.dueDate?.let { put("due_date", it) }
+                    d.note?.let { put("note", it) }
+                    put("created_at", d.createdAt)
+                    put("updated_at", d.updatedAt)
                 }
             }))
 
@@ -376,6 +416,44 @@ class BackupManager(
         }
         transactions.forEach { db.transactions().upsert(it) }
 
+        root["installments"]?.jsonArray.orEmpty().mapNotNull { item ->
+            val obj = item as? JsonObject ?: return@mapNotNull null
+            InstallmentEntity(
+                id = obj["id"]?.jsonPrimitive?.contentOrNull ?: return@mapNotNull null,
+                title = obj["title"]?.jsonPrimitive?.contentOrNull ?: return@mapNotNull null,
+                lender = obj["lender"]?.jsonPrimitive?.contentOrNull,
+                amountMinor = obj["amount_minor"]?.jsonPrimitive?.longOrNull ?: return@mapNotNull null,
+                currency = obj["currency"]?.jsonPrimitive?.contentOrNull ?: "USD",
+                totalCount = obj["total_count"]?.jsonPrimitive?.intOrNull ?: 1,
+                paidCount = obj["paid_count"]?.jsonPrimitive?.intOrNull ?: 0,
+                firstDue = obj["first_due"]?.jsonPrimitive?.contentOrNull ?: clock.today().toString(),
+                intervalMonths = obj["interval_months"]?.jsonPrimitive?.intOrNull ?: 1,
+                calendar = obj["calendar"]?.jsonPrimitive?.contentOrNull ?: "GREGORIAN",
+                reminderDays = obj["reminder_days"]?.jsonPrimitive?.intOrNull ?: 3,
+                walletId = obj["wallet_id"]?.jsonPrimitive?.contentOrNull?.takeIf { it in walletIds },
+                note = obj["note"]?.jsonPrimitive?.contentOrNull,
+                createdAt = obj["created_at"]?.jsonPrimitive?.longOrNull ?: now,
+                updatedAt = obj["updated_at"]?.jsonPrimitive?.longOrNull ?: now,
+            )
+        }.forEach { db.installments().upsert(it) }
+
+        root["debts"]?.jsonArray.orEmpty().mapNotNull { item ->
+            val obj = item as? JsonObject ?: return@mapNotNull null
+            DebtEntity(
+                id = obj["id"]?.jsonPrimitive?.contentOrNull ?: return@mapNotNull null,
+                person = obj["person"]?.jsonPrimitive?.contentOrNull ?: return@mapNotNull null,
+                direction = obj["direction"]?.jsonPrimitive?.contentOrNull ?: "i_owe",
+                amountMinor = obj["amount_minor"]?.jsonPrimitive?.longOrNull ?: return@mapNotNull null,
+                currency = obj["currency"]?.jsonPrimitive?.contentOrNull ?: "USD",
+                settledMinor = obj["settled_minor"]?.jsonPrimitive?.longOrNull ?: 0,
+                date = obj["date"]?.jsonPrimitive?.contentOrNull ?: clock.today().toString(),
+                dueDate = obj["due_date"]?.jsonPrimitive?.contentOrNull,
+                note = obj["note"]?.jsonPrimitive?.contentOrNull,
+                createdAt = obj["created_at"]?.jsonPrimitive?.longOrNull ?: now,
+                updatedAt = obj["updated_at"]?.jsonPrimitive?.longOrNull ?: now,
+            )
+        }.forEach { db.debts().upsert(it) }
+
         BackupStats(
             remindersCount = remindersCount,
             subscriptionsCount = subscriptionsCount,
@@ -393,6 +471,8 @@ class BackupManager(
         db.subscriptions().clear()
         db.categories().clear()
         db.transactions().clear()
+        db.installments().clear()
+        db.debts().clear()
         db.wallets().clear()
     }
 
