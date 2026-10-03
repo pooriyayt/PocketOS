@@ -16,6 +16,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.rounded.OpenInNew
 import androidx.compose.material.icons.rounded.CheckCircle
 import androidx.compose.material.icons.rounded.CloudDownload
 import androidx.compose.material.icons.rounded.InstallMobile
@@ -86,7 +87,7 @@ fun UpdateOverlay(updateManager: AppUpdateManager, state: UpdateState) {
                     }
 
                     if (state.release.changelog.isNotBlank()) {
-                        Spacer(Modifier.height(Spacing.lg))
+                        Spacer(Modifier.height(Spacing.md))
                         Text(
                             stringResource(R.string.update_changelog_title),
                             style = MaterialTheme.typography.labelLarge,
@@ -94,7 +95,7 @@ fun UpdateOverlay(updateManager: AppUpdateManager, state: UpdateState) {
                         )
                         Spacer(Modifier.height(Spacing.xs))
                         GlassCard(
-                            Modifier.fillMaxWidth().height(160.dp),
+                            Modifier.fillMaxWidth().height(140.dp),
                             level = GlassLevel.L1
                         ) {
                             Column(Modifier.verticalScroll(rememberScrollState())) {
@@ -107,25 +108,57 @@ fun UpdateOverlay(updateManager: AppUpdateManager, state: UpdateState) {
                         }
                     }
 
-                    Spacer(Modifier.height(Spacing.xl))
+                    Spacer(Modifier.height(Spacing.md))
+                    GlassCard(
+                        Modifier.fillMaxWidth(),
+                        level = GlassLevel.L1
+                    ) {
+                        Row(
+                            Modifier.padding(Spacing.sm),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(
+                                Icons.Rounded.CheckCircle,
+                                contentDescription = null,
+                                tint = c.accent,
+                                modifier = Modifier.size(20.dp)
+                            )
+                            Spacer(Modifier.width(Spacing.sm))
+                            Text(
+                                stringResource(R.string.update_install_tip),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = c.textSecondary
+                            )
+                        }
+                    }
+
+                    Spacer(Modifier.height(Spacing.lg))
                     Row(
                         Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(Spacing.sm)
                     ) {
                         PocketButton(
-                            stringResource(R.string.update_later),
-                            { updateManager.dismiss() },
+                            stringResource(R.string.view_on_github),
+                            { updateManager.openReleasePage(state.release) },
+                            icon = Icons.AutoMirrored.Rounded.OpenInNew,
                             style = ButtonStyle.Glass,
                             modifier = Modifier.weight(1f)
                         )
                         PocketButton(
-                            stringResource(R.string.update_now),
-                            { updateManager.downloadUpdate(state.release) },
+                            stringResource(R.string.download_apk),
+                            { updateManager.openDownload(state.release) },
                             icon = Icons.Rounded.CloudDownload,
-                            modifier = Modifier.weight(1.5f),
+                            modifier = Modifier.weight(1.3f),
                             haptic = HapticType.Confirm
                         )
                     }
+                    Spacer(Modifier.height(Spacing.xs))
+                    PocketButton(
+                        stringResource(R.string.update_later),
+                        { updateManager.dismiss() },
+                        style = ButtonStyle.Text,
+                        modifier = Modifier.fillMaxWidth()
+                    )
                 }
             }
         }
@@ -212,9 +245,9 @@ fun UpdateOverlay(updateManager: AppUpdateManager, state: UpdateState) {
                             modifier = Modifier.weight(1f)
                         )
                         PocketButton(
-                            stringResource(R.string.install_update),
-                            { updateManager.installApk(state.apkFile) },
-                            icon = Icons.Rounded.InstallMobile,
+                            stringResource(R.string.download_apk),
+                            { updateManager.openDownload(state.release) },
+                            icon = Icons.Rounded.CloudDownload,
                             modifier = Modifier.weight(1.5f),
                             haptic = HapticType.Confirm
                         )

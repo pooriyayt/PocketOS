@@ -835,11 +835,14 @@
     <string name="check_for_updates">بررسی به‌روزرسانی</string>
     <string name="check_for_updates_desc">بررسی نسخه‌های جدید PocketOS در GitHub</string>
     <string name="privacy_first_tagline">۱۰۰٪ روی دستگاه، پایگاه دادهٔ رمزگذاری‌شده، بدون حساب کاربری</string>
-    <string name="github_repository">مخزن GitHub</string>
+    <!-- In-App Updates -->
     <string name="update_available_title">نسخهٔ جدید آماده است</string>
     <string name="update_changelog_title">تازه‌ها</string>
     <string name="update_later">بعداً</string>
     <string name="update_now">دانلود و به‌روزرسانی</string>
+    <string name="download_apk">دانلود مستقیم APK</string>
+    <string name="view_on_github">مشاهده در GitHub</string>
+    <string name="update_install_tip">جهت حفظ امنیت و حریم خصوصی، برنامه بدون مجوز نصب خودکار اجرا می‌شود. با زدن دکمه دانلود، فایل APK در پوشه دانلودهای شما ذخیره شده و می‌توانید آن را به سادگی نصب نمایید.</string>
     <string name="downloading_update">در حال دانلود به‌روزرسانی</string>
     <string name="update_ready_title">به‌روزرسانی آماده است</string>
     <string name="update_ready_subtitle">نسخهٔ جدید دانلود و تأیید شد.</string>

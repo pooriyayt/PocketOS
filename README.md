@@ -124,8 +124,7 @@ There are **no accounts**, **no cloud sync servers**, and **no third-party track
 
 ## Security & Google Play Protect
 
-PocketOS conforms to standard Android application security and privacy guidelines:
-- **No Dropper Permissions in Store Flavor**: The `myket` release build removes `REQUEST_INSTALL_PACKAGES` completely to adhere strictly to Google Play Protect policies for sideloaded and independent store installations.
+- **Zero Package Installer Permissions**: PocketOS requests NO package installation permissions (`REQUEST_INSTALL_PACKAGES`) across all builds. Updates are downloaded transparently through the user's browser to the Downloads folder, completely eliminating dropper alerts and Google Play Protect false-positives.
 - **Hardware-Protected Keys**: No plain-text passwords or secret keys exist in the application files.
 - **Minimal Permissions**: Only requests strictly needed system capabilities (`POST_NOTIFICATIONS`, `SCHEDULE_EXACT_ALARM`, `USE_BIOMETRIC`).
 - **Reproducible Signed Binaries**: Built with ProGuard/R8 dead-code stripping, resource shrinking, and full optimization.

@@ -3,9 +3,6 @@ package app.pocketos.updater
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import android.os.Build
-import android.provider.Settings
-import androidx.core.content.FileProvider
 import app.pocketos.BuildConfig
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -121,38 +118,24 @@ class AppUpdateManager(
         }
     }
 
-    /** Prompts the Android Package Installer to install the downloaded APK. */
-    fun installApk(apkFile: File) {
-        if (!apkFile.exists()) {
-            _state.value = UpdateState.Error("APK file not found")
-            return
+    /** Opens the direct APK download URL in the device's default browser or download manager. */
+    fun openDownload(release: AppReleaseInfo) {
+        val url = release.apkUrl.ifBlank { release.htmlUrl.orEmpty().ifBlank { GITHUB_RELEASES_URL } }
+        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url)).apply {
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         }
+        runCatching { context.startActivity(intent) }
+        dismiss()
+    }
 
-        // On Android 8.0+ verify package install permission
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            if (!context.packageManager.canRequestPackageInstalls()) {
-                val intent = Intent(
-                    Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES,
-                    Uri.parse("package:${context.packageName}")
-                ).apply {
-                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                }
-                context.startActivity(intent)
-                return
-            }
+    /** Opens the official GitHub release page in the device's default browser. */
+    fun openReleasePage(release: AppReleaseInfo) {
+        val url = release.htmlUrl.orEmpty().ifBlank { GITHUB_RELEASES_URL }
+        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url)).apply {
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         }
-
-        val apkUri = FileProvider.getUriForFile(
-            context,
-            "${context.packageName}.fileprovider",
-            apkFile
-        )
-
-        val installIntent = Intent(Intent.ACTION_VIEW).apply {
-            setDataAndType(apkUri, "application/vnd.android.package-archive")
-            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_ACTIVITY_NEW_TASK)
-        }
-        context.startActivity(installIntent)
+        runCatching { context.startActivity(intent) }
+        dismiss()
     }
 
     fun dismiss() {
@@ -266,6 +249,7 @@ class AppUpdateManager(
 
     companion object {
         const val GITHUB_REPO = "pooriyayt/PocketOS"
+        const val GITHUB_RELEASES_URL = "https://github.com/pooriyayt/PocketOS/releases/latest"
         private const val GITHUB_API_LATEST_RELEASE = "https://api.github.com/repos/pooriyayt/PocketOS/releases/latest"
 
         /** Compares semantic versions (e.g. "1.1.0" > "1.0.2"). */

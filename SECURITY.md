@@ -22,11 +22,10 @@ The application functions completely offline without requiring accounts, remote 
 - Key derivation uses **PBKDF2WithHmacSHA256** with **100,000 rounds** and a 16-byte random salt.
 - Every backup payload includes a 12-byte initialization vector (IV) and a 128-bit authentication tag to prevent tampering.
 
-### 3. In-App Updates & Code Execution
+### 3. In-App Update Checks & Transparency
 - The app checks only the official repository (`https://github.com/pooriyayt/PocketOS/releases`) over HTTPS.
-- Release APKs are downloaded directly into the app's internal cache.
-- Where available, **SHA-256 integrity checksums** are validated prior to triggering package installation.
-- APK installation is handed off strictly to the Android system package installer via standard `FileProvider`. No dynamic code evaluation (`DexClassLoader`) is employed.
+- PocketOS never executes dynamic code or silently installs packages. When updates are available, release notes are presented and download links open transparently in the user's browser or download manager.
+- Zero dropper capabilities: no package installer intents or package management permissions exist in the application.
 
 ### 4. Minimal Permissions Model
 PocketOS only requests:
@@ -36,9 +35,8 @@ PocketOS only requests:
 - `android.permission.SCHEDULE_EXACT_ALARM` (for precise notification delivery)
 - `android.permission.RECEIVE_BOOT_COMPLETED` (to restore alarms after reboot)
 - `android.permission.USE_BIOMETRIC` (for device biometric app lock)
-- `android.permission.REQUEST_INSTALL_PACKAGES` (for in-app APK installation prompts)
 
-No sensitive permissions (SMS, contacts, location, notification listeners, accessibility) are requested.
+No sensitive permissions (SMS, contacts, location, notification listeners, accessibility, install packages) are requested.
 
 ---
 

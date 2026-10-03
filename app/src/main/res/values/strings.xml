@@ -855,6 +855,9 @@
     <string name="update_changelog_title">What\'s New</string>
     <string name="update_later">Later</string>
     <string name="update_now">Download &amp; Update</string>
+    <string name="download_apk">Download APK</string>
+    <string name="view_on_github">View on GitHub</string>
+    <string name="update_install_tip">For maximum security and privacy, PocketOS does not request package installation permissions. Tap Download to save the APK to your Downloads folder, then open it to install.</string>
     <string name="downloading_update">Downloading Update</string>
     <string name="update_ready_title">Update Ready</string>
     <string name="update_ready_subtitle">The new version has been downloaded and verified.</string>
