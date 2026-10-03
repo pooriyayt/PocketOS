@@ -9,6 +9,7 @@
 [![Platform](https://img.shields.io/badge/Platform-Android%208.0%2B-brightgreen.svg)](https://developer.android.com)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 [![Privacy](https://img.shields.io/badge/Privacy-100%25%20Local--First-emerald.svg)](#privacy--security)
+[![VirusTotal](https://img.shields.io/badge/VirusTotal-Clean%20Scan-brightgreen.svg)](https://www.virustotal.com/gui/file/99fa9ae8e5eee97eb75a15a20f187df67e818e867b70f86f1f018e15174e7096?nocache=1)
 [![Release](https://img.shields.io/github/v/release/pooriyayt/PocketOS?include_prereleases&color=emerald)](https://github.com/pooriyayt/PocketOS/releases)
 
 ---
@@ -140,6 +141,7 @@ There are **no accounts**, **no cloud sync servers**, and **no third-party track
 - **Hardware-Protected Keys**: No plain-text passwords or secret keys exist in the application files.
 - **Minimal Permissions**: Only requests strictly needed system capabilities (`POST_NOTIFICATIONS`, `SCHEDULE_EXACT_ALARM`, `USE_BIOMETRIC`).
 - **Reproducible Signed Binaries**: Built with ProGuard/R8 dead-code stripping, resource shrinking, and full optimization.
+- **VirusTotal Clean Report**: Verified clean scan report available at [VirusTotal Analysis](https://www.virustotal.com/gui/file/99fa9ae8e5eee97eb75a15a20f187df67e818e867b70f86f1f018e15174e7096?nocache=1).
 
 ---
 
