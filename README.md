@@ -14,9 +14,18 @@
 ---
 
 <p align="center">
-  <img src="docs/images/wallet_dark.png" width="380" alt="PocketOS Dark Mode" />
-  &nbsp;&nbsp;&nbsp;&nbsp;
-  <img src="docs/images/wallet_fa.png" width="380" alt="PocketOS Persian Mode" />
+  <img src="docs/images/home.png" width="260" alt="Home Dashboard" />
+  &nbsp;
+  <img src="docs/images/wallet.png" width="260" alt="Wallet & Balances" />
+  &nbsp;
+  <img src="docs/images/quick_add.png" width="260" alt="Smart Quick Add" />
+</p>
+<p align="center">
+  <img src="docs/images/installments.png" width="260" alt="Installments & Loans" />
+  &nbsp;
+  <img src="docs/images/debts.png" width="260" alt="Debts & Receivables" />
+  &nbsp;
+  <img src="docs/images/subscriptions.png" width="260" alt="Subscriptions" />
 </p>
 
 [English](#english) • [فارسی](#فارسی)
@@ -35,8 +44,8 @@ There are **no accounts**, **no cloud sync servers**, and **no third-party track
 ### 🌟 Key Highlights
 
 #### 🧠 Smart Quick Add (Natural Language Accounting)
-- **Conversational Entry**: Type or speak everyday phrases like `"150k sandwich"`, `"۱۵۰ تومن اسنپ"`, `"salary 5000"`, or `"قسط وام ۲۵۰۰"`.
-- **Instant Keyword & Amount Detection**: Automatically recognizes Persian, Arabic, and Western numbers, detects colloquial Iranian Toman scaling (`۱۵۰ تومن` → `150,000 تومان`), categorizes expenses, and infers payment methods.
+- **Conversational Entry**: Type or speak everyday phrases like `"150k dinner at sushi place"`, `"taxi 35"`, `"salary 5000"`, or `"loan installment 250"`.
+- **Instant Keyword & Amount Detection**: Automatically recognizes Western, Persian, and Arabic numbers, detects colloquial Iranian Toman scaling (`۱۵۰ تومن` → `150,000 تومان`), categorizes expenses, and infers payment methods.
 - **Preview & Edit**: One-tap confirmation sheet lets you adjust categories, accounts, or dates before saving.
 
 #### 🌍 Global Currency Support
@@ -82,7 +91,7 @@ There are **no accounts**, **no cloud sync servers**, and **no third-party track
 ### 🌟 ویژگی‌های برجسته
 
 #### 🧠 ثبت سریع و هوشمند (Smart Quick Add)
-- **تشخیص زبان عامیانه و متن آزاد**: متن‌هایی نظیر «۱۵۰ تومن ساندویچ»، «اسنپ ۳۵ تومن»، «حقوق ۵ میلیون» یا «قسط وام بانک ملی» را بنویسید تا برنامه به طور خودکار نوع تراکنش، مبلغ، و دسته‌بندی مناسب را شناسایی کند.
+- **تشخیص زبان عامیانه و متن آزاد**: متن‌هایی نظیر «۱۵۰ تومن ساندویچ»، «اسنپ ۳۵ تومن»، «حقوق ۵ میلیون» یا «قسط وام» را بنویسید تا برنامه به طور خودکار نوع تراکنش، مبلغ، و دسته‌بندی مناسب را شناسایی کند.
 - **تبدیل هوشمند تومان و هزار تومان**: اعداد عامیانه فارسی نظیر «۱۵۰ تومن» به طور هوشمند به ۱۵۰٬۰۰۰ تومان مقیاس‌بندی می‌شوند.
 - **پیش‌نمایش قبل از ذخیره**: امکان تغییر دسته‌بندی، کیف پول یا تاریخ با یک لمس قبل از ثبت نهایی.
 
