@@ -36,12 +36,18 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.AccountBalance
 import androidx.compose.material.icons.rounded.AccountBalanceWallet
 import androidx.compose.material.icons.rounded.AutoAwesome
 import androidx.compose.material.icons.rounded.CalendarMonth
 import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material.icons.rounded.Done
+import androidx.compose.material.icons.rounded.EventRepeat
 import androidx.compose.material.icons.rounded.Favorite
+import app.pocketos.domain.finance.CheckDirection
+import app.pocketos.domain.finance.CheckItem
+import app.pocketos.domain.finance.InstallmentPlan
+import app.pocketos.domain.finance.ObligationCalculator
 import androidx.compose.material.icons.rounded.KeyboardArrowDown
 import androidx.compose.material.icons.rounded.KeyboardArrowUp
 import androidx.compose.material.icons.rounded.NotificationsActive
@@ -128,6 +134,8 @@ fun HomeScreen(nav: NavController) {
     val actions = rememberItemActions()
     var menuFor by remember { mutableStateOf<Reminder?>(null) }
     var customizing by remember { mutableStateOf(false) }
+    val installments by container.finance.installments.collectAsState(initial = emptyList())
+    val checks by container.finance.checks.collectAsState(initial = emptyList())
 
     PullToRefreshBox(isRefreshing = state.refreshing, onRefresh = vm::refresh, modifier = Modifier.fillMaxSize()) {
         LazyColumn(
@@ -188,7 +196,10 @@ fun HomeScreen(nav: NavController) {
                                 modifier = Modifier.padding(bottom = Spacing.sm).animateItem(fadeInSpec = LocalMotion.current.fade(), placementSpec = LocalMotion.current.placement(), fadeOutSpec = LocalMotion.current.fade()))
                         }
                     }
-                    DashboardSection.OVERVIEW -> if (!model.isEmpty) item(key = "overview") { Overview(state) }
+                    DashboardSection.OVERVIEW -> if (!model.isEmpty) item(key = "overview") {
+                        Overview(state)
+                        HomeObligationsSection(installments, checks, state.today, nav)
+                    }
                     DashboardSection.TIMELINE -> if (model.timeline.isNotEmpty()) {
                         item(key = "timeline_h") { SectionHeader(stringResource(R.string.section_coming_up), action = stringResource(R.string.view_schedule), onAction = { nav.navigate(Routes.Calendar) }) }
                         var lastDate: java.time.LocalDate? = null
@@ -730,3 +741,96 @@ private fun SupportCard(onClick: () -> Unit) {
         }
     }
 }
+
+@Composable
+private fun HomeObligationsSection(
+    installments: List<InstallmentPlan>,
+    checks: List<CheckItem>,
+    today: java.time.LocalDate,
+    nav: NavController,
+) {
+    val c = LocalPocketColors.current
+    val f = LocalFormatter.current
+    val upcomingPlan = ObligationCalculator.upcoming(installments).firstOrNull()
+    val upcomingCheck = ObligationCalculator.upcomingChecks(checks).firstOrNull()
+
+    if (upcomingPlan == null && upcomingCheck == null) return
+
+    Column(Modifier.fillMaxWidth().padding(top = Spacing.md)) {
+        SectionHeader(
+            stringResource(R.string.upcoming_obligations),
+            action = stringResource(R.string.see_all),
+            onAction = { nav.navigate(Routes.Wallet) },
+        )
+
+        Row(
+            Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(Spacing.sm),
+        ) {
+            if (upcomingPlan != null) {
+                val due = upcomingPlan.nextDue
+                val days = due?.let { ObligationCalculator.daysUntil(it, today) } ?: 0
+                val tone = if (days < 0) c.danger else if (days <= 3) c.warning else c.tones.blue
+
+                GlassCard(
+                    modifier = Modifier.weight(1f),
+                    onClick = { nav.navigate(Routes.Installments) },
+                    contentPadding = PaddingValues(Spacing.md),
+                ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        ToneIcon(Icons.Rounded.EventRepeat, tone, size = 34.dp, filled = true)
+                        Spacer(Modifier.width(Spacing.sm))
+                        Column(Modifier.weight(1f)) {
+                            Text(stringResource(R.string.installments), style = MaterialTheme.typography.labelSmall, color = c.textSecondary)
+                            Text(upcomingPlan.title, style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold, color = c.textPrimary, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                        }
+                    }
+                    Spacer(Modifier.height(Spacing.sm))
+                    Text(f.money(upcomingPlan.amountMinor, upcomingPlan.currency, compact = true), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.ExtraBold, color = c.textPrimary)
+                    if (due != null) {
+                        Spacer(Modifier.height(2.dp))
+                        Text(
+                            (if (days < 0) stringResource(R.string.overdue) else f.relative(due, today)) + " · " + f.date(due),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = tone,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                        )
+                    }
+                }
+            }
+
+            if (upcomingCheck != null) {
+                val isIssued = upcomingCheck.direction == CheckDirection.ISSUED
+                val days = ObligationCalculator.daysUntil(upcomingCheck.dueDate, today)
+                val tone = if (days < 0) c.danger else if (days <= 3) c.warning else c.tones.cyan
+
+                GlassCard(
+                    modifier = Modifier.weight(1f),
+                    onClick = { nav.navigate(Routes.Checks) },
+                    contentPadding = PaddingValues(Spacing.md),
+                ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        ToneIcon(Icons.Rounded.AccountBalance, tone, size = 34.dp, filled = true)
+                        Spacer(Modifier.width(Spacing.sm))
+                        Column(Modifier.weight(1f)) {
+                            Text(stringResource(if (isIssued) R.string.check_issued else R.string.check_received), style = MaterialTheme.typography.labelSmall, color = c.textSecondary, maxLines = 1)
+                            Text(upcomingCheck.title.ifBlank { upcomingCheck.counterparty }, style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold, color = c.textPrimary, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                        }
+                    }
+                    Spacer(Modifier.height(Spacing.sm))
+                    Text(f.money(upcomingCheck.amountMinor, upcomingCheck.currency, compact = true), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.ExtraBold, color = c.textPrimary)
+                    Spacer(Modifier.height(2.dp))
+                    Text(
+                        (if (days < 0) stringResource(R.string.overdue) else f.relative(upcomingCheck.dueDate, today)) + " · " + f.date(upcomingCheck.dueDate),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = tone,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                }
+            }
+        }
+    }
+}
+

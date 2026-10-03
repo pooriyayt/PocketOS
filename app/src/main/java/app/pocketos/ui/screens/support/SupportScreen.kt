@@ -24,6 +24,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
+import androidx.compose.material.icons.automirrored.rounded.OpenInNew
 import androidx.compose.material.icons.rounded.Favorite
 import androidx.compose.material.icons.rounded.Lock
 import androidx.compose.material.icons.rounded.PlayArrow
@@ -90,14 +91,30 @@ fun SupportScreen(nav: NavController) {
     val state by ads.rewarded.collectAsState()
     val count by ads.supportCount.collectAsState()
     val thanks by ads.thanks.collectAsState()
+    var showThanksDialog by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) { ads.prepareRewarded(context) }
-    // After each completed ad, celebrate and get the next one ready.
+    // After each completed ad, celebrate with haptic pattern and dialog
     LaunchedEffect(thanks) {
         if (thanks > 0) {
             haptics.perform(HapticType.Success)
+            showThanksDialog = true
             ads.prepareRewarded(context)
         }
+    }
+
+    if (showThanksDialog) {
+        app.pocketos.ui.design.GlassDialog(
+            onDismiss = { showThanksDialog = false },
+            title = stringResource(R.string.thanks_dialog_title),
+            message = stringResource(R.string.thanks_dialog_body),
+            confirmText = stringResource(R.string.thanks_dialog_dismiss),
+            onConfirm = {
+                haptics.perform(HapticType.Confirm)
+                showThanksDialog = false
+            },
+            dismissText = "",
+        )
     }
 
     SupportContent(
@@ -190,6 +207,39 @@ internal fun SupportContent(
             Spacer(Modifier.width(6.dp))
             Text(stringResource(R.string.support_privacy), style = MaterialTheme.typography.bodySmall, color = c.textTertiary)
         }
+
+        Spacer(Modifier.height(Spacing.xl))
+        val uriHandler = androidx.compose.ui.platform.LocalUriHandler.current
+        GlassCard(Modifier.fillMaxWidth().appear(4)) {
+            Column {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    ToneIcon(Icons.Rounded.Favorite, c.tones.pink, size = 44.dp, filled = true)
+                    Spacer(Modifier.width(Spacing.md))
+                    Column(Modifier.weight(1f)) {
+                        Text(
+                            stringResource(R.string.support_donate_title),
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = c.textPrimary,
+                        )
+                        Text(
+                            stringResource(R.string.support_donate_sub),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = c.textSecondary,
+                        )
+                    }
+                }
+                Spacer(Modifier.height(Spacing.md))
+                PocketButton(
+                    stringResource(R.string.support_donate_btn),
+                    onClick = { uriHandler.openUri("https://daramet.com/pooriyayt") },
+                    modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp),
+                    icon = Icons.AutoMirrored.Rounded.OpenInNew,
+                    haptic = HapticType.Confirm,
+                )
+            }
+        }
+
         if (showNative) {
             Spacer(Modifier.height(Spacing.xl))
             NativeAdCard(Modifier.fillMaxWidth())

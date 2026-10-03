@@ -49,7 +49,7 @@ class AlarmScheduler(private val context: Context) {
         return PendingIntent.getBroadcast(context, 0, intent, flags or PendingIntent.FLAG_IMMUTABLE)
     }
 
-    enum class Kind(val path: String) { REMINDER("reminder"), RENEWAL("renewal"), INSTALLMENT("installment"), DEBT("debt") }
+    enum class Kind(val path: String) { REMINDER("reminder"), RENEWAL("renewal"), INSTALLMENT("installment"), DEBT("debt"), CHECK("check") }
 
     companion object {
         const val ACTION_ALARM = "app.pocketos.action.ALARM"

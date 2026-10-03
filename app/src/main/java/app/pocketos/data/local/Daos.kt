@@ -315,3 +315,28 @@ interface DebtDao {
     @Query("DELETE FROM debts")
     suspend fun clear()
 }
+
+@Dao
+interface CheckDao {
+    @Query("SELECT * FROM checks ORDER BY dueDate ASC, createdAt DESC")
+    fun observeAll(): Flow<List<CheckEntity>>
+
+    @Query("SELECT * FROM checks")
+    suspend fun everything(): List<CheckEntity>
+
+    @Query("SELECT * FROM checks WHERE id = :id")
+    suspend fun get(id: String): CheckEntity?
+
+    @Upsert
+    suspend fun upsert(entity: CheckEntity)
+
+    @Query("UPDATE checks SET status = :status, updatedAt = :updatedAt WHERE id = :id")
+    suspend fun updateStatus(id: String, status: String, updatedAt: Long)
+
+    @Query("DELETE FROM checks WHERE id = :id")
+    suspend fun delete(id: String)
+
+    @Query("DELETE FROM checks")
+    suspend fun clear()
+}
+

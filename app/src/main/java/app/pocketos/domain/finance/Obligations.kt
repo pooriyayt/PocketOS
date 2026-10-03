@@ -78,6 +78,66 @@ data class DebtSummary(val currency: String, val iOweMinor: Long, val owedToMeMi
     val netMinor: Long get() = owedToMeMinor - iOweMinor
 }
 
+enum class CheckDirection(val wire: String) {
+    /** Issued / payable check (چک پرداختی / صادره). */
+    ISSUED("issued"),
+
+    /** Received check (چک دریافتی). */
+    RECEIVED("received");
+
+    companion object {
+        fun fromWire(value: String?): CheckDirection = entries.firstOrNull { it.wire == value } ?: ISSUED
+    }
+}
+
+enum class CheckStatus(val wire: String) {
+    /** Pending clearance (در انتظار وصول). */
+    PENDING("pending"),
+
+    /** Cleared / Paid (پاس شده). */
+    CLEARED("cleared"),
+
+    /** Bounced / Returned (برگشت خورده). */
+    BOUNCED("bounced");
+
+    companion object {
+        fun fromWire(value: String?): CheckStatus = entries.firstOrNull { it.wire == value } ?: PENDING
+    }
+}
+
+/** Bank check issued or received with Sayad tracking and clearance status. */
+data class CheckItem(
+    val id: String,
+    val title: String,
+    val counterparty: String,
+    val direction: CheckDirection,
+    val amountMinor: Long,
+    val currency: String,
+    val sayadNumber: String?,
+    val bankName: String?,
+    val dueDate: LocalDate,
+    val issueDate: LocalDate?,
+    val status: CheckStatus,
+    val reminderDays: Int,
+    val note: String?,
+    val walletId: String?,
+    val createdAt: Instant,
+    val updatedAt: Instant,
+) {
+    val isPending: Boolean get() = status == CheckStatus.PENDING
+    val isCleared: Boolean get() = status == CheckStatus.CLEARED
+    val isBounced: Boolean get() = status == CheckStatus.BOUNCED
+}
+
+data class CheckSummary(
+    val currency: String,
+    val pendingIssuedMinor: Long,
+    val pendingReceivedMinor: Long,
+    val clearedMinor: Long,
+) {
+    val netPendingMinor: Long get() = pendingReceivedMinor - pendingIssuedMinor
+}
+
 object ObligationCalculator {
 
     /** Plans with something left to pay, soonest first. */
@@ -110,6 +170,21 @@ object ObligationCalculator {
                 currency,
                 iOweMinor = list.filter { it.direction == DebtDirection.I_OWE }.sumOf { it.remainingMinor },
                 owedToMeMinor = list.filter { it.direction == DebtDirection.OWED_TO_ME }.sumOf { it.remainingMinor },
+            )
+        }
+
+    /** Pending checks sorted by due date, soonest first. */
+    fun upcomingChecks(checks: List<CheckItem>): List<CheckItem> =
+        checks.filter { it.isPending }.sortedBy { it.dueDate }
+
+    /** Pending checks summary per currency. */
+    fun checkSummary(checks: List<CheckItem>): List<CheckSummary> =
+        checks.groupBy { it.currency }.map { (currency, list) ->
+            CheckSummary(
+                currency = currency,
+                pendingIssuedMinor = list.filter { it.isPending && it.direction == CheckDirection.ISSUED }.sumOf { it.amountMinor },
+                pendingReceivedMinor = list.filter { it.isPending && it.direction == CheckDirection.RECEIVED }.sumOf { it.amountMinor },
+                clearedMinor = list.filter { it.isCleared }.sumOf { it.amountMinor },
             )
         }
 }

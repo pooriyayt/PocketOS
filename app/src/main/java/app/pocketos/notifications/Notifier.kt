@@ -167,6 +167,50 @@ class Notifier(private val context: Context) {
         postDue(id, title, text, "pocketos://debts")
     }
 
+    fun showCheck(check: app.pocketos.domain.finance.CheckItem, daysUntil: Long, showSensitive: Boolean) {
+        if (!canPost()) return
+        val id = notificationId("c", check.id)
+        val isIssued = check.direction == app.pocketos.domain.finance.CheckDirection.ISSUED
+        val name = check.title.ifBlank { check.counterparty }
+        val title = when {
+            daysUntil <= 0 -> context.getString(if (isIssued) R.string.notif_check_due_today_issued else R.string.notif_check_due_today_received, name)
+            daysUntil == 1L -> context.getString(if (isIssued) R.string.notif_check_due_tomorrow_issued else R.string.notif_check_due_tomorrow_received, name)
+            else -> context.resources.getQuantityString(
+                if (isIssued) R.plurals.notif_check_in_days_issued else R.plurals.notif_check_in_days_received,
+                daysUntil.toInt(),
+                name,
+                daysUntil.toInt(),
+            )
+        }
+        val details = listOfNotNull(
+            if (showSensitive) MoneyFormatter.format(check.amountMinor, check.currency, Locale.getDefault()) else null,
+            check.bankName?.takeIf { it.isNotBlank() },
+            check.sayadNumber?.takeIf { it.isNotBlank() }?.let { "${context.getString(R.string.check_number)}: $it" },
+        ).joinToString(" · ")
+        val text = details.ifEmpty { context.getString(R.string.notif_renewal_generic) }
+        val publicVersion = NotificationCompat.Builder(context, CHANNEL_RENEWALS)
+            .setSmallIcon(R.drawable.ic_stat_pocketos)
+            .setContentTitle(context.getString(R.string.notif_payment_public_title))
+            .setContentText(context.getString(R.string.notif_unlock_to_view))
+            .build()
+        val builder = NotificationCompat.Builder(context, CHANNEL_RENEWALS)
+            .setSmallIcon(R.drawable.ic_stat_pocketos)
+            .setColor(0xFF0EA5E9.toInt())
+            .setContentTitle(title)
+            .setContentText(text)
+            .setCategory(NotificationCompat.CATEGORY_REMINDER)
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .setVisibility(NotificationCompat.VISIBILITY_PRIVATE)
+            .setPublicVersion(publicVersion)
+            .setAutoCancel(true)
+            .setContentIntent(openIntent("pocketos://checks", id))
+        if (daysUntil <= 0) {
+            builder.addAction(action(R.drawable.ic_action_open, R.string.check_status_cleared, NotificationActionReceiver.ACTION_MARK_CHECK_CLEARED, check.id, id, false))
+        }
+        post(id, builder)
+    }
+
+
     private fun postDue(id: Int, title: String, text: String, uri: String) {
         val publicVersion = NotificationCompat.Builder(context, CHANNEL_RENEWALS)
             .setSmallIcon(R.drawable.ic_stat_pocketos)

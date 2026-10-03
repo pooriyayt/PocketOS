@@ -105,6 +105,7 @@ fun SettingsScreen(nav: NavController) {
             }
         }
         item {
+            Spacer(Modifier.height(Spacing.md))
             SettingsGroup {
                 SettingsRow(
                     Icons.Rounded.Favorite,

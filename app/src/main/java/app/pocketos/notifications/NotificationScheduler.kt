@@ -82,6 +82,18 @@ class NotificationScheduler(
         if (trigger == null) alarms.cancel(AlarmScheduler.Kind.DEBT, id) else alarms.schedule(AlarmScheduler.Kind.DEBT, id, trigger.toEpochMilli())
     }
 
+    /** Checks notify [CheckItem.reminderDays] (typically 2-3 days) before due date and on the due date. */
+    suspend fun scheduleCheck(id: String) {
+        val check = db.checks().get(id)?.toDomain()
+        if (check == null || !check.isPending) {
+            alarms.cancel(AlarmScheduler.Kind.CHECK, id)
+            notifier.cancel("c", id)
+            return
+        }
+        val trigger = nextDueTrigger(check.dueDate, check.reminderDays, notifiedKey("c", id))
+        if (trigger == null) alarms.cancel(AlarmScheduler.Kind.CHECK, id) else alarms.schedule(AlarmScheduler.Kind.CHECK, id, trigger.toEpochMilli())
+    }
+
     /** The first of (due - daysBefore, due) at the reminder time that is still ahead and not yet notified. */
     private suspend fun nextDueTrigger(due: java.time.LocalDate, daysBefore: Int, key: String): Instant? {
         val time = settings.current().renewalReminderTime
@@ -98,6 +110,7 @@ class NotificationScheduler(
         db.subscriptions().allActive().forEach { scheduleRenewal(it.id) }
         db.installments().everything().forEach { scheduleInstallment(it.id) }
         db.debts().everything().forEach { scheduleDebt(it.id) }
+        db.checks().everything().forEach { scheduleCheck(it.id) }
     }
 
     /** Handles a fired alarm: shows the notification, records it, schedules the next one. */
@@ -143,6 +156,12 @@ class NotificationScheduler(
                 notifier.showDebt(debt, ChronoUnit.DAYS.between(clock.today(), due), s.notificationsShowSensitive)
                 db.meta().set(notifiedKey("d", id), now.toEpochMilli().toString())
                 scheduleDebt(id)
+            }
+            AlarmScheduler.Kind.CHECK -> {
+                val check = db.checks().get(id)?.toDomain()?.takeIf { it.isPending } ?: return
+                notifier.showCheck(check, ChronoUnit.DAYS.between(clock.today(), check.dueDate), s.notificationsShowSensitive)
+                db.meta().set(notifiedKey("c", id), now.toEpochMilli().toString())
+                scheduleCheck(id)
             }
         }
     }

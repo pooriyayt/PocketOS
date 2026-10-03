@@ -61,6 +61,7 @@ class AppContainer(val app: Application) {
         override suspend fun onSubscriptionChanged(id: String, deleted: Boolean) = notificationScheduler.scheduleRenewal(id)
         override suspend fun onInstallmentChanged(id: String) = notificationScheduler.scheduleInstallment(id)
         override suspend fun onDebtChanged(id: String) = notificationScheduler.scheduleDebt(id)
+        override suspend fun onCheckChanged(id: String) = notificationScheduler.scheduleCheck(id)
         override fun onDataChanged() {
             widgetUpdater.requestUpdate()
         }

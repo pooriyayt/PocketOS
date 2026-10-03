@@ -188,3 +188,25 @@ data class DebtEntity(
     val createdAt: Long,
     val updatedAt: Long,
 )
+
+/** Accounting: a bank check (issued or received). */
+@Entity(tableName = "checks", indices = [Index("dueDate"), Index("status")])
+data class CheckEntity(
+    @PrimaryKey val id: String,
+    val title: String,
+    val counterparty: String,
+    val direction: String,
+    val amountMinor: Long,
+    val currency: String,
+    val sayadNumber: String?,
+    val bankName: String?,
+    val dueDate: String,
+    val issueDate: String?,
+    val status: String,
+    val reminderDays: Int,
+    val note: String?,
+    val walletId: String?,
+    val createdAt: Long,
+    val updatedAt: Long,
+)
+

@@ -34,9 +34,11 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.rounded.KeyboardArrowRight
+import androidx.compose.material.icons.rounded.AccountBalance
 import androidx.compose.material.icons.rounded.AccountBalanceWallet
 import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material.icons.rounded.North
+import androidx.compose.material.icons.rounded.Payments
 import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.material.icons.rounded.South
 import androidx.compose.material.icons.rounded.SwapHoriz
@@ -137,13 +139,16 @@ fun WalletScreen(nav: NavController) {
 
     val plans by container.finance.installments.collectAsState(initial = emptyList())
     val debts by container.finance.debts.collectAsState(initial = emptyList())
+    val checks by container.finance.checks.collectAsState(initial = emptyList())
     WalletContent(
         wallets = wallets,
         transactions = transactions,
         installments = plans,
         debts = debts,
+        checks = checks,
         onInstallments = { nav.navigate(Routes.Installments) },
         onDebts = { nav.navigate(Routes.Debts) },
+        onChecks = { nav.navigate(Routes.Checks) },
         defaultCurrency = settings.defaultCurrency,
         today = container.clock.today(),
         onSettings = { nav.navigate(Routes.Settings) },
@@ -176,8 +181,10 @@ internal fun WalletContent(
     transactions: List<Transaction>?,
     installments: List<app.pocketos.domain.finance.InstallmentPlan>,
     debts: List<app.pocketos.domain.finance.Debt>,
+    checks: List<app.pocketos.domain.finance.CheckItem>,
     onInstallments: () -> Unit,
     onDebts: () -> Unit,
+    onChecks: () -> Unit,
     defaultCurrency: String,
     today: LocalDate,
     onSettings: () -> Unit,
@@ -267,22 +274,50 @@ internal fun WalletContent(
             }
         }
 
-        // ---- Installments & debts
+        // ---- Obligations (Installments, Checks, Debts)
         item(key = "obligations") {
+            val remainingInstallments = app.pocketos.domain.finance.ObligationCalculator.remainingByCurrency(installments)[primaryCurrency] ?: 0L
+            val activePlans = installments.filterNot { it.isFinished }
             val nextPlan = app.pocketos.domain.finance.ObligationCalculator.upcoming(installments).firstOrNull()
+
+            val checkSummary = app.pocketos.domain.finance.ObligationCalculator.checkSummary(checks).firstOrNull { it.currency == primaryCurrency }
+            val pendingChecks = checks.filter { it.isPending }
+            val nextCheck = app.pocketos.domain.finance.ObligationCalculator.upcomingChecks(checks).firstOrNull()
+
             val debtSummary = app.pocketos.domain.finance.ObligationCalculator.debtSummary(debts).firstOrNull { it.currency == primaryCurrency }
-            Row(Modifier.fillMaxWidth().padding(top = Spacing.md).appear(2), horizontalArrangement = Arrangement.spacedBy(Spacing.sm)) {
-                FeatureTile(
-                    Icons.Rounded.EventRepeat, c.tones.blue, stringResource(R.string.installments),
-                    nextPlan?.nextDue?.let { f.dayLabel(it, today) + " \u00b7 " + f.money(nextPlan.amountMinor, nextPlan.currency, compact = true) }
-                        ?: stringResource(R.string.add_installment),
-                    Modifier.weight(1f), onInstallments,
-                )
-                FeatureTile(
-                    Icons.Rounded.Handshake, c.tones.cyan, stringResource(R.string.debts_title),
-                    debtSummary?.let { f.money(it.netMinor, it.currency, compact = true) } ?: stringResource(R.string.add_debt),
-                    Modifier.weight(1f), onDebts,
-                )
+            val openDebts = debts.filterNot { it.isSettled }
+
+            Column(Modifier.fillMaxWidth().padding(top = Spacing.md).appear(2)) {
+                SectionHeader(stringResource(R.string.obligations_title))
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(Spacing.sm)) {
+                    FeatureTile(
+                        Icons.Rounded.EventRepeat,
+                        c.tones.blue,
+                        stringResource(R.string.installments),
+                        if (activePlans.isNotEmpty()) f.money(remainingInstallments, primaryCurrency, compact = true) else stringResource(R.string.add_installment),
+                        Modifier.weight(1f),
+                        extraInfo = nextPlan?.nextDue?.let { f.dayLabel(it, today) },
+                        onClick = onInstallments,
+                    )
+                    FeatureTile(
+                        Icons.Rounded.AccountBalance,
+                        c.tones.cyan,
+                        stringResource(R.string.tab_checks),
+                        if (pendingChecks.isNotEmpty()) f.money(checkSummary?.pendingIssuedMinor ?: 0, primaryCurrency, compact = true) else stringResource(R.string.new_check),
+                        Modifier.weight(1f),
+                        extraInfo = nextCheck?.dueDate?.let { f.dayLabel(it, today) },
+                        onClick = onChecks,
+                    )
+                    FeatureTile(
+                        Icons.Rounded.Handshake,
+                        c.tones.violet,
+                        stringResource(R.string.debts_title),
+                        if (openDebts.isNotEmpty()) f.money(debtSummary?.netMinor ?: 0, primaryCurrency, compact = true) else stringResource(R.string.add_debt),
+                        Modifier.weight(1f),
+                        extraInfo = if (openDebts.isNotEmpty()) "${f.localizeDigits(openDebts.size.toString())} " + stringResource(R.string.open_items) else null,
+                        onClick = onDebts,
+                    )
+                }
             }
         }
 
@@ -426,7 +461,15 @@ private fun ActionTile(icon: ImageVector, label: String, tone: Color, modifier: 
 }
 
 @Composable
-private fun FeatureTile(icon: ImageVector, tone: Color, title: String, subtitle: String, modifier: Modifier = Modifier, onClick: () -> Unit) {
+private fun FeatureTile(
+    icon: ImageVector,
+    tone: Color,
+    title: String,
+    subtitle: String,
+    modifier: Modifier = Modifier,
+    extraInfo: String? = null,
+    onClick: () -> Unit,
+) {
     val c = LocalPocketColors.current
     GlassCard(
         modifier,
@@ -436,10 +479,14 @@ private fun FeatureTile(icon: ImageVector, tone: Color, title: String, subtitle:
             drawRect(Brush.radialGradient(listOf(tone.copy(alpha = if (c.isDark) 0.20f else 0.10f), Color.Transparent), center = Offset(size.width, 0f), radius = size.width))
         },
     ) {
-        ToneIcon(icon, tone, size = 40.dp, filled = true)
-        Spacer(Modifier.height(Spacing.md))
+        ToneIcon(icon, tone, size = 36.dp, filled = true)
+        Spacer(Modifier.height(Spacing.sm))
         Text(title, style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold, color = c.textPrimary, maxLines = 1, overflow = TextOverflow.Ellipsis)
-        Text(subtitle, style = MaterialTheme.typography.bodySmall, color = c.textSecondary, maxLines = 1, overflow = TextOverflow.Ellipsis)
+        Text(subtitle, style = MaterialTheme.typography.bodySmall, fontWeight = FontWeight.SemiBold, color = tone, maxLines = 1, overflow = TextOverflow.Ellipsis)
+        if (extraInfo != null) {
+            Spacer(Modifier.height(2.dp))
+            Text(extraInfo, style = MaterialTheme.typography.labelSmall, color = c.textSecondary, maxLines = 1, overflow = TextOverflow.Ellipsis)
+        }
     }
 }
 

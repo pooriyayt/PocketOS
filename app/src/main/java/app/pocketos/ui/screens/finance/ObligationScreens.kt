@@ -27,12 +27,15 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
+import androidx.compose.material.icons.rounded.AccountBalance
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.CalendarMonth
+import androidx.compose.material.icons.rounded.Cancel
 import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material.icons.rounded.EventRepeat
 import androidx.compose.material.icons.rounded.Handshake
 import androidx.compose.material.icons.rounded.North
+import androidx.compose.material.icons.rounded.Payments
 import androidx.compose.material.icons.rounded.Remove
 import androidx.compose.material.icons.rounded.South
 import androidx.compose.material3.Icon
@@ -64,6 +67,10 @@ import app.pocketos.R
 import app.pocketos.core.money.Currencies
 import app.pocketos.core.money.MoneyFormatter
 import app.pocketos.core.time.CalendarMath
+import app.pocketos.domain.finance.CheckDirection
+import app.pocketos.domain.finance.CheckItem
+import app.pocketos.domain.finance.CheckStatus
+import app.pocketos.domain.finance.CheckSummary
 import app.pocketos.domain.finance.Debt
 import app.pocketos.domain.finance.DebtDirection
 import app.pocketos.domain.finance.InstallmentPlan
@@ -757,6 +764,428 @@ private fun RepaySheet(debt: Debt, onDismiss: () -> Unit) {
             icon = Icons.Rounded.Check,
             enabled = amountMinor > 0,
             haptic = HapticType.Confirm,
+        )
+    }
+}
+
+// ================================================================= Checks
+
+enum class CheckFilter { ALL, PENDING, ISSUED, RECEIVED, CLEARED }
+
+@Composable
+fun ChecksScreen(nav: NavController) {
+    val container = LocalAppContainer.current
+    val ui = LocalAppUi.current
+    val haptics = LocalHaptics.current
+    val scope = rememberCoroutineScope()
+    val checks by container.finance.checks.collectAsState(initial = null)
+    val settings by container.settings.settings.collectAsState(initial = container.latestSettings)
+    val clearedMsg = stringResource(R.string.check_cleared_msg)
+    val bouncedMsg = stringResource(R.string.check_bounced_msg)
+    var editing by remember { mutableStateOf<CheckItem?>(null) }
+    var creating by remember { mutableStateOf(false) }
+
+    ChecksContent(
+        checks = checks,
+        defaultCurrency = settings.defaultCurrency,
+        today = container.clock.today(),
+        onBack = { nav.popBackStack() },
+        onAdd = { creating = true },
+        onEdit = { editing = it },
+        onMarkCleared = { check ->
+            scope.launch {
+                container.finance.markCheckStatus(check.id, CheckStatus.CLEARED)
+                haptics.perform(HapticType.Success)
+                ui.message(clearedMsg)
+            }
+        },
+        onMarkBounced = { check ->
+            scope.launch {
+                container.finance.markCheckStatus(check.id, CheckStatus.BOUNCED)
+                haptics.perform(HapticType.Warning)
+                ui.message(bouncedMsg)
+            }
+        },
+    )
+    if (creating || editing != null) {
+        CheckEditorSheet(editing, settings.defaultCurrency) { creating = false; editing = null }
+    }
+}
+
+@Composable
+internal fun ChecksContent(
+    checks: List<CheckItem>?,
+    defaultCurrency: String,
+    today: LocalDate,
+    onBack: () -> Unit,
+    onAdd: () -> Unit,
+    onEdit: (CheckItem) -> Unit,
+    onMarkCleared: (CheckItem) -> Unit,
+    onMarkBounced: (CheckItem) -> Unit,
+) {
+    val c = LocalPocketColors.current
+    val f = LocalFormatter.current
+    var filter by rememberSaveable { mutableStateOf(CheckFilter.ALL) }
+    val all = checks.orEmpty()
+    val summaries = ObligationCalculator.checkSummary(all)
+    val primary = summaries.firstOrNull { it.currency == defaultCurrency } ?: summaries.firstOrNull()
+    val currency = primary?.currency ?: defaultCurrency
+    val visible = all.filter {
+        when (filter) {
+            CheckFilter.ALL -> true
+            CheckFilter.PENDING -> it.isPending
+            CheckFilter.ISSUED -> it.direction == CheckDirection.ISSUED
+            CheckFilter.RECEIVED -> it.direction == CheckDirection.RECEIVED
+            CheckFilter.CLEARED -> it.isCleared || it.isBounced
+        }
+    }.sortedWith(
+        compareBy<CheckItem> { if (it.isPending) 0 else 1 }
+            .thenBy { it.dueDate }
+            .thenByDescending { it.createdAt }
+    )
+
+    LazyColumn(Modifier.fillMaxSize(), contentPadding = PaddingValues(horizontal = Spacing.gutter)) {
+        item { Spacer(Modifier.windowInsetsTopHeight(WindowInsets.statusBars)) }
+        item { ScreenTitle(stringResource(R.string.checks_title), onBack, onAdd) }
+        item {
+            GradientCard(Modifier.fillMaxWidth().padding(top = Spacing.lg).appear(0), colors = listOf(Color(0xFF0284C7), Color(0xFF6366F1))) {
+                Row(horizontalArrangement = Arrangement.spacedBy(Spacing.sm)) {
+                    HeroStatSide(
+                        Icons.Rounded.North,
+                        stringResource(R.string.pending_issued_total),
+                        f.money(primary?.pendingIssuedMinor ?: 0, currency, compact = true),
+                        Modifier.weight(1f),
+                    )
+                    HeroStatSide(
+                        Icons.Rounded.South,
+                        stringResource(R.string.pending_received_total),
+                        f.money(primary?.pendingReceivedMinor ?: 0, currency, compact = true),
+                        Modifier.weight(1f),
+                    )
+                }
+                Spacer(Modifier.height(Spacing.md))
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    ToneIcon(Icons.Rounded.Payments, Color.White, size = 32.dp, filled = false)
+                    Spacer(Modifier.width(Spacing.sm))
+                    Text(
+                        pluralStringOf(R.plurals.open_checks, all.count { it.isPending }),
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.SemiBold,
+                        color = Color.White,
+                    )
+                }
+            }
+        }
+        item {
+            Spacer(Modifier.height(Spacing.lg))
+            GlassSegmentedControl(
+                CheckFilter.entries, filter, { filter = it },
+                {
+                    stringResource(
+                        when (it) {
+                            CheckFilter.ALL -> R.string.open_items
+                            CheckFilter.PENDING -> R.string.check_status_pending
+                            CheckFilter.ISSUED -> R.string.check_issued
+                            CheckFilter.RECEIVED -> R.string.check_received
+                            CheckFilter.CLEARED -> R.string.settled
+                        }
+                    )
+                },
+            )
+            Spacer(Modifier.height(Spacing.md))
+        }
+        if (checks != null && visible.isEmpty()) {
+            item {
+                EmptyState(
+                    Icons.Rounded.AccountBalance,
+                    stringResource(R.string.no_checks_title),
+                    stringResource(R.string.no_checks_message),
+                    actionLabel = if (all.isEmpty()) stringResource(R.string.new_check) else null,
+                    onAction = if (all.isEmpty()) onAdd else null,
+                    compact = all.isNotEmpty(),
+                )
+            }
+        }
+        items(visible, key = { it.id }) { check ->
+            CheckCard(
+                check = check,
+                today = today,
+                onEdit = { onEdit(check) },
+                onCleared = { onMarkCleared(check) },
+                onBounced = { onMarkBounced(check) },
+                modifier = Modifier.padding(bottom = Spacing.md).animateItem(),
+            )
+        }
+        item { BottomClearance() }
+    }
+}
+
+@Composable
+private fun HeroStatSide(icon: androidx.compose.ui.graphics.vector.ImageVector, label: String, value: String, modifier: Modifier) {
+    Column(modifier.clip(RoundedCornerShape(18.dp)).background(Color.White.copy(alpha = 0.16f)).padding(Spacing.md)) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Box(Modifier.size(26.dp).clip(CircleShape).background(Color.White.copy(alpha = 0.22f)), contentAlignment = Alignment.Center) {
+                Icon(icon, null, tint = Color.White, modifier = Modifier.size(15.dp))
+            }
+            Spacer(Modifier.width(6.dp))
+            Text(label, style = MaterialTheme.typography.labelMedium, color = Color.White.copy(alpha = 0.85f), maxLines = 1)
+        }
+        Spacer(Modifier.height(Spacing.xs))
+        Text(value, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.ExtraBold, color = Color.White, maxLines = 1, overflow = TextOverflow.Ellipsis)
+    }
+}
+
+@Composable
+private fun CheckCard(
+    check: CheckItem,
+    today: LocalDate,
+    onEdit: () -> Unit,
+    onCleared: () -> Unit,
+    onBounced: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val c = LocalPocketColors.current
+    val f = LocalFormatter.current
+    val isIssued = check.direction == CheckDirection.ISSUED
+    val days = ObligationCalculator.daysUntil(check.dueDate, today)
+    val tone = when {
+        check.isCleared -> c.success
+        check.isBounced -> c.danger
+        days < 0 -> c.danger
+        days <= 3 -> c.warning
+        isIssued -> c.tones.red
+        else -> c.tones.green
+    }
+    val promptClearance = check.isPending && days <= 0
+
+    GlassCard(
+        modifier = modifier.fillMaxWidth(),
+        onClick = onEdit,
+        decoration = {
+            val start = if (layoutDirection == androidx.compose.ui.unit.LayoutDirection.Ltr) 0f else size.width
+            drawRect(
+                androidx.compose.ui.graphics.Brush.radialGradient(
+                    listOf(tone.copy(alpha = if (c.isDark) 0.16f else 0.08f), Color.Transparent),
+                    center = androidx.compose.ui.geometry.Offset(start, 0f),
+                    radius = size.width * 0.8f,
+                )
+            )
+        },
+    ) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            ToneIcon(if (isIssued) Icons.Rounded.North else Icons.Rounded.South, tone, size = 44.dp, filled = true)
+            Spacer(Modifier.width(Spacing.md))
+            Column(Modifier.weight(1f)) {
+                Text(check.title.ifBlank { check.counterparty }, style = MaterialTheme.typography.titleMedium, color = c.textPrimary, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                val sub = listOfNotNull(
+                    stringResource(if (isIssued) R.string.check_payee else R.string.check_issuer) + ": " + check.counterparty,
+                    check.bankName,
+                ).joinToString(" · ")
+                Text(sub, style = MaterialTheme.typography.bodySmall, color = c.textSecondary, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            }
+            Text(f.money(check.amountMinor, check.currency, compact = true), style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.ExtraBold, color = if (check.isCleared) c.textTertiary else c.textPrimary)
+        }
+
+        if (check.sayadNumber != null || check.note != null) {
+            Spacer(Modifier.height(Spacing.sm))
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                check.sayadNumber?.let {
+                    Text(
+                        "${stringResource(R.string.check_number)}: ${f.localizeDigits(it)}",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = c.textTertiary,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.weight(1f, fill = false),
+                    )
+                }
+                if (check.sayadNumber != null && check.note != null) {
+                    Text(" · ", style = MaterialTheme.typography.labelSmall, color = c.textTertiary)
+                }
+                check.note?.let {
+                    Text(it, style = MaterialTheme.typography.labelSmall, color = c.textTertiary, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f, fill = false))
+                }
+            }
+        }
+
+        Spacer(Modifier.height(Spacing.md))
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Column(Modifier.weight(1f)) {
+                Text(f.date(check.dueDate, withYear = true, withWeekday = true), style = MaterialTheme.typography.titleSmall, color = c.textPrimary)
+                val statusText = when {
+                    check.isCleared -> stringResource(R.string.check_status_cleared)
+                    check.isBounced -> stringResource(R.string.check_status_bounced)
+                    days < 0 -> stringResource(R.string.overdue)
+                    else -> f.relative(check.dueDate, today)
+                }
+                StatusPill(statusText, tone, dot = check.isPending)
+            }
+            if (check.isPending && !promptClearance) {
+                PocketButton(stringResource(R.string.check_status_cleared), onCleared, style = ButtonStyle.Tonal, icon = Icons.Rounded.Check, haptic = HapticType.Success)
+            }
+        }
+
+        if (promptClearance) {
+            Spacer(Modifier.height(Spacing.md))
+            Column(
+                Modifier
+                    .clip(RoundedCornerShape(16.dp))
+                    .background(tone.copy(alpha = if (c.isDark) 0.18f else 0.10f))
+                    .padding(Spacing.md)
+            ) {
+                Text(
+                    stringResource(R.string.check_prompt_cleared),
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.Bold,
+                    color = c.textPrimary,
+                )
+                Spacer(Modifier.height(Spacing.sm))
+                Row(horizontalArrangement = Arrangement.spacedBy(Spacing.sm)) {
+                    PocketButton(
+                        stringResource(R.string.check_pass_btn),
+                        onCleared,
+                        Modifier.weight(1f),
+                        style = ButtonStyle.Primary,
+                        icon = Icons.Rounded.Check,
+                        haptic = HapticType.Success,
+                    )
+                    PocketButton(
+                        stringResource(R.string.check_bounce_btn),
+                        onBounced,
+                        Modifier.weight(1f),
+                        style = ButtonStyle.Glass,
+                        icon = Icons.Rounded.Cancel,
+                        haptic = HapticType.Warning,
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun CheckEditorSheet(existing: CheckItem?, defaultCurrency: String, onDismiss: () -> Unit) {
+    val container = LocalAppContainer.current
+    val c = LocalPocketColors.current
+    val f = LocalFormatter.current
+    val haptics = LocalHaptics.current
+    val scope = rememberCoroutineScope()
+    val wallets by container.finance.wallets.collectAsState(initial = emptyList())
+    var direction by rememberSaveable { mutableStateOf(existing?.direction ?: CheckDirection.ISSUED) }
+    var title by rememberSaveable { mutableStateOf(existing?.title.orEmpty()) }
+    var counterparty by rememberSaveable { mutableStateOf(existing?.counterparty.orEmpty()) }
+    var currency by rememberSaveable { mutableStateOf(existing?.currency ?: defaultCurrency) }
+    var amount by rememberSaveable { mutableStateOf(existing?.let { MoneyFormatter.formatPlain(it.amountMinor, it.currency) }.orEmpty()) }
+    var sayadNumber by rememberSaveable { mutableStateOf(existing?.sayadNumber.orEmpty()) }
+    var bankName by rememberSaveable { mutableStateOf(existing?.bankName.orEmpty()) }
+    var dueEpoch by rememberSaveable { mutableStateOf((existing?.dueDate ?: LocalDate.now().plusDays(7)).toEpochDay()) }
+    var remind by rememberSaveable { mutableStateOf(existing?.reminderDays ?: 3) }
+    var walletId by rememberSaveable { mutableStateOf(existing?.walletId ?: wallets.firstOrNull { it.currency == currency }?.id) }
+    var note by rememberSaveable { mutableStateOf(existing?.note.orEmpty()) }
+    var pickCurrency by remember { mutableStateOf(false) }
+    var pickDate by remember { mutableStateOf(false) }
+    var confirmDelete by remember { mutableStateOf(false) }
+    val amountMinor = MoneyFormatter.parse(amount.ifEmpty { "0" }, currency) ?: 0
+    val canSave = counterparty.isNotBlank() && amountMinor > 0
+
+    GlassBottomSheet(onDismiss = onDismiss, title = stringResource(if (existing == null) R.string.new_check else R.string.edit_check)) {
+        Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState())) {
+            GlassSegmentedControl(
+                listOf(CheckDirection.ISSUED, CheckDirection.RECEIVED), direction, { direction = it },
+                { stringResource(if (it == CheckDirection.ISSUED) R.string.check_issued else R.string.check_received) },
+            )
+            Spacer(Modifier.height(Spacing.lg))
+            GlassTextField(title, { title = it.take(80) }, label = stringResource(R.string.check_title_label), placeholder = stringResource(R.string.check_title_hint))
+            Spacer(Modifier.height(Spacing.md))
+            GlassTextField(
+                counterparty,
+                { counterparty = it.take(80) },
+                label = stringResource(if (direction == CheckDirection.ISSUED) R.string.check_payee else R.string.check_issuer),
+                placeholder = stringResource(R.string.person_hint),
+            )
+            Spacer(Modifier.height(Spacing.md))
+            AmountWithCurrency(stringResource(R.string.amount), amount, currency, { amount = AmountInput.sanitize(it, currency) }) { pickCurrency = true }
+            Spacer(Modifier.height(Spacing.md))
+            GlassTextField(bankName, { bankName = it.take(60) }, label = stringResource(R.string.check_bank), placeholder = stringResource(R.string.check_bank_hint))
+            Spacer(Modifier.height(Spacing.md))
+            GlassTextField(sayadNumber, { sayadNumber = it.take(40) }, label = stringResource(R.string.check_number), placeholder = stringResource(R.string.check_sayad_hint))
+            Spacer(Modifier.height(Spacing.lg))
+            FieldTitle(stringResource(R.string.check_due_date))
+            GlassChip(
+                f.date(LocalDate.ofEpochDay(dueEpoch), withYear = true, withWeekday = true),
+                true,
+                { pickDate = true },
+                leading = { Icon(Icons.Rounded.CalendarMonth, null, tint = c.accent, modifier = Modifier.size(16.dp)) },
+            )
+            Spacer(Modifier.height(Spacing.lg))
+            FieldTitle(stringResource(R.string.check_remind_days))
+            FlowRow(horizontalArrangement = Arrangement.spacedBy(Spacing.sm), verticalArrangement = Arrangement.spacedBy(Spacing.sm)) {
+                listOf(0, 1, 2, 3, 7).forEach { d ->
+                    GlassChip(
+                        if (d == 0) stringResource(R.string.on_the_day) else stringResource(R.string.days_before_n, f.localizeDigits(d.toString())),
+                        remind == d,
+                        { remind = d },
+                    )
+                }
+            }
+            Spacer(Modifier.height(Spacing.lg))
+            FieldTitle(stringResource(R.string.pay_from_wallet))
+            WalletOptions(wallets.filter { it.currency == currency && !it.archived }, walletId) { walletId = it }
+            Spacer(Modifier.height(Spacing.lg))
+            GlassTextField(note, { note = it.take(500) }, placeholder = stringResource(R.string.note_optional))
+            Spacer(Modifier.height(Spacing.xl))
+            PocketButton(
+                stringResource(R.string.save),
+                {
+                    scope.launch {
+                        val now = java.time.Instant.now()
+                        container.finance.saveCheck(
+                            CheckItem(
+                                id = existing?.id ?: container.finance.newId(),
+                                title = title.ifBlank { counterparty },
+                                counterparty = counterparty,
+                                direction = direction,
+                                amountMinor = amountMinor,
+                                currency = currency,
+                                sayadNumber = sayadNumber.ifBlank { null },
+                                bankName = bankName.ifBlank { null },
+                                dueDate = LocalDate.ofEpochDay(dueEpoch),
+                                issueDate = existing?.issueDate ?: LocalDate.now(),
+                                status = existing?.status ?: CheckStatus.PENDING,
+                                reminderDays = remind,
+                                note = note.ifBlank { null },
+                                walletId = walletId,
+                                createdAt = existing?.createdAt ?: now,
+                                updatedAt = now,
+                            )
+                        )
+                        haptics.perform(HapticType.Success)
+                        onDismiss()
+                    }
+                },
+                modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp),
+                icon = Icons.Rounded.Check,
+                enabled = canSave,
+                haptic = HapticType.Confirm,
+            )
+            if (existing != null) {
+                Spacer(Modifier.height(Spacing.sm))
+                PocketButton(stringResource(R.string.delete), { confirmDelete = true }, modifier = Modifier.fillMaxWidth(), style = ButtonStyle.Text, haptic = HapticType.Warning)
+            }
+        }
+    }
+
+    if (pickCurrency) CurrencyPickerSheet(currency, { currency = it; amount = AmountInput.adapt(amount, it); walletId = null; pickCurrency = false }, { pickCurrency = false })
+    if (pickDate) CalendarDatePickerSheet(LocalDate.ofEpochDay(dueEpoch), { dueEpoch = it.toEpochDay(); pickDate = false }, { pickDate = false })
+    if (confirmDelete && existing != null) {
+        GlassDialog(
+            onDismiss = { confirmDelete = false },
+            title = stringResource(R.string.delete_check_title),
+            message = existing.title,
+            confirmText = stringResource(R.string.delete),
+            onConfirm = { confirmDelete = false; scope.launch { container.finance.deleteCheck(existing.id); onDismiss() } },
+            dismissText = stringResource(R.string.cancel),
+            destructive = true,
         )
     }
 }

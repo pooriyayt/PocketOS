@@ -1,5 +1,6 @@
 package app.pocketos.data.backup
 
+import app.pocketos.data.local.CheckEntity
 import app.pocketos.data.local.DebtEntity
 import app.pocketos.data.local.InstallmentEntity
 import app.pocketos.data.local.TransactionEntity
@@ -81,6 +82,7 @@ class BackupManager(
         val transactions = db.transactions().everything()
         val installments = db.installments().everything()
         val debts = db.debts().everything()
+        val checks = db.checks().everything()
 
         val root = buildJsonObject {
             put("format", FORMAT_NAME)
@@ -196,6 +198,27 @@ class BackupManager(
                     d.note?.let { put("note", it) }
                     put("created_at", d.createdAt)
                     put("updated_at", d.updatedAt)
+                }
+            }))
+
+            put("checks", JsonArray(checks.map { c ->
+                buildJsonObject {
+                    put("id", c.id)
+                    put("title", c.title)
+                    put("counterparty", c.counterparty)
+                    put("direction", c.direction)
+                    put("amount_minor", c.amountMinor)
+                    put("currency", c.currency)
+                    c.sayadNumber?.let { put("sayad_number", it) }
+                    c.bankName?.let { put("bank_name", it) }
+                    put("due_date", c.dueDate)
+                    c.issueDate?.let { put("issue_date", it) }
+                    put("status", c.status)
+                    put("reminder_days", c.reminderDays)
+                    c.note?.let { put("note", it) }
+                    c.walletId?.let { put("wallet_id", it) }
+                    put("created_at", c.createdAt)
+                    put("updated_at", c.updatedAt)
                 }
             }))
 
@@ -454,6 +477,28 @@ class BackupManager(
             )
         }.forEach { db.debts().upsert(it) }
 
+        root["checks"]?.jsonArray.orEmpty().mapNotNull { item ->
+            val obj = item as? JsonObject ?: return@mapNotNull null
+            CheckEntity(
+                id = obj["id"]?.jsonPrimitive?.contentOrNull ?: return@mapNotNull null,
+                title = obj["title"]?.jsonPrimitive?.contentOrNull ?: "",
+                counterparty = obj["counterparty"]?.jsonPrimitive?.contentOrNull ?: "",
+                direction = obj["direction"]?.jsonPrimitive?.contentOrNull ?: "issued",
+                amountMinor = obj["amount_minor"]?.jsonPrimitive?.longOrNull ?: return@mapNotNull null,
+                currency = obj["currency"]?.jsonPrimitive?.contentOrNull ?: "USD",
+                sayadNumber = obj["sayad_number"]?.jsonPrimitive?.contentOrNull,
+                bankName = obj["bank_name"]?.jsonPrimitive?.contentOrNull,
+                dueDate = obj["due_date"]?.jsonPrimitive?.contentOrNull ?: clock.today().toString(),
+                issueDate = obj["issue_date"]?.jsonPrimitive?.contentOrNull,
+                status = obj["status"]?.jsonPrimitive?.contentOrNull ?: "pending",
+                reminderDays = obj["reminder_days"]?.jsonPrimitive?.intOrNull ?: 3,
+                note = obj["note"]?.jsonPrimitive?.contentOrNull,
+                walletId = obj["wallet_id"]?.jsonPrimitive?.contentOrNull?.takeIf { it in walletIds },
+                createdAt = obj["created_at"]?.jsonPrimitive?.longOrNull ?: now,
+                updatedAt = obj["updated_at"]?.jsonPrimitive?.longOrNull ?: now,
+            )
+        }.forEach { db.checks().upsert(it) }
+
         BackupStats(
             remindersCount = remindersCount,
             subscriptionsCount = subscriptionsCount,
@@ -473,6 +518,7 @@ class BackupManager(
         db.transactions().clear()
         db.installments().clear()
         db.debts().clear()
+        db.checks().clear()
         db.wallets().clear()
     }
 

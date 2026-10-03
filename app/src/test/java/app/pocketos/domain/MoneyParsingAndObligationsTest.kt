@@ -120,4 +120,41 @@ class MoneyParsingAndObligationsTest {
         assertEquals(3_000_000, s.owedToMeMinor)
         assertEquals(2_400_000, s.netMinor)
     }
+
+    @Test
+    fun `check summary calculates pending issued and received checks`() {
+        fun check(id: String, dir: app.pocketos.domain.finance.CheckDirection, status: app.pocketos.domain.finance.CheckStatus, amount: Long) =
+            app.pocketos.domain.finance.CheckItem(
+                id = id,
+                title = "Check $id",
+                counterparty = "Counterparty",
+                direction = dir,
+                amountMinor = amount,
+                currency = "USD",
+                sayadNumber = null,
+                bankName = "Chase",
+                dueDate = LocalDate.of(2026, 10, 15),
+                issueDate = LocalDate.of(2026, 10, 1),
+                status = status,
+                reminderDays = 3,
+                note = null,
+                walletId = null,
+                createdAt = Instant.EPOCH,
+                updatedAt = Instant.EPOCH,
+            )
+
+        val list = listOf(
+            check("c1", app.pocketos.domain.finance.CheckDirection.ISSUED, app.pocketos.domain.finance.CheckStatus.PENDING, 1500),
+            check("c2", app.pocketos.domain.finance.CheckDirection.ISSUED, app.pocketos.domain.finance.CheckStatus.CLEARED, 500),
+            check("c3", app.pocketos.domain.finance.CheckDirection.RECEIVED, app.pocketos.domain.finance.CheckStatus.PENDING, 2200),
+        )
+
+        val s = ObligationCalculator.checkSummary(list).single()
+        assertEquals(1500, s.pendingIssuedMinor)
+        assertEquals(2200, s.pendingReceivedMinor)
+        assertEquals(500, s.clearedMinor)
+        assertEquals(700, s.netPendingMinor)
+        assertEquals(2, ObligationCalculator.upcomingChecks(list).size)
+    }
 }
+

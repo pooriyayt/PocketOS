@@ -17,12 +17,17 @@ import androidx.room.RoomDatabase
         TransactionEntity::class,
         InstallmentEntity::class,
         DebtEntity::class,
+        CheckEntity::class,
     ],
-    version = 3,
+    version = 4,
     exportSchema = true,
-    // v2 adds wallets/transactions, v3 installments/debts; Room generates the
+    // v2 adds wallets/transactions, v3 installments/debts, v4 checks; Room generates the
     // migrations from the exported schemas.
-    autoMigrations = [AutoMigration(from = 1, to = 2), AutoMigration(from = 2, to = 3)],
+    autoMigrations = [
+        AutoMigration(from = 1, to = 2),
+        AutoMigration(from = 2, to = 3),
+        AutoMigration(from = 3, to = 4),
+    ],
 )
 abstract class PocketDatabase : RoomDatabase() {
     abstract fun reminders(): ReminderDao
@@ -35,6 +40,7 @@ abstract class PocketDatabase : RoomDatabase() {
     abstract fun transactions(): TransactionDao
     abstract fun installments(): InstallmentDao
     abstract fun debts(): DebtDao
+    abstract fun checks(): CheckDao
 
     companion object {
         /** Future schema changes add Migration objects here (never destructive fallbacks). */

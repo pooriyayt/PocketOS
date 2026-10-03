@@ -14,18 +14,20 @@
 ---
 
 <p align="center">
-  <img src="docs/images/home.png" width="260" alt="Home Dashboard" />
+  <img src="docs/images/home.png" width="230" alt="Home Dashboard" />
   &nbsp;
-  <img src="docs/images/wallet.png" width="260" alt="Wallet & Balances" />
+  <img src="docs/images/wallet.png" width="230" alt="Wallet & Balances" />
   &nbsp;
-  <img src="docs/images/quick_add.png" width="260" alt="Smart Quick Add" />
+  <img src="docs/images/quick_add.png" width="230" alt="Smart Quick Add" />
 </p>
 <p align="center">
-  <img src="docs/images/installments.png" width="260" alt="Installments & Loans" />
+  <img src="docs/images/checks.png" width="230" alt="Check Management" />
   &nbsp;
-  <img src="docs/images/debts.png" width="260" alt="Debts & Receivables" />
+  <img src="docs/images/installments.png" width="230" alt="Installments & Loans" />
   &nbsp;
-  <img src="docs/images/subscriptions.png" width="260" alt="Subscriptions" />
+  <img src="docs/images/debts.png" width="230" alt="Debts & Receivables" />
+  &nbsp;
+  <img src="docs/images/subscriptions.png" width="230" alt="Subscriptions" />
 </p>
 
 [English](#english) • [فارسی](#فارسی)
@@ -58,6 +60,12 @@ There are **no accounts**, **no cloud sync servers**, and **no third-party track
 - **Multi-Calendar Engine**: Full native support for **Solar Hijri / Jalali (شمسی)**, **Islamic / Lunar Hijri (قمری)**, and **Gregorian (میلادی)** calendars with a custom date picker.
 - **Proactive Reminders**: Local scheduled notifications alert you 3 days before any installment is due and on the exact due date.
 - **Auto-Rollforward**: Automatically advances to the next month upon payment confirmation.
+
+#### 📑 Check Management & Clearance Tracking
+- **Issued & Received Checks**: Complete lifecycle tracking for Sayad and commercial bank checks (Issued / صادره and Received / دریافتی).
+- **Due-Date Proactive Alarms**: Receive automatic reminders 2-3 days before check maturity so you can ensure sufficient account balance and prevent returned checks.
+- **Interactive Clearance Prompt**: On or after the due date, PocketOS interactively asks *"Has this check cleared?"* with one-tap status updates (Pending, Cleared, Bounced).
+- **Automatic Wallet Sync**: Marking an issued check as cleared automatically logs an expense and debits the designated bank account balance.
 
 #### 🤝 Debts & Receivables Tracker
 - **"I Owe" & "Owed to Me"**: Track personal loans and borrowings with individuals or organizations.
@@ -105,6 +113,12 @@ There are **no accounts**, **no cloud sync servers**, and **no third-party track
 - **موتور تقویم سه‌گانه**: پشتیبانی کامل از **تقویم هجری شمسی (جلالی)**، **تقویم هجری قمری** و **تقویم میلادی (Gregorian)** با دیت‌پیکر اختصاصی.
 - **یادآوری هوشمند سررسید**: ارسال نوتیفیکیشن محلی ۳ روز پیش از موعد قسط و همچنین در روز سررسید.
 - **انتقال خودکار به قسط بعد**: با ثبت هر پرداخت، وضعیت وام به‌روز شده و سررسید قسط بعدی محاسبه می‌گردد.
+
+#### 📑 مدیریت و پیگیری چک‌های بانکی و صیادی
+- **چک‌های صادره و دریافتی**: ثبت چک‌های پرداختی و دریافتی با شناسه صیادی ۱۶ رقمی، نام بانک، موعد سررسید و نام شخص/شرکت طرف حساب.
+- **یادآوری هوشمند ۲ الی ۳ روز قبل از سررسید**: آلارم و نوتیفیکیشن‌های پیشگیرانه جهت تأمین موجودی حساب و جلوگیری از برگشت خوردن چک.
+- **استعلام خودکار وضعیت پاس شدن**: در روز موعد یا پس از آن، برنامه به صورت تعاملی می‌پرسد «آیا این چک پاس شد؟» تا کاربر با یک کلیک وضعیت را به «پاس شد»، «برگشت خورد» یا «در انتظار» تغییر دهد.
+- **اتصال هوشمند به کیف پول**: در صورت پاس شدن چک صادره، مبلغ آن به طور خودکار در قالب هزینه ثبت شده و از حساب بانکی متصل کسر می‌گردد.
 
 #### 🤝 مدیریت بدهی‌ها و طلب‌ها
 - **بخش اختصاصی «بدهکارم / بستانکارم»**: پیگیری مبالغی که از دیگران طلب دارید یا به آن‌ها مقروض هستید.

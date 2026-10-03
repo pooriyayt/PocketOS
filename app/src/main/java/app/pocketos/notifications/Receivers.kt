@@ -44,6 +44,7 @@ class NotificationActionReceiver : BroadcastReceiver() {
                 ACTION_COMPLETE -> container.reminders.complete(id)
                 ACTION_SNOOZE -> container.reminders.snooze(id, container.settings.current().snoozeMinutes.toLong())
                 ACTION_SNOOZE_RENEWAL -> container.notificationScheduler.snoozeRenewal(id, RENEWAL_SNOOZE_MINUTES)
+                ACTION_MARK_CHECK_CLEARED -> container.finance.markCheckStatus(id, app.pocketos.domain.finance.CheckStatus.CLEARED)
             }
             NotificationManagerCompat.from(context).cancel(notificationId)
         }
@@ -53,6 +54,7 @@ class NotificationActionReceiver : BroadcastReceiver() {
         const val ACTION_COMPLETE = "app.pocketos.action.COMPLETE"
         const val ACTION_SNOOZE = "app.pocketos.action.SNOOZE"
         const val ACTION_SNOOZE_RENEWAL = "app.pocketos.action.SNOOZE_RENEWAL"
+        const val ACTION_MARK_CHECK_CLEARED = "app.pocketos.action.MARK_CHECK_CLEARED"
         const val EXTRA_ID = "id"
         const val EXTRA_NOTIFICATION_ID = "notification_id"
         private const val RENEWAL_SNOOZE_MINUTES = 3L * 60

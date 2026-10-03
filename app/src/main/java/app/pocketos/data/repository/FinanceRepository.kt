@@ -3,9 +3,13 @@ package app.pocketos.data.repository
 import app.pocketos.core.AppClock
 import app.pocketos.data.local.DatabaseManager
 import app.pocketos.core.time.CalendarKind
+import app.pocketos.data.local.CheckEntity
 import app.pocketos.data.local.DebtEntity
 import app.pocketos.data.local.InstallmentEntity
 import app.pocketos.data.local.TransactionEntity
+import app.pocketos.domain.finance.CheckDirection
+import app.pocketos.domain.finance.CheckItem
+import app.pocketos.domain.finance.CheckStatus
 import app.pocketos.domain.finance.Debt
 import app.pocketos.domain.finance.DebtDirection
 import app.pocketos.domain.finance.FinanceCategories
@@ -211,6 +215,66 @@ class FinanceRepository(
         effects.onDebtChanged(id)
         effects.onDataChanged()
     }
+
+    // ----------------------------------------------------------------- Checks
+
+    val checks: Flow<List<CheckItem>> = databases.active.flatMapLatest { it.db.checks().observeAll() }
+        .map { list -> list.map { it.toDomain() } }
+
+    suspend fun saveCheck(check: CheckItem): CheckItem {
+        val existing = db.checks().get(check.id)
+        val now = clock.now()
+        val saved = check.copy(
+            title = check.title.trim().take(80),
+            counterparty = check.counterparty.trim().take(80),
+            sayadNumber = check.sayadNumber?.trim()?.take(40)?.ifEmpty { null },
+            bankName = check.bankName?.trim()?.take(60)?.ifEmpty { null },
+            note = check.note?.trim()?.take(500)?.ifEmpty { null },
+            reminderDays = check.reminderDays.coerceIn(0, 30),
+            createdAt = existing?.let { Instant.ofEpochMilli(it.createdAt) } ?: now,
+            updatedAt = now,
+        )
+        db.checks().upsert(saved.toEntity())
+        effects.onCheckChanged(saved.id)
+        effects.onDataChanged()
+        return saved
+    }
+
+    suspend fun markCheckStatus(id: String, status: CheckStatus, walletId: String? = null) {
+        val check = db.checks().get(id)?.toDomain() ?: return
+        val wasPending = check.isPending
+        val now = clock.now()
+        db.checks().updateStatus(id, status.wire, now.toEpochMilli())
+        val targetWallet = walletId ?: check.walletId
+        if (wasPending && status == CheckStatus.CLEARED && targetWallet != null && db.wallets().get(targetWallet) != null) {
+            val isIssued = check.direction == CheckDirection.ISSUED
+            val cat = if (isIssued) FinanceCategories.DEBT_PAID else FinanceCategories.DEBT_RECEIVED
+            val note = (if (isIssued) "وصول چک پرداختی: " else "وصول چک دریافتی: ") + check.title.ifEmpty { check.counterparty }
+            saveTransaction(
+                Transaction(
+                    newId(),
+                    if (isIssued) TxType.EXPENSE else TxType.INCOME,
+                    check.amountMinor,
+                    check.currency,
+                    targetWallet,
+                    null,
+                    cat,
+                    note,
+                    clock.today(),
+                    now,
+                    now,
+                )
+            )
+        }
+        effects.onCheckChanged(id)
+        effects.onDataChanged()
+    }
+
+    suspend fun deleteCheck(id: String) {
+        db.checks().delete(id)
+        effects.onCheckChanged(id)
+        effects.onDataChanged()
+    }
 }
 
 fun InstallmentEntity.toDomain() = InstallmentPlan(
@@ -330,3 +394,42 @@ fun Transaction.toEntity() = TransactionEntity(
     createdAt = createdAt.toEpochMilli(),
     updatedAt = updatedAt.toEpochMilli(),
 )
+
+fun CheckEntity.toDomain() = CheckItem(
+    id = id,
+    title = title,
+    counterparty = counterparty,
+    direction = CheckDirection.fromWire(direction),
+    amountMinor = amountMinor,
+    currency = currency,
+    sayadNumber = sayadNumber,
+    bankName = bankName,
+    dueDate = runCatching { LocalDate.parse(dueDate) }.getOrElse { LocalDate.now() },
+    issueDate = issueDate?.let { runCatching { LocalDate.parse(it) }.getOrNull() },
+    status = CheckStatus.fromWire(status),
+    reminderDays = reminderDays,
+    note = note,
+    walletId = walletId,
+    createdAt = Instant.ofEpochMilli(createdAt),
+    updatedAt = Instant.ofEpochMilli(updatedAt),
+)
+
+fun CheckItem.toEntity() = CheckEntity(
+    id = id,
+    title = title,
+    counterparty = counterparty,
+    direction = direction.wire,
+    amountMinor = amountMinor,
+    currency = currency,
+    sayadNumber = sayadNumber,
+    bankName = bankName,
+    dueDate = dueDate.toString(),
+    issueDate = issueDate?.toString(),
+    status = status.wire,
+    reminderDays = reminderDays,
+    note = note,
+    walletId = walletId,
+    createdAt = createdAt.toEpochMilli(),
+    updatedAt = updatedAt.toEpochMilli(),
+)
+

@@ -15,6 +15,9 @@ interface SideEffects {
 
     suspend fun onDebtChanged(id: String) {}
 
+    /** A check changed: reschedule its due-date reminder notification. */
+    suspend fun onCheckChanged(id: String) {}
+
     /** Any user data changed: refresh widgets and schedule a sync. */
     fun onDataChanged() {}
 

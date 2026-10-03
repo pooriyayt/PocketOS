@@ -169,6 +169,7 @@ private fun MainScaffold(settings: AppSettings, deepLinks: StateFlow<Uri?>, onDe
                     composable<Routes.Wallet> { WalletScreen(nav) }
                     composable<Routes.Installments> { app.pocketos.ui.screens.finance.InstallmentsScreen(nav) }
                     composable<Routes.Debts> { app.pocketos.ui.screens.finance.DebtsScreen(nav) }
+                    composable<Routes.Checks> { app.pocketos.ui.screens.finance.ChecksScreen(nav) }
                     composable<Routes.Support> { app.pocketos.ui.screens.support.SupportScreen(nav) }
                     composable<Routes.Insights> { InsightsScreen(nav) }
                     composable<Routes.Settings> { SettingsScreen(nav) }
@@ -260,6 +261,7 @@ private fun handleDeepLink(uri: Uri, nav: NavHostController, ui: AppUiController
         "wallet" -> nav.navigate(Routes.Wallet) { launchSingleTop = true }
         "installments" -> nav.navigate(Routes.Installments) { launchSingleTop = true }
         "debts" -> nav.navigate(Routes.Debts) { launchSingleTop = true }
+        "checks" -> nav.navigate(Routes.Checks) { launchSingleTop = true }
         "support" -> nav.navigate(Routes.Support) { launchSingleTop = true }
         "add" -> when (uri.getQueryParameter("type")) {
             "reminder" -> nav.navigate(Routes.ReminderEditor())
