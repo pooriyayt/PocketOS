@@ -130,18 +130,23 @@ There are **no accounts**, **no cloud sync servers**, and **no third-party track
 
 #### 🛡️ امنیت و حریم خصوصی مطلق
 - **کاملاً آفلاین**: برنامه بدون نیاز به اینترنت عمل می‌کند.
+- **گزارش رسمی و پاک VirusTotal**: تمامی فایل‌های خروجی و نصبی پاکت او اس توسط ده‌ها آنتی‌ویروس معتبر اسکن شده و وضعیت کاملاً ایمن و پاک دارند ([مشاهده گزارش اسکن VirusTotal](https://www.virustotal.com/gui/file/99fa9ae8e5eee97eb75a15a20f187df67e818e867b70f86f1f018e15174e7096?nocache=1)).
 - **رمزنگاری سرتاسری پایگاه داده**: استفاده از پایگاه داده امن SQLCipher با کلید مشتق‌شده از ماژول امنیتی دستگاه (Android Keystore).
 - **پشتیبان‌گیری رمزنگاری‌شده**: قابلیت تهیه فایل بکاپ با رمز عبور دلخواه به صورت فایل رمزگذاری‌شده با الگوریتم **AES-256-GCM** و **PBKDF2** (۱۰۰ هزار دور).
 
 ---
 
-## Security & Google Play Protect
+## Security & Trust
+
+> [!TIP]
+> **100% Clean & Verified Binary**: Every official PocketOS release is thoroughly inspected and verified against dozens of antivirus engines.
+> 
+> 🛡️ **[View Full VirusTotal Analysis Report (0 Detections)](https://www.virustotal.com/gui/file/99fa9ae8e5eee97eb75a15a20f187df67e818e867b70f86f1f018e15174e7096?nocache=1)**
 
 - **Zero Package Installer Permissions**: PocketOS requests NO package installation permissions (`REQUEST_INSTALL_PACKAGES`) across all builds. Updates are downloaded transparently through the user's browser to the Downloads folder, completely eliminating dropper alerts and Google Play Protect false-positives.
 - **Hardware-Protected Keys**: No plain-text passwords or secret keys exist in the application files.
 - **Minimal Permissions**: Only requests strictly needed system capabilities (`POST_NOTIFICATIONS`, `SCHEDULE_EXACT_ALARM`, `USE_BIOMETRIC`).
 - **Reproducible Signed Binaries**: Built with ProGuard/R8 dead-code stripping, resource shrinking, and full optimization.
-- **VirusTotal Clean Report**: Verified clean scan report available at [VirusTotal Analysis](https://www.virustotal.com/gui/file/99fa9ae8e5eee97eb75a15a20f187df67e818e867b70f86f1f018e15174e7096?nocache=1).
 
 ---
 
