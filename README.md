@@ -12,6 +12,20 @@
 [![VirusTotal](https://img.shields.io/badge/VirusTotal-Clean%20Scan-brightgreen.svg)](https://www.virustotal.com/gui/file/99fa9ae8e5eee97eb75a15a20f187df67e818e867b70f86f1f018e15174e7096?nocache=1)
 [![Release](https://img.shields.io/github/v/release/pooriyayt/PocketOS?include_prereleases&color=emerald)](https://github.com/pooriyayt/PocketOS/releases)
 
+<br/>
+
+### 📥 دانلود و دریافت / Download
+
+<p align="center">
+  <a href="https://myket.ir/app/app.pocketos">
+    <img src="https://img.shields.io/badge/دریافت_از_مایکت-Get_it_on_Myket-1877F2?style=for-the-badge&logo=android&logoColor=white" height="42" alt="دانلود از مایکت | Download on Myket" />
+  </a>
+  &nbsp;&nbsp;
+  <a href="https://github.com/pooriyayt/PocketOS/releases/tag/v1.4.1">
+    <img src="https://img.shields.io/badge/Get_it_on-GitHub-181717?style=for-the-badge&logo=github&logoColor=white" height="42" alt="دریافت از گیت‌هاب | Get it on GitHub" />
+  </a>
+</p>
+
 ---
 
 <p align="center">
