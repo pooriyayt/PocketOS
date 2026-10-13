@@ -236,12 +236,11 @@ The compiled APK will be located in:
 ## License
 
 ```
-Copyright 2026 Pouriya Parniyan and PocketOS Contributors
+Copyright (c) 2026 Pouriya Parniyan. All rights reserved.
 
-Licensed under the PolyForm Noncommercial License 1.0.0.
-Personal use, study, and research are permitted. Commercial use,
-unauthorized rebranding, and republishing to public app stores
-(Google Play, Myket, Bazaar, etc.) are strictly prohibited.
+PocketOS is source-available for security auditing and personal, non-commercial use only.
+Commercial exploitation, unauthorized redistribution, rebranding, and publishing to app stores
+(Google Play, Myket, Cafe Bazaar, etc.) are strictly prohibited.
 
-See the LICENSE file for details.
+See the LICENSE file for full legal terms.
 ```

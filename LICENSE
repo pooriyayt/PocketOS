@@ -1,15 +1,24 @@
-PolyForm Noncommercial License 1.0.0
+PocketOS Source-Available License
 
-https://polyformproject.org/licenses/noncommercial/1.0.0
+Copyright (c) 2026 Pouriya Parniyan. All rights reserved.
 
-Copyright 2026 Pouriya Parniyan and PocketOS Contributors.
+This software and its associated source code, design assets, and documentation (the "Software") are made available for viewing, security auditing, and personal non-commercial evaluation only. 
 
-Permission is hereby granted to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, and evaluate the Software, subject to the following conditions:
+By accessing, downloading, or using the Software, you agree to the following terms:
 
-1. Noncommercial Purpose Only: You may run, modify, and build the Software only for personal, educational, research, or other Noncommercial Purposes. Commercial use, commercial distribution, selling, sublicensing, or charging for access to the Software or services based on the Software is strictly prohibited without explicit written permission from the copyright owner.
+1. PERMITTED USES
+   - You may view, audit, inspect, and fork the source code for personal educational and security verification purposes.
+   - You may compile and run the Software locally on your own personal devices solely for private, non-commercial use.
 
-2. No Unauthorized App Store Distribution: You may not distribute, publish, package, or monetize this Software or any derivative work on any public application store or marketplace (including but not limited to Google Play, Myket, Cafe Bazaar, F-Droid, or Apple App Store) under your own or any other name without prior written consent from the author.
+2. PROHIBITED USES & RESTRICTIONS
+   Without explicit, prior written authorization from the copyright holder (Pouriya Parniyan), you are strictly prohibited from:
+   - Publishing, republishing, distributing, sublicensing, leasing, or transferring the Software or any derivative work in whole or in part, in source or compiled binary format (including but not limited to APK, AAB, or jar files).
+   - Packaging, repackaging, cloning, or distributing the Software or any modified version thereof on any public or private app marketplace, digital store, or software directory, including but not limited to Google Play Store, Myket, Cafe Bazaar, F-Droid, or Apple App Store.
+   - Rebranding, modifying trademarks, logos, app identifiers, package names, or removing any proprietary copyright and ownership notices.
+   - Utilizing any part of the Software for commercial purposes, including selling, monetization, displaying third-party advertising networks for commercial profit, or offering paid hosted services based on the Software.
 
-3. Notice: You must retain the above copyright notice, this list of conditions, and the following disclaimer in all copies or substantial portions of the Software.
+3. INTELLECTUAL PROPERTY & ENFORCEMENT
+   All rights, title, interest, and intellectual property in and to the Software remain exclusively with Pouriya Parniyan. Any unauthorized reproduction, redistribution, store deployment, or commercial exploitation constitutes copyright infringement and will be subject to immediate legal action and statutory takedown notices, including Digital Millennium Copyright Act (DMCA) requests submitted to hosting providers and app store operators.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+4. DISCLAIMER OF WARRANTY
+   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND NON-INFRINGEMENT. IN NO EVENT SHALL THE COPYRIGHT HOLDER BE LIABLE FOR ANY CLAIM, DAMAGES, OR OTHER LIABILITY ARISING FROM, OUT OF, OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
