@@ -17,8 +17,57 @@ By accessing, downloading, or using the Software, you agree to the following ter
    - Rebranding, modifying trademarks, logos, app identifiers, package names, or removing any proprietary copyright and ownership notices.
    - Utilizing any part of the Software for commercial purposes, including selling, monetization, displaying third-party advertising networks for commercial profit, or offering paid hosted services based on the Software.
 
-3. INTELLECTUAL PROPERTY & ENFORCEMENT
+3. CONTRIBUTIONS
+   Any contribution, pull request, bug fix, patch, feature enhancement, code, or documentation submitted by you to this repository or to the copyright holder shall be deemed an irrevocable, perpetual, worldwide, non-exclusive, royalty-free, transferable, and sublicensable assignment of license to Pouriya Parniyan. The copyright holder may incorporate, modify, distribute, or license your contributions as part of the Software or any derivative commercial or non-commercial product without any obligation of compensation, accounting, or separate prior consent.
+
+4. INTELLECTUAL PROPERTY & ENFORCEMENT
    All rights, title, interest, and intellectual property in and to the Software remain exclusively with Pouriya Parniyan. Any unauthorized reproduction, redistribution, store deployment, or commercial exploitation constitutes copyright infringement and will be subject to immediate legal action and statutory takedown notices, including Digital Millennium Copyright Act (DMCA) requests submitted to hosting providers and app store operators.
 
-4. DISCLAIMER OF WARRANTY
+5. TERMINATION
+   Any breach or violation of the terms, conditions, or restrictions set forth in this License shall immediately and automatically terminate all your rights to access, inspect, fork, compile, build, or run the Software. Upon termination, you must promptly destroy and delete all copies and derivative works of the Software in your possession or control.
+
+6. DISCLAIMER OF WARRANTY
    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND NON-INFRINGEMENT. IN NO EVENT SHALL THE COPYRIGHT HOLDER BE LIABLE FOR ANY CLAIM, DAMAGES, OR OTHER LIABILITY ARISING FROM, OUT OF, OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+================================================================================
+                           ترجمه فارسی مجوز پاکت‌او‌اس
+================================================================================
+
+سلب مسئولیت قانونی:
+این ترجمه فارسی صرفاً جهت درک بهتر و راهنمایی کاربران فارسی‌زبان ارائه شده است.
+تنها نسخه انگلیسی فوق دارای اعتبار قانونی، حقوقی و رسمی بوده و در تمامی محاکم و
+مراجع قضایی و استعلام‌های حقوقی (از جمله درخواست‌های DMCA) ملاک عمل می‌باشد.
+
+--------------------------------------------------------------------------------
+
+مجوز دسترسی به سورس‌کد پاکت‌او‌اس (Source-Available)
+
+حقوق نشر (کپی‌رایت) © ۲۰۲۶ پوریا پرنیان. تمامی حقوق محفوظ است.
+
+این نرم‌افزار، سورس‌کدها، طرح‌های بصری و مستندات مربوط به آن ("نرم‌افزار") صرفاً جهت
+مشاهده، بررسی‌های امنیتی و ارزیابی شخصی غیرتجاری در دسترس قرار گرفته است.
+
+با دسترسی، دانلود، فورک یا استفاده از این نرم‌افزار، شما صراحتاً با شرایط زیر موافقت می‌کنید:
+
+۱. کاربردهای مجاز
+   - شما مجازید سورس‌کد را صرفاً برای اهداف آموزشی، بازبینی، تحلیل و بررسی‌های امنیتی مشاهده، ارزیابی و فورک کنید.
+   - شما مجازید نرم‌افزار را به صورت محلی و اختصاصی روی دستگاه‌های شخصی خود کامپایل کرده و تنها برای مصارف شخصی و غیرتجاری اجرا نمایید.
+
+۲. موارد ممنوعه و محدودیت‌ها
+   بدون دریافت مجوز کتبی و قبلی از دارنده حق کپی‌رایت (پوریا پرنیان)، انجام موارد زیر اکیداً ممنوع و غیرقانونی است:
+   - انتشار، بازنشر، توزیع، اعطای مجوز فرعی (ساب‌لایسنس)، اجاره یا انتقال تمام یا بخشی از این نرم‌افزار یا آثار مشتق‌شده از آن، چه در قالب سورس‌کد و چه در قالب باینری کامپایل‌شده (شامل فایل‌های APK، AAB یا JAR).
+   - پکیج‌بندی، ریپکیج (Re-package)، کلون‌سازی یا انتشار نرم‌افزار و هرگونه نسخه تغییریافته آن در کلیه استورها و بازارهای عمومی یا خصوصی اپلیکیشن (از جمله گوگل پلی، مایکت، کافه‌بازار، اف‌دروید، اپ استور اپل یا هر مارکت دیگر).
+   - تغییر نام تجاری (ری‌برندینگ)، تغییر لوگوها، علائم تجاری، نام پکیج (Package Name)، شناسه برنامه یا حذف هرگونه اعلامیه مالکیت معنوی و کپی‌رایت.
+   - استفاده تجاری از هر بخش این پروژه، از جمله فروش، کسب درآمد، ادغام با شبکه‌های تبلیغاتی به منظور سود مالی، یا ارائه خدمات پولی میزبانی‌شده بر پایه این نرم‌افزار.
+
+۳. مشارکت‌ها و ارسالی‌ها (Contributions)
+   هرگونه کد، رفع باگ، قابلیت جدید، پول‌ریکوئست (PR) یا مستنداتی که توسط شما به این مخزن یا به شخص مؤلف ارسال شود، به صورت دائمی، جهانی، انحصاری در بهره‌برداری، غیرقابل‌فسخ، بدون حق امتیاز (Royalty-Free) و قابل‌انتقال به پوریا پرنیان واگذار می‌گردد. دارنده حق کپی‌رایت مجاز است بدون نیاز به کسب اجازه مجدد یا پرداخت هرگونه وجه، این مشارکت‌ها را در نرم‌افزار اصلی، نسخه‌های تجاری یا سایر پروژه‌های خود ادغام و منتشر کند.
+
+۴. مالکیت معنوی و پیگیری حقوقی
+   تمامی حقوق مادی و معنوی، عنوان، مالکیت و امتیازات این نرم‌افزار منحصراً متعلق به پوریا پرنیان است. هرگونه استفاده غیرمجاز، بازنشر یا انتشار در استورها نقض آشکار کپی‌رایت تلقی شده و بلافاصله مشمول پیگرد قانونی و اخطاریه‌های توقف فعالیت (از جمله درخواست‌های رسمی DMCA به استورها و ارائه‌دهندگان میزبانی) خواهد شد.
+
+۵. فسخ مجوز (Termination)
+   هرگونه تخطی یا نقض شرایط و محدودیت‌های این مجوز، فوراً و به طور خودکار کلیه حقوق شما در زمینه دسترسی، مشاهده، فورک، کامپایل و اجرای نرم‌افزار را باطل و فسخ می‌کند. در صورت فسخ، شما موظفید بلافاصله کلیه نسخه‌ها و مشتقات نرم‌افزار را که در اختیارتان قرار دارد حذف و معدوم نمایید.
+
+۶. سلب ضمانت (Disclaimer of Warranty)
+   این نرم‌افزار "به همان صورت که هست" (AS IS) و بدون هرگونه ضمانت صریح یا ضمنی (از جمله ضمانت کارایی، قابلیت فروش، یا تناسب برای هدفی خاص) ارائه می‌شود. دارنده حق کپی‌رایت تحت هیچ شرایطی مسئولیتی در قبال خسارات احتمالی، مستقیم یا غیرمستقیم ناشی از استفاده یا عدم توانایی در استفاده از این نرم‌افزار نخواهد داشت.
