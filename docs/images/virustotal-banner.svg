@@ -27,7 +27,7 @@
   </g>
 
   <!-- Title & Subtitle -->
-  <text x="130" y="47" fill="#FFFFFF" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="20" font-weight="700">VirusTotal Verified Clean • 0 / 71 Detections</text>
+  <text x="130" y="47" fill="#FFFFFF" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="20" font-weight="700">VirusTotal Verified Clean • 0 / 66 Detections</text>
   <text x="130" y="74" fill="#94A3B8" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="13" font-weight="500">Official Release v1.5.1 • 100% Offline • Hardware-Backed Keystore • No Droppers</text>
 
   <!-- Right Pill Button "View Report →" -->
