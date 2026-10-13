@@ -86,6 +86,19 @@ There are **no accounts**, **no cloud sync servers**, and **no third-party track
 - **Interactive Clearance Prompt**: On or after the due date, PocketOS interactively asks *"Has this check cleared?"* with one-tap status updates (Pending, Cleared, Bounced).
 - **Automatic Wallet Sync**: Marking an issued check as cleared automatically logs an expense and debits the designated bank account balance.
 
+#### 👥 Smart Bill & Group Trip Splitter (محاسبه دنگ)
+- **Equitable Group Settlement**: Log shared group expenses during trips, parties, and dinners with customizable payer and participant distribution.
+- **Optimized Debt Solver**: Uses an algorithmic greedy simplification model to eliminate circular debts and settle all balances with the minimum number of transactions.
+- **Direct Debts Integration**: Export final settlement debts directly into your "Debts & Receivables" tracker with a single tap.
+- **Offline Session Persistence**: Group members and expense data persist safely in local storage across sessions.
+
+#### 📈 30-Day Predictive Cash Flow & Shortfall Alert
+- **Automated Balance Forecast**: Projects your net balance across bank accounts over the next 30 days based on scheduled checks, loan installments, and recurring subscriptions.
+- **Deficit Warning**: Proactively warns you when scheduled commitments exceed incoming cash flow to prevent account overdrafts.
+
+#### ⚡ Android Quick Settings Tile
+- **Instant System Shade Access**: Pull down the notification shade and tap the PocketOS tile to instantly launch the natural language Quick Add sheet from anywhere in Android.
+
 #### 🤝 Debts & Receivables Tracker
 - **"I Owe" & "Owed to Me"**: Track personal loans and borrowings with individuals or organizations.
 - **Partial Repayments**: Record progressive partial payments, maintain repayment logs, and update balances dynamically.
@@ -138,6 +151,19 @@ There are **no accounts**, **no cloud sync servers**, and **no third-party track
 - **یادآوری هوشمند ۲ الی ۳ روز قبل از سررسید**: آلارم و نوتیفیکیشن‌های پیشگیرانه جهت تأمین موجودی حساب و جلوگیری از برگشت خوردن چک.
 - **استعلام خودکار وضعیت پاس شدن**: در روز موعد یا پس از آن، برنامه به صورت تعاملی می‌پرسد «آیا این چک پاس شد؟» تا کاربر با یک کلیک وضعیت را به «پاس شد»، «برگشت خورد» یا «در انتظار» تغییر دهد.
 - **اتصال هوشمند به کیف پول**: در صورت پاس شدن چک صادره، مبلغ آن به طور خودکار در قالب هزینه ثبت شده و از حساب بانکی متصل کسر می‌گردد.
+
+#### 👥 دستیار هوشمند دنگ و سفر (Smart Bill Splitter)
+- **تقسیم عادلانه و هوشمند مخارج**: ثبت کلیه هزینه‌های مشترک در سفرها، دورهمی‌ها و خریدهای گروهی با تعیین دقیق پرداخت‌کننده و افراد سهیم.
+- **الگوریتم بهینه‌سازی تسویه**: محاسبه کمترین تعداد جابجایی پول میان افراد جهت بستن کامل بدهی‌ها بدون پیچیدگی و سردرگمی.
+- **انتقال مستقیم به دفتر طلب و بدهی**: ثبت مستقیم تسویه‌های نهایی در بخش «طلب و بدهی» برنامه تنها با یک لمس.
+- **ذخیره‌سازی پایدار و آفلاین**: ذخیره خودکار افراد و خرج‌ها روی گوشی بدون پاک شدن هنگام خروج از صفحه.
+
+#### 📈 پیش‌بینی ۳۰ روزه جریان نقدینگی و هشدار کسری حساب
+- **شبیه‌سازی مانده حساب‌های بانکی**: تحلیل هوشمند موجودی کیف پول‌ها در ۳۰ روز آینده با در نظر گرفتن چک‌های سررسید نزدیک، اقساط وام‌ها و تمدید اشتراک‌ها.
+- **هشدار زودهنگام کسری موجودی**: آگاه‌سازی شما در صورتی که مجموع تعهدات آتی از دریافتی‌ها بیشتر باشد تا مانع از برگشت خوردن چک یا کسری حساب شوید.
+
+#### ⚡ کاشی دسترسی سریع اندروید (Quick Settings Tile)
+- **دسترسی سریع از نوار اعلانات**: افزودن کاشی PocketOS به بخش تنظیمات سریع بالای گوشی جهت ثبت فوری تراکنش، یادآور یا تسویه از هر کجای سیستم‌عامل.
 
 #### 🤝 مدیریت بدهی‌ها و طلب‌ها
 - **بخش اختصاصی «بدهکارم / بستانکارم»**: پیگیری مبالغی که از دیگران طلب دارید یا به آن‌ها مقروض هستید.
