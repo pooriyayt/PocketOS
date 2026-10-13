@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 460 52" width="460" height="52">
+  <defs>
+    <linearGradient id="faBtnGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0091EA"/>
+      <stop offset="100%" stop-color="#0071F0"/>
+    </linearGradient>
+  </defs>
+  <!-- Background pill button -->
+  <rect x="1" y="1" width="458" height="50" rx="25" fill="url(#faBtnGrad)" stroke="#38BDF8" stroke-width="1.2"/>
+  
+  <!-- Content: Icon + Crisp Text -->
+  <g fill="#FFFFFF">
+    <!-- Book emoji / icon -->
+    <text x="24" y="34" font-size="22">📖</text>
+    
+    <!-- Clean Persian text rendered with system fallback fonts -->
+    <text x="56" y="33" font-family="IRANSans, Vazirmatn, 'Segoe UI', Tahoma, Arial, sans-serif" font-size="16" font-weight="700">برای مطالعه توضیحات به زبان فارسی کلیک کنید</text>
+  </g>
+</svg>
