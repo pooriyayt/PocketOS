@@ -2,6 +2,8 @@ package app.pocketos.ui.screens.finance
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -83,6 +85,7 @@ import app.pocketos.ui.design.GlassIconButton
 import app.pocketos.ui.design.GlassLevel
 import app.pocketos.ui.design.GlassTextField
 import app.pocketos.ui.design.PocketButton
+import app.pocketos.ui.design.glass
 import app.pocketos.ui.format.LocalFormatter
 import app.pocketos.ui.theme.LocalPocketColors
 import app.pocketos.ui.theme.Shapes
@@ -330,23 +333,34 @@ fun BillSplitterScreen(nav: NavController) {
                 members.forEach { m ->
                     val displayName = resolveMemberName(m)
                     if (m.isSelf) {
-                        // Current user ("من (شما)") - Highlighted chip, cannot be deleted
+                        // Current user ("من (شما)") - Vibrant accent glass pill, non-deletable
                         Box(
                             modifier = Modifier
                                 .clip(Shapes.pill)
+                                .glass(GlassLevel.L1, Shapes.pill)
                                 .background(c.accent.copy(alpha = if (c.isDark) 0.22f else 0.12f))
                                 .border(1.dp, c.accent.copy(alpha = 0.5f), Shapes.pill)
-                                .padding(horizontal = Spacing.md, vertical = Spacing.sm),
+                                .padding(horizontal = Spacing.md, vertical = 6.dp),
                             contentAlignment = Alignment.Center,
                         ) {
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Icon(
-                                    Icons.Rounded.Person,
-                                    contentDescription = null,
-                                    tint = c.accent,
-                                    modifier = Modifier.size(16.dp),
-                                )
-                                Spacer(Modifier.width(6.dp))
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(Spacing.xs),
+                            ) {
+                                Box(
+                                    modifier = Modifier
+                                        .size(22.dp)
+                                        .clip(CircleShape)
+                                        .background(c.accent.copy(alpha = if (c.isDark) 0.35f else 0.25f)),
+                                    contentAlignment = Alignment.Center,
+                                ) {
+                                    Icon(
+                                        Icons.Rounded.Person,
+                                        contentDescription = null,
+                                        tint = if (c.isDark) c.accentHighlight else c.accent,
+                                        modifier = Modifier.size(14.dp),
+                                    )
+                                }
                                 Text(
                                     displayName,
                                     style = MaterialTheme.typography.labelLarge,
@@ -356,38 +370,68 @@ fun BillSplitterScreen(nav: NavController) {
                             }
                         }
                     } else {
-                        // Companion member - Can be deleted
+                        // Companion member - Stylish tinted glass pill with initial avatar and neat close button
                         Box(
                             modifier = Modifier
                                 .clip(Shapes.pill)
-                                .background(if (c.isDark) Color.White.copy(alpha = 0.08f) else Color.Black.copy(alpha = 0.04f))
-                                .border(1.dp, c.glassBorder, Shapes.pill)
-                                .padding(start = Spacing.md, end = Spacing.xs, top = Spacing.xs, bottom = Spacing.xs),
+                                .glass(GlassLevel.L1, Shapes.pill)
+                                .background(c.tones.blue.copy(alpha = if (c.isDark) 0.18f else 0.10f))
+                                .border(1.dp, c.tones.blue.copy(alpha = if (c.isDark) 0.40f else 0.25f), Shapes.pill)
+                                .padding(start = Spacing.sm, end = 8.dp, top = 5.dp, bottom = 5.dp),
                             contentAlignment = Alignment.Center,
                         ) {
-                            Row(verticalAlignment = Alignment.CenterVertically) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(Spacing.xs),
+                            ) {
+                                // Avatar circle with first letter
+                                Box(
+                                    modifier = Modifier
+                                        .size(22.dp)
+                                        .clip(CircleShape)
+                                        .background(c.tones.blue.copy(alpha = if (c.isDark) 0.30f else 0.20f)),
+                                    contentAlignment = Alignment.Center,
+                                ) {
+                                    Text(
+                                        displayName.take(1).uppercase(f.locale),
+                                        style = MaterialTheme.typography.labelSmall,
+                                        fontWeight = FontWeight.Bold,
+                                        color = if (c.isDark) Color(0xFF93C5FD) else c.tones.blue,
+                                    )
+                                }
+
                                 Text(
                                     displayName,
                                     style = MaterialTheme.typography.labelLarge,
-                                    fontWeight = FontWeight.Medium,
+                                    fontWeight = FontWeight.SemiBold,
                                     color = c.textPrimary,
                                 )
-                                Spacer(Modifier.width(4.dp))
-                                GlassIconButton(
-                                    icon = Icons.Rounded.Close,
-                                    contentDescription = stringResource(R.string.split_delete_member),
-                                    onClick = {
-                                        val hasExpenses = expenses.any { it.paidById == m.id || it.participantIds.contains(m.id) }
-                                        if (hasExpenses) {
-                                            memberToDelete = m
-                                        } else {
-                                            scope.launch { container.billSplitter.removeMember(m.id) }
-                                        }
-                                    },
-                                    size = 28.dp,
-                                    tint = c.textSecondary,
-                                    level = GlassLevel.L1,
-                                )
+
+                                Spacer(Modifier.width(2.dp))
+
+                                // Minimalist Circular Delete (X) Button
+                                Box(
+                                    modifier = Modifier
+                                        .size(20.dp)
+                                        .clip(CircleShape)
+                                        .background(if (c.isDark) Color.White.copy(alpha = 0.15f) else Color.Black.copy(alpha = 0.08f))
+                                        .clickable {
+                                            val hasExpenses = expenses.any { it.paidById == m.id || it.participantIds.contains(m.id) }
+                                            if (hasExpenses) {
+                                                memberToDelete = m
+                                            } else {
+                                                scope.launch { container.billSplitter.removeMember(m.id) }
+                                            }
+                                        },
+                                    contentAlignment = Alignment.Center,
+                                ) {
+                                    Icon(
+                                        Icons.Rounded.Close,
+                                        contentDescription = stringResource(R.string.split_delete_member),
+                                        tint = c.textSecondary,
+                                        modifier = Modifier.size(12.dp),
+                                    )
+                                }
                             }
                         }
                     }
