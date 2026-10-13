@@ -32,10 +32,9 @@ android {
         buildConfigField("String", "ADIVERY_APP_ID", "\"$adiveryAppId\"")
         buildConfigField("String", "ADIVERY_REWARDED_PLACEMENT", "\"$adiveryRewarded\"")
         buildConfigField("String", "ADIVERY_NATIVE_PLACEMENT", "\"$adiveryNative\"")
+        buildConfigField("boolean", "SELF_UPDATE", "true")
     }
 
-    // Release signing comes from signing.properties (git-ignored, never committed):
-    //   storeFile=..., storePassword=..., keyAlias=..., keyPassword=...
     val signingProps = Properties().apply {
         val f = rootProject.file("signing.properties")
         if (f.exists()) f.inputStream().use { load(it) }
@@ -51,22 +50,6 @@ android {
                 enableV2Signing = true
                 enableV3Signing = true
             }
-        }
-    }
-
-    // myket:  store build (Myket) - updates come from the store, so no self-updater and
-    //         no install-packages / internet permission. Nothing in it looks like a
-    //         dropper to Play Protect or antivirus heuristics.
-    // github: sideloaded build that updates itself from official GitHub releases.
-    flavorDimensions += "distribution"
-    productFlavors {
-        create("myket") {
-            dimension = "distribution"
-            buildConfigField("boolean", "SELF_UPDATE", "false")
-        }
-        create("github") {
-            dimension = "distribution"
-            buildConfigField("boolean", "SELF_UPDATE", "true")
         }
     }
 

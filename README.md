@@ -7,7 +7,7 @@
 *100% Local-First. Zero Cloud Tracking. Hardware-Backed Encryption.*
 
 [![Platform](https://img.shields.io/badge/Platform-Android%208.0%2B-brightgreen.svg)](https://developer.android.com)
-[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
+[![License](https://img.shields.io/badge/License-Noncommercial-blue.svg)](LICENSE)
 [![Privacy](https://img.shields.io/badge/Privacy-100%25%20Local--First-emerald.svg)](#privacy--security)
 [![VirusTotal](https://img.shields.io/badge/VirusTotal-Clean%20Scan-brightgreen.svg)](https://www.virustotal.com/gui/file/9d9bc3b53e5ede7282fa0f7468994b337e4dedd49ed47ec9402a8fa65406d37c/detection)
 [![Release](https://img.shields.io/github/v/release/pooriyayt/PocketOS?include_prereleases&color=emerald)](https://github.com/pooriyayt/PocketOS/releases)
@@ -213,16 +213,12 @@ cd PocketOS
 # Build debug APK
 ./gradlew assembleDebug
 
-# Build release APKs (Standard Clean Flavor)
-./gradlew assembleMyketRelease
-
-# Build release APKs (GitHub Self-Updating Flavor)
-./gradlew assembleGithubRelease
+# Build unified release APK (Self-Updating & Store Ready)
+./gradlew assembleRelease
 ```
 
-The compiled APKs will be located in:
-- `app/build/outputs/apk/myket/release/app-myket-release.apk`
-- `app/build/outputs/apk/github/release/app-github-release.apk`
+The compiled APK will be located in:
+- `app/build/outputs/apk/release/app-release.apk`
 
 ---
 
@@ -240,17 +236,12 @@ The compiled APKs will be located in:
 ## License
 
 ```
-Copyright 2026 PocketOS Contributors
+Copyright 2026 Pouriya Parniyan and PocketOS Contributors
 
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
+Licensed under the PolyForm Noncommercial License 1.0.0.
+Personal use, study, and research are permitted. Commercial use,
+unauthorized rebranding, and republishing to public app stores
+(Google Play, Myket, Bazaar, etc.) are strictly prohibited.
 
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
+See the LICENSE file for details.
 ```
