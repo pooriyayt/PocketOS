@@ -11,8 +11,15 @@
 [![Privacy](https://img.shields.io/badge/Privacy-100%25%20Local--First-emerald.svg)](#privacy--security)
 [![VirusTotal](https://img.shields.io/badge/VirusTotal-Clean%20Scan-brightgreen.svg)](https://www.virustotal.com/gui/file/9d9bc3b53e5ede7282fa0f7468994b337e4dedd49ed47ec9402a8fa65406d37c/detection)
 [![Release](https://img.shields.io/github/v/release/pooriyayt/PocketOS?include_prereleases&color=emerald)](https://github.com/pooriyayt/PocketOS/releases)
+[![توضیحات فارسی](https://img.shields.io/badge/%F0%9F%87%AE%F0%9F%87%B7%20%D8%AA%D9%88%D8%B6%DB%8C%D8%AD%D8%A7%D8%AA%20%D9%81%D8%A7%D8%B1%D8%B3%DB%8C-Persian%20README-059669?style=flat-square)](#فارسی)
 
 <br/>
+
+<p align="center">
+  <a href="#فارسی">
+    <img src="https://img.shields.io/badge/%F0%9F%93%96%20%D8%A8%D8%B1%D8%A7%DB%8C%20%D9%85%D8%B7%D8%A7%D9%84%D8%B9%D9%87%20%D8%AA%D9%88%D8%B6%DB%8C%D8%AD%D8%A7%D8%AA%20%D8%A8%D9%87%20%D8%B2%D8%A8%D8%A7%D9%86%20%D9%81%D8%A7%D8%B1%D8%B3%DB%8C%20%DA%A9%D9%84%DB%8C%DA%A9%20%DA%A9%D9%86%DB%8C%D8%AF-0091EA?style=for-the-badge" height="34" alt="توضیحات فارسی" />
+  </a>
+</p>
 
 ### 📥 Download
 
