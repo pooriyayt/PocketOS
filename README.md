@@ -11,7 +11,6 @@
 [![Privacy](https://img.shields.io/badge/Privacy-100%25%20Local--First-emerald.svg)](#privacy--security)
 [![VirusTotal](https://img.shields.io/badge/VirusTotal-Clean%20Scan-brightgreen.svg)](https://www.virustotal.com/gui/file/9d9bc3b53e5ede7282fa0f7468994b337e4dedd49ed47ec9402a8fa65406d37c/detection)
 [![Release](https://img.shields.io/github/v/release/pooriyayt/PocketOS?include_prereleases&color=emerald)](https://github.com/pooriyayt/PocketOS/releases)
-[![Language: Persian](https://img.shields.io/badge/%F0%9F%87%AE%F0%9F%87%B7%20Lang-Persian%20%2F%20%D9%81%D8%A7%D8%B1%D8%B3%DB%8C-059669)](#فارسی)
 
 <br/>
 
