@@ -1,5 +1,9 @@
 # PocketOS
 
+> [!IMPORTANT]
+> **Source-Available Software Notice**  
+> The source code of PocketOS is made publicly available strictly for transparency, open security auditing, and personal, non-commercial use. Unauthorized redistribution, commercialization, rebranding, or publishing compiled binaries (`.apk` / `.aab`) to any application marketplace (including Google Play, Myket, Cafe Bazaar, etc.) is strictly prohibited and legally enforced under the [LICENSE](LICENSE).
+
 <div align="center">
 
 **Your private, offline personal command center for daily finances, installments, reminders, and subscriptions.**
