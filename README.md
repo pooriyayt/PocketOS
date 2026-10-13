@@ -14,15 +14,15 @@
 
 <br/>
 
-### 📥 دانلود و دریافت / Download
+### 📥 Download
 
 <p align="center">
   <a href="https://myket.ir/app/app.pocketos">
-    <img src="https://img.shields.io/badge/دریافت_از_مایکت-Get_it_on_Myket-1877F2?style=for-the-badge&logo=android&logoColor=white" height="42" alt="دانلود از مایکت | Download on Myket" />
+    <img src="https://img.shields.io/badge/GET_IT_ON-MYKET-1877F2?style=for-the-badge&logo=android&logoColor=white" height="38" alt="Get it on Myket" />
   </a>
   &nbsp;&nbsp;
   <a href="https://github.com/pooriyayt/PocketOS/releases/tag/v1.4.1">
-    <img src="https://img.shields.io/badge/Get_it_on-GitHub-181717?style=for-the-badge&logo=github&logoColor=white" height="42" alt="دریافت از گیت‌هاب | Get it on GitHub" />
+    <img src="https://img.shields.io/badge/GET_IT_ON-GITHUB-181717?style=for-the-badge&logo=github&logoColor=white" height="38" alt="Get it on GitHub" />
   </a>
 </p>
 
