@@ -9,7 +9,7 @@
 [![Platform](https://img.shields.io/badge/Platform-Android%208.0%2B-brightgreen.svg)](https://developer.android.com)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 [![Privacy](https://img.shields.io/badge/Privacy-100%25%20Local--First-emerald.svg)](#privacy--security)
-[![VirusTotal](https://img.shields.io/badge/VirusTotal-Clean%20Scan-brightgreen.svg)](https://www.virustotal.com/gui/file/99fa9ae8e5eee97eb75a15a20f187df67e818e867b70f86f1f018e15174e7096?nocache=1)
+[![VirusTotal](https://img.shields.io/badge/VirusTotal-Clean%20Scan-brightgreen.svg)](https://www.virustotal.com/gui/file/9d9bc3b53e5ede7282fa0f7468994b337e4dedd49ed47ec9402a8fa65406d37c/detection)
 [![Release](https://img.shields.io/github/v/release/pooriyayt/PocketOS?include_prereleases&color=emerald)](https://github.com/pooriyayt/PocketOS/releases)
 
 <br/>
@@ -18,11 +18,17 @@
 
 <p align="center">
   <a href="https://myket.ir/app/app.pocketos">
-    <img src="https://img.shields.io/badge/GET_IT_ON-MYKET-1877F2?style=for-the-badge&logo=android&logoColor=white" height="38" alt="Get it on Myket" />
+    <img src="https://myket.ir/core/images/logo/get-en.svg" height="52" alt="Get it on Myket" />
   </a>
-  &nbsp;&nbsp;
-  <a href="https://github.com/pooriyayt/PocketOS/releases/tag/v1.5.0">
-    <img src="https://img.shields.io/badge/GET_IT_ON-GITHUB-181717?style=for-the-badge&logo=github&logoColor=white" height="38" alt="Get it on GitHub" />
+  &nbsp;&nbsp;&nbsp;&nbsp;
+  <a href="https://github.com/pooriyayt/PocketOS/releases/tag/v1.5.1">
+    <img src="docs/images/get-github.svg" height="52" alt="Get it on GitHub" />
+  </a>
+</p>
+
+<p align="center">
+  <a href="https://www.virustotal.com/gui/file/9d9bc3b53e5ede7282fa0f7468994b337e4dedd49ed47ec9402a8fa65406d37c/detection">
+    <img src="docs/images/virustotal-banner.svg" width="620" alt="VirusTotal Verified Clean" />
   </a>
 </p>
 
@@ -144,7 +150,7 @@ There are **no accounts**, **no cloud sync servers**, and **no third-party track
 
 #### 🛡️ امنیت و حریم خصوصی مطلق
 - **کاملاً آفلاین**: برنامه بدون نیاز به اینترنت عمل می‌کند.
-- **گزارش رسمی و پاک VirusTotal**: تمامی فایل‌های خروجی و نصبی پاکت او اس توسط ده‌ها آنتی‌ویروس معتبر اسکن شده و وضعیت کاملاً ایمن و پاک دارند ([مشاهده گزارش اسکن VirusTotal](https://www.virustotal.com/gui/file/99fa9ae8e5eee97eb75a15a20f187df67e818e867b70f86f1f018e15174e7096?nocache=1)).
+- **گزارش رسمی و پاک VirusTotal**: تمامی فایل‌های خروجی و نصبی پاکت او اس توسط ده‌ها آنتی‌ویروس معتبر اسکن شده و وضعیت کاملاً ایمن و پاک دارند ([مشاهده گزارش اسکن VirusTotal](https://www.virustotal.com/gui/file/9d9bc3b53e5ede7282fa0f7468994b337e4dedd49ed47ec9402a8fa65406d37c/detection)).
 - **رمزنگاری سرتاسری پایگاه داده**: استفاده از پایگاه داده امن SQLCipher با کلید مشتق‌شده از ماژول امنیتی دستگاه (Android Keystore).
 - **پشتیبان‌گیری رمزنگاری‌شده**: قابلیت تهیه فایل بکاپ با رمز عبور دلخواه به صورت فایل رمزگذاری‌شده با الگوریتم **AES-256-GCM** و **PBKDF2** (۱۰۰ هزار دور).
 
@@ -155,7 +161,7 @@ There are **no accounts**, **no cloud sync servers**, and **no third-party track
 > [!TIP]
 > **100% Clean & Verified Binary**: Every official PocketOS release is thoroughly inspected and verified against dozens of antivirus engines.
 > 
-> 🛡️ **[View Full VirusTotal Analysis Report (0 Detections)](https://www.virustotal.com/gui/file/99fa9ae8e5eee97eb75a15a20f187df67e818e867b70f86f1f018e15174e7096?nocache=1)**
+> 🛡️ **[View Full VirusTotal Analysis Report (0 Detections)](https://www.virustotal.com/gui/file/9d9bc3b53e5ede7282fa0f7468994b337e4dedd49ed47ec9402a8fa65406d37c/detection)**
 
 - **Zero Package Installer Permissions**: PocketOS requests NO package installation permissions (`REQUEST_INSTALL_PACKAGES`) across all builds. Updates are downloaded transparently through the user's browser to the Downloads folder, completely eliminating dropper alerts and Google Play Protect false-positives.
 - **Hardware-Protected Keys**: No plain-text passwords or secret keys exist in the application files.
