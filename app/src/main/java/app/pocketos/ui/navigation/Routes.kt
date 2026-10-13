@@ -18,6 +18,7 @@ object Routes {
     @Serializable data object Installments
     @Serializable data object Debts
     @Serializable data object Checks
+    @Serializable data object BillSplitter
     @Serializable data object Support
     @Serializable data object Calendar
     @Serializable data object Search

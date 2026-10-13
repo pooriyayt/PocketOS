@@ -454,6 +454,22 @@ fun AboutScreen(nav: NavController) {
             color = c.textSecondary,
         )
 
+        val devWebsiteUrl = stringResource(R.string.developer_website_url)
+        val devName = stringResource(R.string.developer_name)
+
+        SettingsGroup(stringResource(R.string.about_developer_title)) {
+            SettingsRow(
+                icon = Icons.Rounded.Security,
+                title = devName,
+                subtitle = stringResource(R.string.developer_website),
+                onClick = {
+                    container.appLock.allowExternalActivity()
+                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse(devWebsiteUrl))
+                    runCatching { context.startActivity(intent) }
+                },
+            )
+        }
+
         SettingsGroup(stringResource(R.string.updates_and_source)) {
             if (app.pocketos.BuildConfig.SELF_UPDATE) {
                 SettingsRow(

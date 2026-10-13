@@ -566,6 +566,7 @@ private fun QuickActions(nav: NavController) {
         QuickAction(Icons.Rounded.EventRepeat, R.string.qa_installment, t.blue) { nav.navigate(Routes.Installments) },
         QuickAction(Icons.Rounded.AccountBalance, R.string.qa_check, t.cyan) { nav.navigate(Routes.Checks) },
         QuickAction(Icons.Rounded.Handshake, R.string.qa_debt, t.orange) { nav.navigate(Routes.Debts) },
+        QuickAction(Icons.Rounded.AutoAwesome, R.string.split_bills_title, t.green) { nav.navigate(Routes.BillSplitter) },
         QuickAction(Icons.Rounded.NotificationsActive, R.string.qa_reminder, t.amber) { nav.navigate(Routes.ReminderEditor()) },
         QuickAction(Icons.Rounded.Autorenew, R.string.qa_subscription, t.violet) { nav.navigate(Routes.SubscriptionEditor()) },
         QuickAction(Icons.Rounded.TaskAlt, R.string.qa_task, t.blue) { nav.navigate(Routes.ReminderEditor(kind = "task")) },

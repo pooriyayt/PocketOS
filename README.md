@@ -21,7 +21,7 @@
     <img src="https://img.shields.io/badge/GET_IT_ON-MYKET-1877F2?style=for-the-badge&logo=android&logoColor=white" height="38" alt="Get it on Myket" />
   </a>
   &nbsp;&nbsp;
-  <a href="https://github.com/pooriyayt/PocketOS/releases/tag/v1.4.1">
+  <a href="https://github.com/pooriyayt/PocketOS/releases/tag/v1.5.0">
     <img src="https://img.shields.io/badge/GET_IT_ON-GITHUB-181717?style=for-the-badge&logo=github&logoColor=white" height="38" alt="Get it on GitHub" />
   </a>
 </p>

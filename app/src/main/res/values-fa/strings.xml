@@ -738,7 +738,12 @@
     <string name="export_done">خروجی ذخیره شد</string>
     <string name="erase_local_footer">پاک کردن، یادآورها و اشتراک‌ها را برای همیشه از این دستگاه حذف می‌کند.</string>
 
-    <string name="about_body">PocketOS یادآورها، کارها و اشتراک‌ها را در یک جای خصوصی نگه می‌دارد. بدون اینترنت کار می‌کند، فقط اگر بخواهید همگام می‌شود و هرگز داده‌های شما را نمی‌فروشد.</string>
+    <string name="about_body">PocketOS امور مالی شخصی، اقساط، چک‌ها، طلب و بدهی‌ها، و اشتراک‌های شما را در محیطی امن و کاملاً خصوصی نگه می‌دارد. این برنامه ۱۰۰٪ آفلاین عمل کرده و هرگز داده‌های شما را نمی‌فروشد.</string>
+    <string name="about_developer_title">توسعه‌دهنده و سازنده</string>
+    <string name="developer_name">پوریا پرنیان</string>
+    <string name="developer_website">وب‌سایت شخصی</string>
+    <string name="developer_website_url" translatable="false">https://pouriyaparniyan.ir/fa/</string>
+    <string name="quick_add_tile">ثبت سریع پاکت او اس</string>
     <string name="legal">حقوقی</string>
     <string name="brand_icons">نمادهای برندها</string>
     <string name="brand_icons_notice">از Simple Icons نسخهٔ %1$s (CC0). نام و نشان برندها متعلق به صاحبانشان است و فقط برای شناسایی سرویس‌ها استفاده می‌شود.</string>
@@ -1153,4 +1158,30 @@
     <string name="enter_amount">مبلغ را وارد کنید</string>
     <string name="example_expense">۱۵۰ تومن ساندویچ</string>
     <string name="example_income">حقوق ۲۵ میلیون تومان</string>
+
+    <!-- پیش‌بینی جریان نقدینگی و کسری حساب -->
+    <string name="cash_flow_forecast_title">پیش‌بینی جریان نقدینگی ۳۰ روزه</string>
+    <string name="cash_flow_required_label">کل تعهدات پرداختی پیش‌رو</string>
+    <string name="shortfall_alert_title">هشدار کسری موجودی حساب</string>
+    <string name="shortfall_alert_desc">کسری %1$s در %2$s برای «%3$s» (%4$d روز تا سررسید)</string>
+    <string name="cash_flow_empty">تعهد پرداختی فعالی در ۳۰ روز آینده وجود ندارد.</string>
+    <string name="cash_flow_commitments_count">%1$d پرداخت در راه</string>
+
+    <!-- محاسبه دنگ و تقسیم هزینه -->
+    <string name="split_bills_title">محاسبه دنگ و سفر</string>
+    <string name="split_bills_subtitle">سهم‌بندی مخارج سفر و دورهمی با تسویه‌حساب خودکار</string>
+    <string name="split_members_header">افراد حاضر</string>
+    <string name="split_add_member">افزودن شخص</string>
+    <string name="split_member_name_hint">نام (مثلاً علی)</string>
+    <string name="split_expenses_header">خرج‌های انجام‌شده</string>
+    <string name="split_add_expense">ثبت هزینه جدید</string>
+    <string name="split_expense_title_hint">عنوان (مثلاً شام، بنزین)</string>
+    <string name="split_paid_by">چه کسی پرداخت کرد؟</string>
+    <string name="split_for_whom">تقسیم بین چه کسانی؟</string>
+    <string name="split_settlement_header">ساده‌ترین روش تسویه‌حساب</string>
+    <string name="split_owes_text">%1$s مبلغ %2$s به %3$s بپردازد</string>
+    <string name="split_record_to_debt">ثبت در طلب و بدهی</string>
+    <string name="split_all_settled">تمام حساب‌ها تسویه و برابر هستند!</string>
+    <string name="split_empty_desc">افراد و هزینه‌ها را اضافه کنید تا فرمول تسویه دنگ‌ها محاسبه شود.</string>
+    <string name="split_added_to_debts">در بخش طلب و بدهی‌ها ثبت شد</string>
 </resources>

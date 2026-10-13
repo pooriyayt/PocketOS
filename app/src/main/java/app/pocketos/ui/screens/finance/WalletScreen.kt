@@ -140,6 +140,7 @@ fun WalletScreen(nav: NavController) {
     val plans by container.finance.installments.collectAsState(initial = emptyList())
     val debts by container.finance.debts.collectAsState(initial = emptyList())
     val checks by container.finance.checks.collectAsState(initial = emptyList())
+    val subscriptions by container.subscriptions.subscriptions.collectAsState(initial = emptyList())
     WalletContent(
         wallets = wallets,
         transactions = transactions,
@@ -149,6 +150,8 @@ fun WalletScreen(nav: NavController) {
         onInstallments = { nav.navigate(Routes.Installments) },
         onDebts = { nav.navigate(Routes.Debts) },
         onChecks = { nav.navigate(Routes.Checks) },
+        onSplit = { nav.navigate(Routes.BillSplitter) },
+        subscriptions = subscriptions,
         defaultCurrency = settings.defaultCurrency,
         today = container.clock.today(),
         onSettings = { nav.navigate(Routes.Settings) },
@@ -182,9 +185,11 @@ internal fun WalletContent(
     installments: List<app.pocketos.domain.finance.InstallmentPlan>,
     debts: List<app.pocketos.domain.finance.Debt>,
     checks: List<app.pocketos.domain.finance.CheckItem>,
+    subscriptions: List<app.pocketos.domain.model.Subscription> = emptyList(),
     onInstallments: () -> Unit,
     onDebts: () -> Unit,
     onChecks: () -> Unit,
+    onSplit: () -> Unit,
     defaultCurrency: String,
     today: LocalDate,
     onSettings: () -> Unit,
@@ -274,6 +279,95 @@ internal fun WalletContent(
             }
         }
 
+        // ---- Cash Flow Forecast & Shortfall Alerts
+        item(key = "cash_flow") {
+            val forecast = remember(allWallets, txs, installments, checks, debts, subscriptions, today) {
+                app.pocketos.domain.finance.CashFlowCalculator.forecast(
+                    today = today,
+                    windowDays = 30,
+                    wallets = allWallets,
+                    transactions = txs,
+                    installments = installments,
+                    checks = checks,
+                    debts = debts,
+                    subscriptions = subscriptions,
+                )
+            }
+
+            Column(Modifier.fillMaxWidth().padding(top = Spacing.md).appear(1)) {
+                // Shortfall Alerts (Critical Warning)
+                forecast.shortfallAlerts.forEach { alert ->
+                    GlassCard(
+                        Modifier.fillMaxWidth().padding(bottom = Spacing.xs),
+                        level = GlassLevel.L2,
+                    ) {
+                        Row(
+                            Modifier.fillMaxWidth().padding(Spacing.md),
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            ToneIcon(Icons.Rounded.North, c.danger)
+                            Spacer(Modifier.width(Spacing.md))
+                            Column(Modifier.weight(1f)) {
+                                Text(
+                                    stringResource(R.string.shortfall_alert_title),
+                                    style = MaterialTheme.typography.labelMedium,
+                                    fontWeight = FontWeight.Bold,
+                                    color = c.danger,
+                                )
+                                Text(
+                                    stringResource(
+                                        R.string.shortfall_alert_desc,
+                                        f.money(alert.shortfallMinor, alert.currency, compact = true),
+                                        alert.walletName,
+                                        alert.commitmentTitle,
+                                        alert.daysRemaining,
+                                    ),
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = c.textPrimary,
+                                )
+                            }
+                        }
+                    }
+                }
+
+                // 30-Day Commitment Forecast Card
+                val upcomingTotal = forecast.totalRequiredByCurrency[primaryCurrency] ?: 0L
+                if (forecast.commitments.isNotEmpty()) {
+                    GlassCard(
+                        Modifier.fillMaxWidth().padding(top = Spacing.xs),
+                        level = GlassLevel.L2,
+                    ) {
+                        Row(
+                            Modifier.fillMaxWidth().padding(Spacing.md),
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            ToneIcon(Icons.Rounded.Payments, c.tones.amber)
+                            Spacer(Modifier.width(Spacing.md))
+                            Column(Modifier.weight(1f)) {
+                                Text(
+                                    stringResource(R.string.cash_flow_forecast_title),
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    fontWeight = FontWeight.SemiBold,
+                                    color = c.textPrimary,
+                                )
+                                Text(
+                                    stringResource(R.string.cash_flow_commitments_count, forecast.commitments.size),
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = c.textSecondary,
+                                )
+                            }
+                            Text(
+                                f.money(upcomingTotal, primaryCurrency, compact = true),
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Bold,
+                                color = c.tones.amber,
+                            )
+                        }
+                    }
+                }
+            }
+        }
+
         // ---- Obligations (Installments, Checks, Debts)
         item(key = "obligations") {
             val remainingInstallments = app.pocketos.domain.finance.ObligationCalculator.remainingByCurrency(installments)[primaryCurrency] ?: 0L
@@ -317,6 +411,39 @@ internal fun WalletContent(
                         extraInfo = if (openDebts.isNotEmpty()) "${f.localizeDigits(openDebts.size.toString())} " + stringResource(R.string.open_items) else null,
                         onClick = onDebts,
                     )
+                }
+                Spacer(Modifier.height(Spacing.sm))
+                // Quick Bill Splitter trigger
+                GlassCard(
+                    Modifier.fillMaxWidth(),
+                    level = GlassLevel.L2,
+                    onClick = onSplit,
+                ) {
+                    Row(
+                        Modifier.fillMaxWidth().padding(horizontal = Spacing.md, vertical = Spacing.sm),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        ToneIcon(Icons.Rounded.SwapHoriz, c.tones.green)
+                        Spacer(Modifier.width(Spacing.md))
+                        Column(Modifier.weight(1f)) {
+                            Text(
+                                stringResource(R.string.split_bills_title),
+                                style = MaterialTheme.typography.bodyLarge,
+                                fontWeight = FontWeight.SemiBold,
+                                color = c.textPrimary,
+                            )
+                            Text(
+                                stringResource(R.string.split_bills_subtitle),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = c.textSecondary,
+                            )
+                        }
+                        Icon(
+                            Icons.AutoMirrored.Rounded.KeyboardArrowRight,
+                            contentDescription = null,
+                            tint = c.textTertiary,
+                        )
+                    }
                 }
             }
         }

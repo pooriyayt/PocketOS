@@ -758,7 +758,12 @@
     <string name="export_done">Export saved</string>
     <string name="erase_local_footer">Erasing removes reminders and subscriptions from this device permanently.</string>
 
-    <string name="about_body">PocketOS keeps reminders, tasks and subscriptions in one private place. It works offline, syncs only if you choose, and never sells your data.</string>
+    <string name="about_body">PocketOS keeps your personal finances, installments, checks, debts, and subscriptions in one calm, private place. It works 100% offline and never sells your data.</string>
+    <string name="about_developer_title">Creator &amp; Developer</string>
+    <string name="developer_name">Pouriya Parniyan</string>
+    <string name="developer_website">Website</string>
+    <string name="developer_website_url" translatable="false">https://pouriyaparniyan.ir/</string>
+    <string name="quick_add_tile">PocketOS Quick Add</string>
     <string name="legal">Legal</string>
     <string name="brand_icons">Brand icons</string>
     <string name="brand_icons_notice">From Simple Icons %1$s (CC0). Brand names and logos belong to their owners and are used only to identify services.</string>
@@ -1181,4 +1186,30 @@
     <string name="enter_amount">Add an amount</string>
     <string name="example_expense">Lunch 12 dollars</string>
     <string name="example_income">Salary 3000 dollars</string>
+
+    <!-- Cash Flow Forecast -->
+    <string name="cash_flow_forecast_title">30-Day Cash Flow Forecast</string>
+    <string name="cash_flow_required_label">Total upcoming commitments</string>
+    <string name="shortfall_alert_title">Account Shortfall Alert</string>
+    <string name="shortfall_alert_desc">Needs %1$s in %2$s for \"%3$s\" (%4$d days left)</string>
+    <string name="cash_flow_empty">No upcoming payment commitments in the next 30 days.</string>
+    <string name="cash_flow_commitments_count">%1$d upcoming payments</string>
+
+    <!-- Bill / Dong Splitter -->
+    <string name="split_bills_title">Bill Splitter</string>
+    <string name="split_bills_subtitle">Split group trip &amp; dining expenses with smart debt settlement</string>
+    <string name="split_members_header">Members</string>
+    <string name="split_add_member">Add person</string>
+    <string name="split_member_name_hint">Name (e.g. Alex)</string>
+    <string name="split_expenses_header">Expenses</string>
+    <string name="split_add_expense">Add expense</string>
+    <string name="split_expense_title_hint">Title (e.g. Dinner, Taxi)</string>
+    <string name="split_paid_by">Paid by</string>
+    <string name="split_for_whom">Split among</string>
+    <string name="split_settlement_header">Optimal Settlement</string>
+    <string name="split_owes_text">%1$s pays %2$s to %3$s</string>
+    <string name="split_record_to_debt">Record in Debts</string>
+    <string name="split_all_settled">All balances are settled!</string>
+    <string name="split_empty_desc">Add members and their shared expenses to see the simplified settlement.</string>
+    <string name="split_added_to_debts">Recorded in your Debts &amp; Receivables</string>
 </resources>
