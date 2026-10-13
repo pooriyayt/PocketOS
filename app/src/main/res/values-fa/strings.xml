@@ -1081,7 +1081,7 @@
     <string name="support_donate_btn">حمایت در Daramet.com</string>
     <string name="thanks_dialog_title">دمت گرم، خیلی متشکریم! ❤️</string>
     <string name="thanks_dialog_body">مشاهده این تبلیغ کمک بزرگی به ما برای زنده نگه داشتن و توسعه امکانات جدید PocketOS است. از همراهی و حمایتت بی‌نهایت سپاسگزاریم!</string>
-    <string name="thanks_dialog_dismiss">عزیزی، وظیفه بود!</string>
+    <string name="thanks_dialog_dismiss">خوشحالم که کمک کردم</string>
     <string name="checks_title">مدیریت چک‌ها</string>
     <string name="tab_checks">چک‌ها</string>
     <string name="checks_summary_title">چک‌های سررسید نزدیک</string>
@@ -1182,6 +1182,18 @@
     <string name="split_owes_text">%1$s مبلغ %2$s به %3$s بپردازد</string>
     <string name="split_record_to_debt">ثبت در طلب و بدهی</string>
     <string name="split_all_settled">تمام حساب‌ها تسویه و برابر هستند!</string>
-    <string name="split_empty_desc">افراد و هزینه‌ها را اضافه کنید تا فرمول تسویه دنگ‌ها محاسبه شود.</string>
+    <string name="split_member_me">من (شما)</string>
+    <string name="split_delete_member">حذف شخص</string>
+    <string name="split_delete_member_confirm">آیا از حذف «%1$s» مطمئن هستید؟ هزینه‌های ثبت‌شده مربوط به این شخص نیز حذف خواهند شد.</string>
+    <string name="split_at_least_two_members">حداقل دو نفر برای محاسبه دنگ نیاز است</string>
+    <string name="split_clear_all">پاک‌کردن کل لیست</string>
+    <string name="split_clear_confirm">آیا مطمئن هستید؟ تمام افراد و هزینه‌های این دنگ پاک خواهند شد و می‌توانید از نو شروع کنید.</string>
+    <string name="split_need_two_members_tip">برای محاسبه دنگ، حداقل یک نفر دیگر از همسفران را اضافه کنید.</string>
+    <string name="split_no_expenses_tip">هنوز هزینه‌ای ثبت نشده است. هزینه‌های گروه را اضافه کنید تا دنگ‌ها محاسبه شوند.</string>
+    <string name="split_select_all">انتخاب همه</string>
+    <string name="split_clear_selection">لغو همه</string>
+    <string name="split_settlement_transfers">%1$s انتقال برای تسویه کامل</string>
+    <string name="split_expense_payer_and_count">پرداخت توسط %1$s • سهم %2$s نفر</string>
+    <string name="split_all_balances_zero">هیچ فردی به دیگری بدهکار نیست</string>
     <string name="split_added_to_debts">در بخش طلب و بدهی‌ها ثبت شد</string>
 </resources>

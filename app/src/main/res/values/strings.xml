@@ -1210,6 +1210,18 @@
     <string name="split_owes_text">%1$s pays %2$s to %3$s</string>
     <string name="split_record_to_debt">Record in Debts</string>
     <string name="split_all_settled">All balances are settled!</string>
-    <string name="split_empty_desc">Add members and their shared expenses to see the simplified settlement.</string>
+    <string name="split_member_me">You</string>
+    <string name="split_delete_member">Remove person</string>
+    <string name="split_delete_member_confirm">Are you sure you want to remove %1$s? Any expenses associated with this person will also be removed.</string>
+    <string name="split_at_least_two_members">Add at least two people to split expenses</string>
+    <string name="split_clear_all">Clear all</string>
+    <string name="split_clear_confirm">Are you sure you want to clear all members and expenses?</string>
+    <string name="split_need_two_members_tip">Add at least one more companion to calculate shared expenses.</string>
+    <string name="split_no_expenses_tip">No expenses logged yet. Add your group expenses to see the settlement calculation.</string>
+    <string name="split_select_all">Select all</string>
+    <string name="split_clear_selection">Deselect all</string>
+    <string name="split_settlement_transfers">%1$s transfers to settle all balances</string>
+    <string name="split_expense_payer_and_count">Paid by %1$s • %2$s shares</string>
+    <string name="split_all_balances_zero">No outstanding balances</string>
     <string name="split_added_to_debts">Recorded in your Debts &amp; Receivables</string>
 </resources>

@@ -15,6 +15,7 @@ import app.pocketos.data.backup.BackupManager
 import app.pocketos.data.local.DatabaseManager
 import app.pocketos.data.prefs.AppSettings
 import app.pocketos.data.prefs.SettingsRepository
+import app.pocketos.data.repository.BillSplitterRepository
 import app.pocketos.data.repository.CatalogRepository
 import app.pocketos.data.repository.CategoryRepository
 import app.pocketos.data.repository.FinanceRepository
@@ -72,6 +73,7 @@ class AppContainer(val app: Application) {
     val categories = CategoryRepository(databases, clock, effects)
     val finance = FinanceRepository(databases, clock, effects)
     val catalog = CatalogRepository(app)
+    val billSplitter = BillSplitterRepository(app, scope)
     val backupManager = BackupManager(databases, clock)
     val updateManager = AppUpdateManager(app, scope)
     val ads = AdsManager(app)
