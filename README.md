@@ -10,14 +10,13 @@
 
 *100% Local-First. Zero Cloud Tracking. Hardware-Backed Encryption.*
 
-[![Developer](https://img.shields.io/badge/Developer-Pouriya%20Parniyan-blue?logo=googlechrome&logoColor=white)](https://pouriyaparniyan.ir)
-[![Website](https://img.shields.io/badge/Website-pouriyaparniyan.ir-4A90E2?style=flat&logo=safari&logoColor=white)](https://pouriyaparniyan.ir)
 [![Platform](https://img.shields.io/badge/Platform-Android%208.0%2B-brightgreen.svg)](https://developer.android.com)
 [![License](https://img.shields.io/badge/License-POSAL%20v1.0-orange.svg)](LICENSE)
 [![Security Policy](https://img.shields.io/badge/Security-Hardware--Backed-blue.svg?logo=shield)](SECURITY.md)
 [![Privacy](https://img.shields.io/badge/Privacy-100%25%20Local--First-emerald.svg)](SECURITY.md)
 [![VirusTotal](https://img.shields.io/badge/VirusTotal-Clean%20Scan-brightgreen.svg)](https://www.virustotal.com/gui/file/9d9bc3b53e5ede7282fa0f7468994b337e4dedd49ed47ec9402a8fa65406d37c/detection)
 [![Release](https://img.shields.io/github/v/release/pooriyayt/PocketOS?include_prereleases&color=emerald)](https://github.com/pooriyayt/PocketOS/releases)
+[![Website](https://img.shields.io/badge/Website-pouriyaparniyan.ir-10b981?style=flat&logo=firefoxbrowser&logoColor=white)](https://pouriyaparniyan.ir)
 
 <br/>
 
@@ -250,3 +249,11 @@ The source code is published solely for security auditing and private evaluation
 Publishing builds (APK/AAB) to app stores, rebranding, and commercial redistribution
 are strictly prohibited. See the LICENSE file for full legal terms.
 ```
+
+---
+
+<div align="center">
+
+**Made with 💚&🍵 by [Pouriya Parniyan](https://pouriyaparniyan.ir)**
+
+</div>
