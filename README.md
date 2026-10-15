@@ -10,6 +10,8 @@
 
 *100% Local-First. Zero Cloud Tracking. Hardware-Backed Encryption.*
 
+[![Developer](https://img.shields.io/badge/Developer-Pouriya%20Parniyan-blue?logo=googlechrome&logoColor=white)](https://pouriyaparniyan.ir)
+[![Website](https://img.shields.io/badge/Website-pouriyaparniyan.ir-4A90E2?style=flat&logo=safari&logoColor=white)](https://pouriyaparniyan.ir)
 [![Platform](https://img.shields.io/badge/Platform-Android%208.0%2B-brightgreen.svg)](https://developer.android.com)
 [![License](https://img.shields.io/badge/License-POSAL%20v1.0-orange.svg)](LICENSE)
 [![Security Policy](https://img.shields.io/badge/Security-Hardware--Backed-blue.svg?logo=shield)](SECURITY.md)
