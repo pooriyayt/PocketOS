@@ -29,7 +29,7 @@
 ### 📥 Download
 
 <p align="center">
-  <a href="https://cafebazaar.ir/app/app.pocketos" style="text-decoration:none;"><img src="docs/images/get-cafebazaar.png" height="52" alt="Get it on CafeBazaar" style="vertical-align:middle;margin:0 8px;" /></a><a href="https://myket.ir/app/app.pocketos" style="text-decoration:none;"><img src="https://myket.ir/core/images/logo/get-en.svg" height="52" alt="Get it on Myket" style="vertical-align:middle;margin:0 8px;" /></a><a href="https://github.com/pooriyayt/PocketOS/releases/tag/v1.5.1" style="text-decoration:none;"><img src="docs/images/get-github.svg" height="52" alt="Get it on GitHub" style="vertical-align:middle;margin:0 8px;" /></a>
+  <a href="https://cafebazaar.ir/app/app.pocketos" style="text-decoration:none;"><img src="docs/images/get-bazaar.svg" height="52" alt="Get it on CafeBazaar" style="vertical-align:middle;margin:0 8px;" /></a><a href="https://myket.ir/app/app.pocketos" style="text-decoration:none;"><img src="https://myket.ir/core/images/logo/get-en.svg" height="52" alt="Get it on Myket" style="vertical-align:middle;margin:0 8px;" /></a><a href="https://github.com/pooriyayt/PocketOS/releases/tag/v1.5.1" style="text-decoration:none;"><img src="docs/images/get-github.svg" height="52" alt="Get it on GitHub" style="vertical-align:middle;margin:0 8px;" /></a>
 </p>
 
 <p align="center">
